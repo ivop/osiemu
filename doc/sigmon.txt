@@ -1,0 +1,14 @@
+ROM by Steve Gray
+
+The "O.S.I. Superboard-II Rev.D Colour Project"
+
+
+Firmware Support
+
+Hardware is not very useful without proper software. I have taken the popular CEGMON ROM source code and added extra commenting, more labels and extra customization. I have removed the Disk Bootstrap option and added additional Control codes to support the colour board. The following is added:
+
+    CTRL-R - Switch to RGB colour mode
+    CTRL-V - Switch to Video (mono) mode
+    CTRL-N - Switch to Narrow characters (48 column)
+    CTRL-W - Switch to Wide character (24 column)
+    CTRL-U - Clear coloUr screen. Poke $D400 with the colour

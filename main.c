@@ -354,7 +354,6 @@ int main(int argc, char **argv) {
     }
 
     ticks_per_frame = cpu_clock / fps;
-    double sdl_ticks_per_frame = 1000 / fps;
 
     printf("screen width: %d\nscreen height: %d\n", osi_width, osi_height);
     printf("cpu clock: %d Hz\n", cpu_clock);
@@ -388,6 +387,9 @@ int main(int argc, char **argv) {
     winsurface = SDL_GetWindowSurface(window);
     screen = empty_surface(window, screen_width, screen_height);
 
+    // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
+
+    double sdl_ticks_per_frame = 1000.0 / fps;
     double target = SDL_GetTicks();
     double cpu_ticks = 0.0;
     double cpu_target = cpu_ticks + ticks_per_frame;
@@ -396,7 +398,8 @@ int main(int argc, char **argv) {
         target += sdl_ticks_per_frame;
 
         blit_screenmem(screen, font);
-        SDL_Rect fillrect = { 0, 0, stretchx * zoom * screen_width, stretchy * zoom * screen_height };
+        SDL_Rect fillrect = { 0, 0, stretchx * zoom * screen_width,
+                                    stretchy * zoom * screen_height };
         SDL_BlitScaled(screen, 0, winsurface, &fillrect);
         SDL_UpdateWindowSurface(window);
 

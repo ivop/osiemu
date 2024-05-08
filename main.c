@@ -157,6 +157,8 @@ static void keyboard_press_key(SDL_Keysym *key) {
 
 //    printf("\tfound row %d col %d\n", row, col);
 
+    keyboard_init();
+
     keyboard_osi_matrix[row] ^= 1 << col;
 
     if (key->mod == KMOD_CAPS)

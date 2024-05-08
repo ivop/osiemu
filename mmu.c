@@ -24,9 +24,10 @@ uint8_t RAM[0xc000];         // Maximum of 48kB RAM
 uint8_t BASIC[0x2000];       // 8kB BASIC ROM
 uint8_t KERNEL[0x1000];      // 4kB Kernel ROM
 
-bool basic_enabled = true;
-uint16_t ram_top = 0x9fff;
-uint16_t kernel_bottom;
+bool mmu_basic_enabled = true;
+uint16_t mmu_ram_top = 0x9fff;
+
+static uint16_t kernel_bottom;
 
 // ----------------------------------------------------------------------------
 
@@ -68,10 +69,10 @@ uint16_t kernel_bottom;
 // ----------------------------------------------------------------------------
 
 uint8_t read6502(uint16_t address) {
-    if (address < ram_top) {
+    if (address < mmu_ram_top) {
         return RAM[address];
     }
-    if (basic_enabled) {
+    if (mmu_basic_enabled) {
         if (address >= 0xa000 && address <= 0xbfff) {
             return BASIC[address - 0xa000];
         }
@@ -97,7 +98,7 @@ uint8_t read6502(uint16_t address) {
 }
 
 void write6502(uint16_t address, uint8_t value) {
-    if (address < ram_top) {
+    if (address < mmu_ram_top) {
         RAM[address] = value;
     }
     if (video_enabled) {
@@ -121,7 +122,7 @@ void write6502(uint16_t address, uint8_t value) {
 // of the buffer.
 // Return false if file I/O failed.
 //
-bool load_file(uint8_t *buf, int size, char *filename, bool iskernel) {
+bool mmu_load_file(uint8_t *buf, int size, char *filename, bool iskernel) {
     printf("loading %s\n", filename);
     FILE *f = fopen(filename, "rb");
     if (!f) {

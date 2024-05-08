@@ -1,11 +1,19 @@
-CC ?= cc
+CC ?= gcc
 FAKE6502 = fake6502/fake6502.c
-SDL = $$(pkg-config --cflags --libs sdl2 SDL2_image)
+CFLAGS = -flto -O3 $$(pkg-config --cflags sdl2 SDL2_image)
+LFLAGS = -flto
+LIBS = $$(pkg-config --libs sdl2 SDL2_image)
 
 all: osiemu
 
-osiemu: main.c mmu.c keyboard.c video.c
-	$(CC) -flto -march=native -O3 -o $@ $^ $(FAKE6502) $(SDL)
+osiemu: main.o mmu.o keyboard.o video.o fake6502/fake6502.o
+	$(CC) $(LFLAGS) -o $@ $^ $(LIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+strip: osiemu
+	strip osiemu
 
 clean:
-	rm -f *~ osiemu
+	rm -f *~ osiemu *.o fake6502/*.o

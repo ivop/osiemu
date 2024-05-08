@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
             kernel_filename = strdup(optarg);
             break;
         case 'd':
-            basic_enabled = false;
-            ram_top = 0xbfff;
+            mmu_basic_enabled = false;
+            mmu_ram_top = 0xbfff;
             break;
         case 'v':
             video_enabled = false;
@@ -126,11 +126,11 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    if (basic_enabled) {
-        if (!load_file(BASIC, 8192, basic_filename, false))
+    if (mmu_basic_enabled) {
+        if (!mmu_load_file(BASIC, 8192, basic_filename, false))
             return 1;
     }
-    if (!load_file(KERNEL, 4096, kernel_filename, true)) {
+    if (!mmu_load_file(KERNEL, 4096, kernel_filename, true)) {
         return 1;
     }
 

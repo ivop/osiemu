@@ -6,9 +6,7 @@ extern uint8_t SCREEN[0x0800];
 extern uint8_t COLOR[0x0800];
 extern uint8_t KERNEL[0x1000];
 
-extern uint16_t ram_top;
-extern uint16_t kernel_bottom;
+extern uint16_t mmu_ram_top;
+extern bool mmu_basic_enabled;
 
-extern bool basic_enabled;
-
-bool load_file(uint8_t *buf, int size, char *filename, bool iskernel);
+bool mmu_load_file(uint8_t *buf, int size, char *filename, bool iskernel);

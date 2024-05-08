@@ -50,7 +50,7 @@ static void usage(void) {
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
 "\n"
 "    -m/--video-mode mode       select mode: 64x32 (default), 64x16, or 32x32\n"
-"    -i/--invert-keyboard       inverted keyboard matrix signals\n"
+"    -i/--invert-keyboard       invert keyboard matrix signals\n"
 "\n"
 "    -h/--help                  show usage information\n"
 );
@@ -59,20 +59,21 @@ static void usage(void) {
 // ----------------------------------------------------------------------------
 
 static struct option long_options[] = {
-    { "help",           no_argument,        0, 'h' },
     { "basic",          required_argument,  0, 'b' },
-    { "font",           required_argument,  0, 'f' },
-    { "kernel",         required_argument,  0, 'k' },
     { "disable-basic",  no_argument,        0, 'd' },
+    { "font",           required_argument,  0, 'f' },
+    { "help",           no_argument,        0, 'h' },
+    { "invert-keyboard",no_argument,        0, 'i' },
+    { "kernel",         required_argument,  0, 'k' },
+    { "video-mode",     required_argument,  0, 'm' },
     { "disable-video",  no_argument,        0, 'v' },
     { "zoom",           no_argument,        0, 'z' },
-    { "video-mode",     required_argument,  0, 'm' },
 };
 
 int main(int argc, char **argv) {
     int option, index;
 
-    while ((option = getopt_long(argc, argv, "hb:k:f:",
+    while ((option = getopt_long(argc, argv, "b:df:hik:m:vz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -114,6 +115,9 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;
             }
+            break;
+        case 'i':
+            keyboard_inverted ^= 1;
             break;
         case 'h':
             usage();

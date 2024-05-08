@@ -1,9 +1,21 @@
 #pragma once
 struct acia {
-    // callbacks
+    // Callback functions
     //
-    int (*input)(void);                 // return -1 on EOF, or value [0..]
-    int (*output)(uint8_t byte);        // return -1 on overun, 0 OK
+    // int input()
+    //      return values:
+    //      -1      EOF
+    //      0-255   input value
+    //      set bit 8 if a value was missed
+    //
+    int (*input)(void);
+    //
+    // int output(uint8_t byte)
+    //      return values:
+    //      -1      last byte was not sent yet
+    //      0       OK
+    //
+    int (*output)(uint8_t byte);
  
     // internal
     //

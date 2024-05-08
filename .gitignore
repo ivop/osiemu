@@ -1,1 +1,4 @@
 *~
+*.o
+fake6502/*.o
+osiemu

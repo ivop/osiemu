@@ -123,6 +123,72 @@ static double ticks_per_frame;
 
 // ----------------------------------------------------------------------------
 
+// matrix[row][col]
+static uint8_t keyboard_matrix[8][8] = {
+{ 0, /*rshift*/ 0, /*lshift*/ 0, 0, 0, SDLK_ESCAPE, /*ctrl*/ 0, /*rpt*/ 0 },
+{ 0, SDLK_p, SDLK_SEMICOLON, SDLK_SLASH, SDLK_SPACE, SDLK_z, SDLK_a, SDLK_q },
+{ 0, SDLK_COMMA, SDLK_m, SDLK_n, SDLK_b, SDLK_v, SDLK_c, SDLK_x },
+{ 0, SDLK_k, SDLK_j, SDLK_h, SDLK_g, SDLK_f, SDLK_d, SDLK_s },
+{ 0, SDLK_i, SDLK_u, SDLK_y, SDLK_t, SDLK_r, SDLK_e, SDLK_w },
+{ 0, 0, 0, SDLK_RETURN, /* LF */ 0, SDLK_o, SDLK_l, SDLK_PERIOD },
+{ 0, 0, SDLK_BACKSPACE, SDLK_MINUS, SDLK_COLON, SDLK_0, SDLK_9, SDLK_8 },
+{ 0, SDLK_7, SDLK_6, SDLK_5, SDLK_4, SDLK_3, SDLK_2, SDLK_1 }
+};
+
+static uint8_t keyboard_osi_matrix[8];
+static uint8_t keyboard_osi_row;
+static bool keyboard_inverted = true;
+
+static void keyboard_init(void) {
+    memset(keyboard_osi_matrix, keyboard_inverted ? 0xff : 0, 8);
+}
+
+static void keyboard_press_key(SDL_Keysym *key) {
+    int i, row, col;
+
+    if (key->sym > 127 || !key->sym) return;
+
+    for (i = 0; i < 64; i++) {
+        row = i / 8;
+        col = i % 8;
+        if (keyboard_matrix[row][col] == key->sym) break;
+    }
+    if (i == 64) return;    // not found
+
+//    printf("\tfound row %d col %d\n", row, col);
+
+    keyboard_osi_matrix[row] ^= 1 << col;
+
+    if (key->mod == KMOD_CAPS)
+        keyboard_osi_matrix[0] ^= 1 << 0;
+    if (key->mod == KMOD_LSHIFT)
+        keyboard_osi_matrix[0] ^= 1 << 2;
+    if (key->mod == KMOD_RSHIFT)
+        keyboard_osi_matrix[0] ^= 1 << 1;
+    if (key->mod == KMOD_LCTRL || key->mod == KMOD_RCTRL)
+        keyboard_osi_matrix[0] ^= 1 << 6;
+}
+
+static void keyboard_release_key(SDL_Keysym *key) {
+    keyboard_init();
+}
+
+static uint8_t keyboard_read(void) {
+//    printf("keyb read, osi_row %d\n", keyboard_osi_row);
+//    printf("bitmap: %02x\n", keyboard_osi_matrix[keyboard_osi_row]);
+    return keyboard_osi_matrix[keyboard_osi_row];
+}
+
+static void keyboard_write(uint8_t value) {
+//    printf("keyb write %02x\n", value);
+    if (keyboard_inverted) value ^= 0xff;
+    for (int i=0; i<8; i++) {
+        if (value & (1<<i)) keyboard_osi_row = i;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 uint8_t read6502(uint16_t address) {
     if (address < ram_top) {
         return RAM[address];
@@ -142,6 +208,9 @@ uint8_t read6502(uint16_t address) {
             }
         }
     }
+    if (address == 0xdf00) {
+        return keyboard_read();
+    }
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
     }
@@ -160,6 +229,9 @@ void write6502(uint16_t address, uint8_t value) {
         if (address >= 0xe000 && address <= 0xe7ff) {
             COLOR[address - 0xe000] = value;
         }
+    }
+    if (address == 0xdf00) {
+        keyboard_write(value);
     }
 }
 
@@ -383,6 +455,7 @@ int main(int argc, char **argv) {
     }
 
     reset6502();
+    keyboard_init();
 
     winsurface = SDL_GetWindowSurface(window);
     screen = empty_surface(window, screen_width, screen_height);
@@ -405,9 +478,32 @@ int main(int argc, char **argv) {
 
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) break;
+            switch (e.type) {
+            case SDL_QUIT:
+                goto exit_out;
+                break;
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym) {
+                default:
+                    keyboard_press_key(&e.key.keysym);
+                    break;
+                }
+                break;
+            case SDL_KEYUP:
+                switch (e.key.keysym.sym) {
+                case SDLK_F5:
+                    reset6502();
+                    break;
+                case SDLK_F9:
+                    goto exit_out;
+                    break;
+                default:
+                    keyboard_release_key(&e.key.keysym);
+                    break;
+                }
+                break;
+            }
         }
-        if (e.type == SDL_QUIT) break;
 
         while (cpu_ticks < cpu_target) {
             cpu_ticks += step6502();
@@ -419,4 +515,5 @@ int main(int argc, char **argv) {
             ;
     }
 
+exit_out:
 }

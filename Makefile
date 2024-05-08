@@ -3,7 +3,8 @@ CFLAGS = -flto -O3 $$(pkg-config --cflags sdl2 SDL2_image)
 LFLAGS = -flto
 LIBS = $$(pkg-config --libs sdl2 SDL2_image)
 
-SRC_FILES = main.c mmu.c keyboard.c video.c acia.c fake6502/fake6502.c
+SRC_FILES = main.c mmu.c keyboard.c video.c acia.c fake6502/fake6502.c \
+            tape.c
 OBJ_FILES = $(SRC_FILES:%.c=%.o)
 
 all: osiemu

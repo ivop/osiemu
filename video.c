@@ -28,6 +28,9 @@ bool color_enabled = false;
 
 int zoom = 1, stretchx = 1, stretchy = 1;
 
+double aspectx = 1.0;
+double aspecty = 1.0;
+
 int screen_width = 512;
 int screen_height = 256;
 
@@ -116,8 +119,8 @@ static SDL_Surface *empty_surface(SDL_Window *win, int w, int h) {
 
 void screen_update(void) {
     blit_screenmem(screen, font);
-    SDL_Rect fillrect = { 0, 0, stretchx * zoom * screen_width,
-                                stretchy * zoom * screen_height };
+    SDL_Rect fillrect = { 0, 0, aspectx * stretchx * zoom * screen_width,
+                                aspecty * stretchy * zoom * screen_height };
     SDL_BlitScaled(screen, 0, winsurface, &fillrect);
     SDL_UpdateWindowSurface(window);
 }
@@ -130,8 +133,8 @@ bool screen_init(void) {
 
     window = SDL_CreateWindow("OSIEMU",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              stretchx * zoom * screen_width,
-                              stretchy * zoom * screen_height,
+                              aspectx * stretchx * zoom * screen_width,
+                              aspecty * stretchy * zoom * screen_height,
                               SDL_WINDOW_SHOWN );
     if( window == NULL ) {
         fprintf(stderr,  "error: cannot create window: %s\n", SDL_GetError() );

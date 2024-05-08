@@ -21,11 +21,14 @@
 #include "mmu.h"
 #include "keyboard.h"
 #include "video.h"
+#include "tape.h"
 
 // ----------------------------------------------------------------------------
 
 static char *basic_filename = "basic/basic-osi.rom";
 static char *kernel_filename = "kernel/synmon-alt.rom";
+static char *tape_input_filename = NULL;
+static char *tape_output_filename = "tape_output.dat";
 
 // How fast does our 6502 run?
 
@@ -50,6 +53,7 @@ static void usage(void) {
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
 "\n"
 "    -m/--video-mode mode       select mode: 64x32 (default), 64x16, or 32x32\n"
+"    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals\n"
 "\n"
 "    -h/--help                  show usage information\n"
@@ -59,6 +63,7 @@ static void usage(void) {
 // ----------------------------------------------------------------------------
 
 static struct option long_options[] = {
+    { "aspect",         required_argument,  0, 'a' },
     { "basic",          required_argument,  0, 'b' },
     { "disable-basic",  no_argument,        0, 'd' },
     { "font",           required_argument,  0, 'f' },
@@ -79,6 +84,20 @@ int main(int argc, char **argv) {
         case 0:
             printf("long option %s with argument %s\n",
                     long_options[index].name, optarg);
+            break;
+        case 'a':
+            if (!strcmp(optarg, "full")) {
+                aspectx = 1.0;
+                aspecty = 1.0;
+            } else if (!strcmp(optarg, "16:9")) {
+                aspectx = 8.0/9.0;
+                aspecty = 1.0;
+            } else if (!strcmp(optarg, "4:3")) {
+                aspectx = 6.0/9.0;
+                aspecty = 1.0;
+            } else {
+                printf("warning: unknown aspect %s\n", optarg);
+            }
             break;
         case 'b':
             basic_filename = strdup(optarg);
@@ -159,6 +178,7 @@ int main(int argc, char **argv) {
 
     reset6502();
     keyboard_init();
+    tape_init(tape_input_filename, tape_output_filename, cpu_clock);
 
     // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
 

@@ -351,3 +351,9 @@ void acia_init(struct acia *a, double cpu_clock) {
 
 void acia_tick(struct acia *a) {
 }
+
+uint8_t acia_read(struct acia *a, uint16_t address) {
+}
+
+void acia_write(struct acia *a, uint16_t address, uint8_t value) {
+}

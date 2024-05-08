@@ -4,9 +4,9 @@ struct acia {
     //
     // int input()
     //      return values:
+    //      -2      framing error
     //      -1      EOF
     //      0-255   input value
-    //      set bit 8 if a value was missed
     //
     int (*input)(void);
     //
@@ -27,3 +27,5 @@ struct acia {
 void acia_init(struct acia *a, double cpu_clock);
 void acia_hardware_reset(struct acia *a);
 void acia_tick(struct acia *a);
+uint8_t acia_read(struct acia *a, uint16_t address);
+void acia_write(struct acia *a, uint16_t address, uint8_t value);

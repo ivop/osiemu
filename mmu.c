@@ -69,7 +69,7 @@ static uint16_t kernel_bottom;
 // ----------------------------------------------------------------------------
 
 uint8_t read6502(uint16_t address) {
-    if (address < mmu_ram_top) {
+    if (address <= mmu_ram_top) {
         return RAM[address];
     }
     if (mmu_basic_enabled) {
@@ -94,6 +94,7 @@ uint8_t read6502(uint16_t address) {
         return KERNEL[address - 0xf000];
     }
 
+    printf("mmu: reading %04x\n", address);
     return 0xff;
 }
 

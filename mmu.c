@@ -59,7 +59,9 @@ static uint16_t kernel_bottom;
 //
 // e000-e7ff    Color RAM
 //
-// f000-ffff    Kernel ROM
+// f000-f0ff    ACIA for tape input
+//
+// f000-ffff    Kernel ROM, kernel_bottom adjusted by size of kernel ROM
 //
 // f000-ffff    some pages might contain another peripheral
 //              if fcxx is ACIA, page fc is mapped to f4
@@ -94,7 +96,6 @@ uint8_t read6502(uint16_t address) {
         return KERNEL[address - 0xf000];
     }
 
-    printf("mmu: reading %04x\n", address);
     return 0xff;
 }
 

@@ -10,9 +10,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <unistd.h>
-#include <string.h>
-#include <getopt.h>
 #include "fake6502/fake6502.h"
 
 #include <SDL.h>

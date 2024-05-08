@@ -10,9 +10,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <unistd.h>
-#include <string.h>
-#include <getopt.h>
 
 #include <SDL.h>
 #include <SDL_image.h>

@@ -220,6 +220,8 @@ static void blit_char(SDL_Surface *s, SDL_Surface *font,
 // ----------------------------------------------------------------------------
 
 static void blit_screenmem(SDL_Surface *s, SDL_Surface *font) {
+    if (!video_enabled) return;
+
     for (int y = 0; y < osi_height; y++) {
         for (int x = 0; x < osi_width; x++) {
             blit_char(s, font, x, y, SCREEN[x+y*osi_width], mono_color);
@@ -282,7 +284,7 @@ static struct option long_options[] = {
 };
 
 int main(int argc, char **argv) {
-    int option, index, zoom = 1;
+    int option, index, zoom = 1, stretchx = 1, stretchy = 1;
 
     while ((option = getopt_long(argc, argv, "hb:k:f:",
                                  long_options, &index)) != -1) {
@@ -317,11 +319,13 @@ int main(int argc, char **argv) {
             } else if (!strcmp(optarg, "32x32")) {
                 osi_width = 32;
                 osi_height = 32;
+                stretchx = 2;
             } else if (!strcmp(optarg, "64x16")) {
                 osi_width = 64;
                 osi_height = 16;
+                stretchy = 2;
             } else {
-                fprintf(stderr, "error: unrecognized more\n");
+                fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;
             }
             break;
@@ -365,11 +369,10 @@ int main(int argc, char **argv) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
 
-    if (osi_height == 16) screen_height *= 2;   // stretch vertically
-
     window = SDL_CreateWindow("SDL Tutorial",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              zoom * screen_width, zoom * screen_height,
+                              stretchx * zoom * screen_width,
+                              stretchy * zoom * screen_height,
                               SDL_WINDOW_SHOWN );
     if( window == NULL ) {
         fprintf(stderr,  "error: cannot create window: %s\n", SDL_GetError() );
@@ -393,7 +396,7 @@ int main(int argc, char **argv) {
         target += sdl_ticks_per_frame;
 
         blit_screenmem(screen, font);
-        SDL_Rect fillrect = { 0, 0, zoom * screen_width, zoom * screen_height };
+        SDL_Rect fillrect = { 0, 0, stretchx * zoom * screen_width, stretchy * zoom * screen_height };
         SDL_BlitScaled(screen, 0, winsurface, &fillrect);
         SDL_UpdateWindowSurface(window);
 

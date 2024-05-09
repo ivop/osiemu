@@ -1,0 +1,2 @@
+OSI 65V2A video PROM monitor for OSI540 with ASCII keyboard & BASIC-In-ROM
+located at $FF00

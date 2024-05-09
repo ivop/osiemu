@@ -1,0 +1,115 @@
+;OSI 65F ROM assembly listing with comments
+;reconstructed from partial ROM listing
+;
+FF00 A0 00    LDY #$00	;init disk controller
+FF02 8C 01 C0 STY $C001 ;select DDRA.
+FF05 8C 00 C0 STY $C000 ;0's in DDRA indicate input.
+FF08 A2 04    LDX #$04
+FF0A 8E 01 C0 STX $C001 ;select PORTA
+FF0D 8C 03 C0 STY $C003 ;select DDRB
+FF10 88       DEY
+FF11 8C 02 C0 STY $C002 ;1's in DDRB indicate output.
+FF14 8E 03 C0 STX $C003 ;select PORT B
+FF17 8C 02 C0 STY $C002	;make all outputs high
+FF1A A9 FB    LDA #$FB
+FF1C 20 89 FF JSR $FF89	;step to track +1
+FF1F A2 18    LDX #$18
+FF21 20 74 FF JSR $FF74 ;delay
+FF24 A9 02    LDA #$02
+FF26 2C 00 C0 BIT $C000
+FF29 F0 08    BEQ $FF33 ;track 0 enabled?
+FF2B A9 FF    LDA #$FF  ;step down to 0
+FF2D 20 89 FF JSR $FF89 
+FF30 4C 24 FF JMP $FF24
+FF33 A2 7F    LDX #$7F
+FF35 8E 02 C0 STX $C002	;load head
+FF38 20 74 FF JSR $FF74 ;delay
+FF3B AD 00 C0 LDA $C000
+FF3E 30 FB    BMI $FF3B ;wait for index start
+FF40 AD 00 C0 LDA $C000
+FF43 10 FB    BPL $FF40 ;wait for index end
+FF45 A9 03    LDA #$03
+FF47 8D 10 C0 STA $C010 ;reset disk ACIA
+FF4A A9 58    LDA #$58
+FF4C 8D 10 C0 STA $C010 ;/1 RTS hi, no irq
+FF4F 20 7F FF JSR $FF7F
+FF52 85 01    STA $01   ;read start addr hi
+FF54 20 7F FF JSR $FF7F
+FF57 85 00    STA $00   ;read start addr lo
+FF59 20 7F FF JSR $FF7F
+FF5C 85 02    STA $02   ;read num pages
+FF5E A0 00    LDY #$00
+FF60 20 7F FF JSR $FF7F
+FF63 91 00    STA ($00),Y ;read the specified num pages
+FF65 C8       INY
+FF66 D0 F8    BNE $FF60
+FF68 E6 01    INC $01
+FF6A C6 02    DEC $02
+FF6C D0 F2    BNE $FF60
+FF6E A9 FF    LDA #$FF
+FF70 8D 02 C0 STA $C002  ;disable drive
+FF73 60       RTS
+FF74 A0 F8    LDY #$F8	;loop for delay
+FF76 88       DEY
+FF77 D0 FD    BNE $FF76
+FF79 55 FF    EOR $FF,X
+FF7B CA       DEX
+FF7C D0 F6    BNE $FF74
+FF7E 60       RTS
+FF7F AD 10 C0 LDA $C010	;read byte from disk
+FF82 4A       LSR A
+FF83 90 FA    BCC $FF7F
+FF85 AD 11 C0 LDA $C011
+FF88 60       RTS
+FF89 8D 02 C0 STA $C002	;($FB=step direction up )
+FF8C 20 88 FF JSR $FF88
+FF8F 29 F7    AND #$F7	;step on
+FF91 8D 02 C0 STA $C002
+FF94 20 88 FF JSR $FF88
+FF97 09 08    ORA #$08	;step off
+FF99 8D 02 C0 STA $C002
+FF9C A2 18    LDX #$18	
+FF9E 20 74 FF JSR $FF74	;delay
+FFA1 F0 E5    BEQ $FF88 ;???
+FFA3 00       BRK       ;??? (not sure if this is correct)
+FFA4 44 2F    .BYTE $44,$2F ; 'D/
+FFA6 4D 3F    .BYTE $4D,$3F ; 'M?
+FFA8 D8       CLD
+FFA9 A2 D4    LDX #$D4	;max vid page address (hi)
+FFAB A9 D0    LDA #$D0  ;start vid address (hi)
+FFAD 85 01    STA $01
+FFAF A0 00    LDY #$00
+FFB1 84 00    STY $00
+FFB3 A9 20    LDA #$20
+FFB5 91 00    STA ($00),Y ;erase video memory (1K)
+FFB7 C8       INY
+FFB8 D0 FB    BNE $FFB5
+FFBA E6 01    INC $01
+FFBC E4 01    CPX $01
+FFBE D0 F5    BNE $FFB5
+FFC0 A9 03    LDA #$03
+FFC2 8D 00 FC STA $FC00	;reset ACIA
+FFC5 A9 B1    LDA #$B1
+FFC7 8D 00 FC STA $FC00   ;8N2 /16 RTSIRQ
+FFCA B9 A4 FF LDA $FFA4,Y ;"D/M?" prompt
+FFCD 30 0E    BMI $FFDD		;end of prompt?
+FFCF 99 C6 D0 STA $D0C6,Y ;write to video memory
+FFD2 AE 01 FE LDX $FE01	  ;test 65A (0) vs 65V ($28) monitor
+FFD5 D0 03    BNE $FFDA
+FFD7 20 0B FE JSR $FE0B   ;65A send char out via ACIA
+FFDA C8       INY
+FFDB D0 ED    BNE $FFCA
+FFDD AD 01 FE LDA $FE01 ;test 65A (0) vs 65V ($28) monitor
+FFE0 D0 05    BNE $FFE7
+FFE2 20 00 FE JSR $FE00	;65A GetChar with echo
+FFE5 B0 03    BCS $FFEA
+FFE7 20 ED FE JSR $FEED ;65V GetChar from ASCII KB/etc.
+FFEA C9 44    CMP #$44  ;'D
+FFEC D0 09    BNE $FFF7
+FFEE 20 00 FF JSR $FF00 ;call disk load routine subroutine
+FFF1 4C 00 22 JMP $2200	;execute loaded disk track (hopefully $2200)
+FFF4 20 00 FF JSR $FF00
+FFF7 6C FC FE JMP ($FEFC) ;(storage for entry point to monitor)
+FFFA 30 01    .BYTE $03,$01 	;NMI vector
+FFFC A8 FF    .BYTE $A8,$FF	;reset vector
+FFFD C0 01    .BYTE $C0,$01	;IRQ vector

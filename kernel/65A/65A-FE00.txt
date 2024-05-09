@@ -1,0 +1,16 @@
+The is the OSI 65A serial monitor ROM
+This is used primarily in the OSI C3 series but can also be found in OSI500 serial based systems.
+This ROM can be used with different BOOT ROMs when located @ $FE00 or by itself as the only ROM in the system when located at $FF00. It expects the console ACIA at $FC00
+
+Cmds 'R' reset,
+     'P' <address> - dump data at supplied address until keypress
+     'L' <address><data> - read hex data from acia until 'R' encountered
+     'G' Go - set CPU value to the following:
+
+         Execute address hi,lo @ $012E, $012F
+         S Stack pointer    @ $012D
+         K Processor status @ $012C
+         A @ $012B
+         X @ $012A
+         Y @ $0129
+

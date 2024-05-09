@@ -1,0 +1,9 @@
+OSI SERIAL BOOT ROM FOR BASIC IN ROM MACHINES @ $FF00
+Expects 6850 ACIA @$FC00 and S1883/AY-5-1013 UART @FB03+
+note: ROM still works if UART is missing, but with broken BASIC LOAD and SAVE functionality.
+( SAVE command works, but does nothing useful, LOAD command receives endless '{' characters)
+
+Adds CTRL+E processing to toggle output to ACIA suppression
+Expects 65A serial monitor ROM at $FE00 as well as BASIC ROMS at $A000-$BFFF
+
+This ROM was found in serial OSI500 system and as an unused page in a 6800 support ROM for 510 CPU board

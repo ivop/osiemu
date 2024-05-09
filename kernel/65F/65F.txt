@@ -1,0 +1,4 @@
+Reconstructed 65F ROM for early OSI 400/500 systems. 
+Supports Disk and either 65V or 65A monitor ROM at $FE00.
+Thanks to bxdanny for the partial assembly dump, I was able to fill in the missing pieces with code from other ROMs. -Mark
+

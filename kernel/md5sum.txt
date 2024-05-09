@@ -10,8 +10,8 @@ b101e12b27275534f8071a1c643d79d0  cegmon2.rom
 e11d62628d7f1d478057b1044e4d6f90  cegmonc2.rom
 cbc104a7937f7ba88135c932a6e5908e  cegmonjsc.rom
 5fafce35f2e2d2384dd0c648cad73c5a  cegmon.rom
-7dd4e5cbf65fc46e43b4435b7a500548  cegmonuk.rom
-02ed52b1942147637df37d12163bb7a8  chargen.rom
+7dd4e5cbf65fc46e43b4435b7a500548  cegmonuk16.rom
+a09a72736d2f19cd3103011fc1e09bec  cegmonuk32.rom
 7e868386b821943282ee07df5bf66323  dabug_iii_ep2c_c1p_s2.rom
 7c286f000eadcf31646f1e0f6c3fa037  eprom1_uk54.rom
 af76d2aceef81877403acb60f96b3474  eprom1_v54max.rom
@@ -28,7 +28,6 @@ bdc8f71ab1921875f50709540dc87c8e  monuk03.rom
 871a0f2cb5dedfd4a11837c00360d0a4  monus.rom
 23b89f91e0a2e3f15523ac71400b2936  newmon.rom
 3de72592a4155de897e7646f36e676a8  osi_600_baer.rom
-c53f7ea55da4880dc37b16f32761c631  osi_ibm.rom
 b0e3fa095918c0eb83827886066abebf  romc1s.rom
 340e6c8b3ef6a5a5195c7b15f121f65c  sjgmon012-sb.rom
 4f70e06b42da873a27ca6e632c82daeb  syn600.rom

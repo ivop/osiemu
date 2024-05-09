@@ -80,6 +80,14 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     return true;
 }
 
+void tape_rewind(void) {
+    if (inputf) {
+        printf("tape: rewinding input tape\n");
+        fseek(inputf, 0, SEEK_SET);
+        running = 0;
+    }
+}
+
 void tape_tick(double ticks) {
      timer += ticks;
      if (timer < ticks_per_clock) return;
@@ -116,18 +124,15 @@ void tape_tick(double ticks) {
 }
 
 uint8_t tape_read(uint16_t address) {
-//    fprintf(stderr, "tape: read: %04x\n", address);
     switch (address & 1) {
     case 0:                     // status register
-//        fprintf(stderr, "tape: read status (%02x)\n", status);
         if (!running) {
-//            fprintf(stderr, "tape: first status read, press PLAY on tape\n");
+            printf("tape: reading status, activate tape\n");
             running = 1;
         }
         return status;
         break;
     case 1:                     // receive register
-//        fprintf(stderr, "tape: receive byte (%02x)\n", RDR);
         clrbit(status, STATUS_RDRF_MASK);
         clrbit(status, STATUS_OVRN_MASK);
         return RDR;
@@ -142,35 +147,29 @@ void tape_write(uint16_t address, uint8_t value) {
         control = value;
         switch (control & CONTROL_DIV_MASK) {
         case 0:
-//            fprintf(stderr, "tape: set div 1\n");
+            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 1);
             baud_div = baud_timer = 1;
             break;
         case 1:
-//            fprintf(stderr, "tape: set div 16\n");
+            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 16);
             baud_div = baud_timer = 16;
             break;
         case 2:
-//            fprintf(stderr, "tape: set div 64\n");
+            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 64);
             baud_div = baud_timer = 64;
             break;
         case 3:
-//            fprintf(stderr, "tape: master reset\n");
+            printf("tape: master reset\n");
+            running = 0;
             status = 0;
+            setbit(status, STATUS_TDRE_MASK);   // empty
             break;
         }
         bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
-//        fprintf(stderr, "tape: word select, total of %d bits\n", bits_per_byte);
         break;
     case 1:                     // transmit register
         TDR = value;
         clrbit(status, STATUS_TDRE_MASK);   // not empty
         break;
-    }
-}
-
-void tape_rewind(void) {
-    if (inputf) {
-        fseek(inputf, 0, SEEK_SET);
-        running = 0;
     }
 }

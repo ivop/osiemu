@@ -58,6 +58,7 @@ static void usage(void) {
 "\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
+"    -C/--tape-location         ACIA location: f000 (default), fc00\n"
 "\n"
 "    -h/--help                  show usage information\n"
 );
@@ -68,6 +69,7 @@ static void usage(void) {
 static struct option long_options[] = {
     { "aspect",         required_argument,  0, 'a' },
     { "basic",          required_argument,  0, 'b' },
+    { "tape-location",  required_argument,  0, 'C' },
     { "disable-basic",  no_argument,        0, 'd' },
     { "font",           required_argument,  0, 'f' },
     { "help",           no_argument,        0, 'h' },
@@ -86,7 +88,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:df:hik:m:t:T:vz",
+    while ((option = getopt_long(argc, argv, "a:b:C:df:hik:m:t:T:vz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -151,6 +153,15 @@ int main(int argc, char **argv) {
             break;
         case 'T':
             tape_output_filename = strdup(optarg);
+            break;
+        case 'C':
+            if (!strcmp(optarg, "f000")) {
+                tape_location = 0xf000;
+            } else if (!strcmp(optarg, "fc00")) {
+                tape_location = 0xfc00;
+            } else {
+                fprintf(stderr, "error: unknown tape location\n");
+            }
             break;
         case 'h':
             usage();

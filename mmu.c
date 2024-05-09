@@ -25,6 +25,7 @@ uint8_t KERNEL[0x1000];      // 4kB Kernel ROM
 
 bool mmu_basic_enabled = true;
 uint16_t mmu_ram_top = 0x9fff;
+uint16_t tape_location = 0xf000;
 
 static uint16_t kernel_bottom;
 
@@ -94,7 +95,7 @@ uint8_t read6502(uint16_t address) {
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
     }
-    if (address >= 0xf000 && address <= 0xf003) {
+    if (address >= tape_location && address <= tape_location+3) {
         return tape_read(address);
     }
     printf("mmu: unmapped read from $%04x\n", address);
@@ -120,7 +121,7 @@ void write6502(uint16_t address, uint8_t value) {
         keyboard_write(value);
         return;
     }
-    if (address >= 0xf000 && address <= 0xf003) {
+    if (address >= tape_location && address <= tape_location+3) {
         tape_write(address, value);
         return;
     }

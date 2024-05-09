@@ -16,7 +16,6 @@
 #include "fake6502/fake6502.h"
 
 #include <SDL.h>
-#include <SDL_image.h>
 
 #include "mmu.h"
 #include "keyboard.h"
@@ -79,6 +78,7 @@ static struct option long_options[] = {
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
+    { "smooth-video",   no_argument,        0, 'V' },
     { "zoom",           no_argument,        0, 'z' },
 };
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:C:df:hik:m:t:T:vz",
+    while ((option = getopt_long(argc, argv, "a:b:C:df:hik:m:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -124,6 +124,9 @@ int main(int argc, char **argv) {
             break;
         case 'v':
             video_enabled = false;
+            break;
+        case 'V':
+            video_smooth = true;
             break;
         case 'z':
             zoom = 2;

@@ -13,6 +13,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL2_rotozoom.h>
 
 #include "video.h"
 
@@ -25,6 +26,7 @@ uint8_t COLOR[0x0800];       // 2kB Color RAM
 
 bool video_enabled = true;
 bool color_enabled = false;
+bool video_smooth = false;
 
 int zoom = 1, stretchx = 1, stretchy = 1;
 
@@ -119,9 +121,17 @@ static SDL_Surface *empty_surface(SDL_Window *win, int w, int h) {
 
 void screen_update(void) {
     blit_screenmem(screen, font);
-    SDL_Rect fillrect = { 0, 0, aspectx * stretchx * zoom * screen_width,
-                                aspecty * stretchy * zoom * screen_height };
-    SDL_BlitScaled(screen, 0, winsurface, &fillrect);
+    if (!video_smooth) {
+        SDL_Rect fillrect = { 0, 0, aspectx * stretchx * zoom * screen_width,
+                                    aspecty * stretchy * zoom * screen_height};
+        SDL_BlitScaled(screen, 0, winsurface, &fillrect);
+    } else {
+        double zoomX = aspectx * stretchx * zoom * screen_width / screen->w;
+        double zoomY = aspecty * stretchy * zoom * screen_height / screen->h;
+        SDL_Surface *news = rotozoomSurfaceXY(screen, 0.0, zoomX, zoomY, 1);
+        SDL_BlitSurface(news, 0, winsurface, 0);
+        SDL_FreeSurface(news);
+    }
     SDL_UpdateWindowSurface(window);
 }
 

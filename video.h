@@ -8,6 +8,7 @@ extern uint8_t COLOR[0x0800];
 
 extern bool video_enabled;
 extern bool color_enabled;
+extern bool video_smooth;
 
 extern double aspectx;
 extern double aspecty;

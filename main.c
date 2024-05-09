@@ -25,7 +25,7 @@
 
 // ----------------------------------------------------------------------------
 
-static char *basic_filename = "basic/basic-osi.rom";
+static char *basic_filename = "basic/basic-osi-fix.rom";
 static char *kernel_filename = "kernel/synmon-alt.rom";
 static char *tape_input_filename = NULL;
 static char *tape_output_filename = "tapeout.dat";

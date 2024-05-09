@@ -97,6 +97,7 @@ uint8_t read6502(uint16_t address) {
     if (address >= 0xf000 && address <= 0xf003) {
         return tape_read(address);
     }
+    printf("mmu: unmapped read from $%04x\n", address);
     return 0xff;
 }
 
@@ -123,6 +124,7 @@ void write6502(uint16_t address, uint8_t value) {
         tape_write(address, value);
         return;
     }
+    printf("mmu: unmapped write to $%04x ($%02x)\n", address, value);
 }
 
 // ----------------------------------------------------------------------------

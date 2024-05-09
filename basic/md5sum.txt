@@ -1,5 +1,5 @@
 7ff1eb5a01e9c7f27d52b7f7b016041d  basic-newmon.rom
-4c3c29d51531862c1ba534c705fef814  basic-osi-alt.rom
+4c3c29d51531862c1ba534c705fef814  basic-osi-fix.rom
 330e0941666abe420dbd2143d035ea41  basic-osi.rom
 dce12ec45ff2e12acd78688589ee8519  basic-uk101-alt.rom
 229529e6126de5bd56f45e8a55e46f15  basic-uk101.rom

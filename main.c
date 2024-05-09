@@ -82,6 +82,7 @@ static struct option long_options[] = {
 
 int main(int argc, char **argv) {
     int option, index;
+    double cpu_ticks = 0.0;
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
@@ -197,7 +198,6 @@ int main(int argc, char **argv) {
 
     double sdl_ticks_per_frame = 1000.0 / fps;
     double target = SDL_GetTicks();
-    double cpu_ticks = 0.0;
     double cpu_target = cpu_ticks + ticks_per_frame;
 
     while (1) {
@@ -222,6 +222,7 @@ int main(int argc, char **argv) {
                 switch (e.key.keysym.sym) {
                 case SDLK_F5:
                     reset6502();
+                    tape_rewind();
                     break;
                 case SDLK_F9:
                     goto exit_out;
@@ -235,7 +236,9 @@ int main(int argc, char **argv) {
         }
 
         while (cpu_ticks < cpu_target) {
-            cpu_ticks += step6502();
+            double ticks = step6502();
+            cpu_ticks += ticks;
+            tape_tick(ticks);
         }
 
         cpu_target += ticks_per_frame;

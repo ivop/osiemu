@@ -12,9 +12,54 @@
 #include <stdbool.h>
 #include "tape.h"
 
+#define TX_RX_CLOCK     19200.0
+
 static FILE *inputf;
 static FILE *outputf;
+static double timer;
+static double ticks_per_clock;
+static int bits_per_byte;               // inluding start, parity, stop
+static int bits_remaining;
+static int baud_timer;
+static int baud_div;
 
+static bool running = false;
+
+static uint8_t control;
+static uint8_t status;
+static uint8_t RDR;                     // Receive Data Register
+static uint8_t TDR;                     // Transmit Data Register
+
+#define CONTROL_DIV_MASK    0x03        // divider 1,16,64,master reset
+#define CONTROL_WS_MASK     0x1c        // see below
+#define CONTROL_TX_CTRL     0x60        // transmit control
+#define CONTROL_RX_IRQE     0x80        // receive interrupt enable
+
+#define STATUS_RDRF_MASK    0x01        // Rx data register full
+#define STATUS_TDRE_MASK    0x02        // Tx data register empty
+#define STATUS_nDCD_MASK    0x04        // /DCD Data Carrier Detect
+#define STATUS_nCTS_MASK    0x08        // /CTS Clear To Send
+#define STATUS_FE_MASK      0x10        // Rx Frame Error
+#define STATUS_OVRN_MASK    0x20        // Rx Overrun
+#define STATUS_PE_MASK      0x40        // Rx Parity Error
+#define STATUS_IRQ_MASK     0x80        // /IRQ, if pin output is low, bit is 1
+                                        // clear by read of RDR
+
+#define setbit(v,msk)   (v) |= (msk)
+#define clrbit(v,msk)   (v) &= ~(msk)
+#define getbit(v,msk)   (v & (msk))
+
+static int word_select_times[8] = {
+    11,     // start bit + 7 bits + even parity + 2 stop bits
+    11,     // start bit + 7 bits +  odd parity + 2 stop bits
+    10,     // start bit + 7 bits + even parity + 1 stop bit
+    10,     // start bit + 7 bits +  odd parity + 1 stop bit
+    11,     // start bit + 8 bits +   no parity + 2 stop bits
+    10,     // start bit + 8 bits +   no parity + 1 stop bit
+    11,     // start bit + 8 bits + even parity + 1 stop bit
+    11      // start bit + 8 bits +  odd parity + 1 stop bit
+};
+ 
 bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     if (input_file) {
         if (!(inputf = fopen(input_file, "rb"))) {
@@ -30,16 +75,102 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
         }
     }
 
+    ticks_per_clock = cpu_clock / TX_RX_CLOCK;
+    bits_per_byte = 11;
     return true;
 }
 
-void tape_tick(void) {
+void tape_tick(double ticks) {
+     timer += ticks;
+     if (timer < ticks_per_clock) return;
+
+     timer -= ticks_per_clock;
+
+     if (!running) return;
+
+     baud_timer--;
+
+     if (baud_timer) return;
+
+     baud_timer = baud_div;
+
+     bits_remaining--;
+
+     if (bits_remaining <= 0) {
+         if (inputf) {
+             // receiving...
+             int v = fgetc(inputf);
+             if (v < 0) {                           // end-of-file
+                 setbit(status, STATUS_FE_MASK);
+             } else {
+                 RDR = v;
+                 if (getbit(status, STATUS_RDRF_MASK)) {
+                     setbit(status, STATUS_OVRN_MASK);
+                 }
+                 setbit(status, STATUS_RDRF_MASK);
+             }
+         }
+         // wait again...
+         bits_remaining = bits_per_byte;
+     }
 }
 
 uint8_t tape_read(uint16_t address) {
-    fprintf(stderr, "tape: read: %04x\n", address);
+//    fprintf(stderr, "tape: read: %04x\n", address);
+    switch (address & 1) {
+    case 0:                     // status register
+//        fprintf(stderr, "tape: read status (%02x)\n", status);
+        if (!running) {
+//            fprintf(stderr, "tape: first status read, press PLAY on tape\n");
+            running = 1;
+        }
+        return status;
+        break;
+    case 1:                     // receive register
+//        fprintf(stderr, "tape: receive byte (%02x)\n", RDR);
+        clrbit(status, STATUS_RDRF_MASK);
+        clrbit(status, STATUS_OVRN_MASK);
+        return RDR;
+        break;
+    }
 }
 
 void tape_write(uint16_t address, uint8_t value) {
-    fprintf(stderr, "tape: write: %04x <-- %02x\n", address, value);
+//    fprintf(stderr, "tape: write: %04x <-- %02x\n", address, value);
+    switch (address & 1) {
+    case 0:                     // control register
+        control = value;
+        switch (control & CONTROL_DIV_MASK) {
+        case 0:
+//            fprintf(stderr, "tape: set div 1\n");
+            baud_div = baud_timer = 1;
+            break;
+        case 1:
+//            fprintf(stderr, "tape: set div 16\n");
+            baud_div = baud_timer = 16;
+            break;
+        case 2:
+//            fprintf(stderr, "tape: set div 64\n");
+            baud_div = baud_timer = 64;
+            break;
+        case 3:
+//            fprintf(stderr, "tape: master reset\n");
+            status = 0;
+            break;
+        }
+        bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
+//        fprintf(stderr, "tape: word select, total of %d bits\n", bits_per_byte);
+        break;
+    case 1:                     // transmit register
+        TDR = value;
+        clrbit(status, STATUS_TDRE_MASK);   // not empty
+        break;
+    }
+}
+
+void tape_rewind(void) {
+    if (inputf) {
+        fseek(inputf, 0, SEEK_SET);
+        running = 0;
+    }
 }

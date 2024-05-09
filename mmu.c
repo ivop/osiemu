@@ -94,7 +94,6 @@ uint8_t read6502(uint16_t address) {
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
     }
-    fprintf(stderr, "mmu: read: %04x\n", address);
     if (address >= 0xf000 && address <= 0xf003) {
         return tape_read(address);
     }
@@ -120,7 +119,6 @@ void write6502(uint16_t address, uint8_t value) {
         keyboard_write(value);
         return;
     }
-    fprintf(stderr, "mmu: write: %04x value: %02x\n", address, value);
     if (address >= 0xf000 && address <= 0xf003) {
         tape_write(address, value);
         return;

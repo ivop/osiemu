@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS = -flto -O3 $$(pkg-config --cflags sdl2 SDL2_image)
+CFLAGS = -flto -O3 $$(pkg-config --cflags sdl2 SDL2_image) -g3
 LFLAGS = -flto
 LIBS = $$(pkg-config --libs sdl2 SDL2_image)
 

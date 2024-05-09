@@ -1,7 +1,7 @@
-772f2ca978fa2821481dba6bacff931f  aardvark_c1s.rom
+e4b144d5a853e27c25eb6dd77157420f  aardvark-c1s-2.rom
+772f2ca978fa2821481dba6bacff931f  aardvark-c1s.rom
 474e5740e18428dce0d6ba6e1a52af1f  bamble.rom
 15b7cfe0324f4dc926a14ad496b471e9  c1.rom
-e4b144d5a853e27c25eb6dd77157420f  c1s-2.rom
 cbcddaee9bc4b81f34c9147dbc29e1eb  c2_cwmhigh.rom
 ee27016d2c6e1bacdb9c7cee24c77fe4  c2_hdmhigh.rom
 ade9cf9e96cd16a246a322afa0c81e3e  cegmon0.rom
@@ -26,7 +26,6 @@ f661bbc9432271a851058fa0f6ebfb87  eprom_hgr.rom
 6912b3a20682641fe3fcedc08440e990  monuk01x32.rom
 b0e3fa095918c0eb83827886066abebf  monuk02.rom
 bdc8f71ab1921875f50709540dc87c8e  monuk03.rom
-871a0f2cb5dedfd4a11837c00360d0a4  monus.rom
 23b89f91e0a2e3f15523ac71400b2936  newmon.rom
 3de72592a4155de897e7646f36e676a8  osi_600_baer.rom
 b0e3fa095918c0eb83827886066abebf  romc1s.rom

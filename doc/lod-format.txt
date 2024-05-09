@@ -1,0 +1,14 @@
+M(onitor)
+L(oad from serial port)
+
+.0200       Load address
+/DE         Data
+AD
+BE
+EF
+.0300       A new load address
+/DE
+AD
+BE
+EF
+.200G       Run/GO

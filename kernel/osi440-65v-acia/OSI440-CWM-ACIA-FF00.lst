@@ -1,0 +1,149 @@
+    1                  ; FFxx ROM for OSI440 video + BASIC ROMS ASCII Keyboard
+    2                  
+    3                  ;$200 - current screen cursor pos
+    4                  ;$201 - temp storage for char to be printed
+    5                  ;$203 - load flag $01 = from ACIA
+    6                  
+    7                  ;$205 - save flag $0 = NOT save mode
+    8                  ;$206 - time delay for CRT driver
+    9                  ;$20F -
+   10                  ;$212 - CTRL-C flag, not 0 = ignore Ctrl-C
+   11                  
+   12  FF00            *=$FF00
+   13  FF00            RESET_HANDLER
+   14  FF00  D8               CLD
+   15  FF01  A2 28            LDX #$28
+   16  FF03  9A               TXS
+   17  FF04  20 22 BF         JSR $BF22   ;init ACIA 8N2/16
+   18  FF07  A0 00            LDY #$00
+   19  FF09  8C 12 02         STY $0212
+   20  FF0C  8C 03 02         STY $0203
+   21  FF0F  8C 05 02         STY $0205
+   22  FF12  8C 06 02         STY $0206
+   23  FF15  AD E0 FF         LDA LFFE0
+   24  FF18  8D 00 02         STA $0200
+   25  FF1B  A9 20            LDA #$20
+   26  FF1D  8D 01 02         STA $0201
+   27  FF20  8D 0F 02         STA $020F
+   28  FF23  99 00 D7  LFF23  STA $D700,Y    ;erase 2K screen
+   29  FF26  99 00 D6         STA $D600,Y
+   30  FF29  99 00 D5         STA $D500,Y
+   31  FF2C  99 00 D4         STA $D400,Y
+   32  FF2F  99 00 D3         STA $D300,Y
+   33  FF32  99 00 D2         STA $D200,Y
+   34  FF35  99 00 D1         STA $D100,Y
+   35  FF38  99 00 D0         STA $D000,Y
+   36  FF3B  C8               INY
+   37  FF3C  D0 E5            BNE LFF23
+   38  FF3E  B9 65 FF  LFF3E  LDA LFF65,Y
+   39  FF41  F0 06            BEQ LFF49
+   40  FF43  20 2D BF         JSR $BF2D  ;BASIC screen printer
+   41  FF46  C8               INY
+   42  FF47  D0 F5            BNE LFF3E
+   43  FF49  20 AB FF  LFF49  JSR SFFAB
+   44  FF4C  C9 4D            CMP #$4D
+   45  FF4E  D0 03            BNE LFF53
+   46  FF50  4C 00 FE         JMP $FE00  ;Monitor ROM start
+   47                  
+   48  FF53  C9 57     LFF53  CMP #$57
+   49  FF55  D0 03            BNE LFF5A
+   50  FF57  4C 00 00         JMP $0000  ;Warm Start
+   51                  
+   52  FF5A  C9 43     LFF5A  CMP #$43
+   53  FF5C  D0 A2            BNE RESET_HANDLER
+   54  FF5E  A9 00            LDA #$00
+   55  FF60  AA               TAX
+   56  FF61  A8               TAY
+   57  FF62  4C 11 BD         JMP $BD11  ;goto BASIC cold start routine
+   58                  
+   59  FF65  43 2F 57  LFF65  .BYTE 'C/W/M?',0
+       FF68  2F 4D 3F  
+       FF6B  00        
+   60                  
+   61  FF6C  20 2D BF  LFF6C  JSR $BF2D  ;BASIC screen printer
+   62  FF6F  48               PHA
+   63  FF70  AD 05 02         LDA $0205
+   64  FF73  F0 24            BEQ LFF99
+   65  FF75  68               PLA
+   66  FF76  20 15 BF         JSR $BF15  ;write to ACIA
+   67  FF79  C9 0D            CMP #$0D
+   68  FF7B  D0 1D            BNE LFF9A
+   69  FF7D  48               PHA        ;upon writing <CR> append 10 <NULs>
+   70  FF7E  8A               TXA
+   71  FF7F  48               PHA
+   72  FF80  A2 0A            LDX #$0A
+   73  FF82  A9 00            LDA #$00
+   74  FF84  20 15 BF  LFF84  JSR $BF15  ;write to ACIA
+   75  FF87  CA               DEX
+   76  FF88  D0 FA            BNE LFF84
+   77  FF8A  68               PLA
+   78  FF8B  AA               TAX
+   79  FF8C  68               PLA
+   80  FF8D  60               RTS
+   81                  
+   82  FF8E  48        LFF8E  PHA
+   83  FF8F  A9 01            LDA #$01   ;turn on ACIA input
+   84  FF91  8D 03 02         STA $0203
+   85  FF94  A9 00            LDA #$00   ;turn off save flag
+   86  FF96  8D 05 02  LFF96  STA $0205
+   87  FF99  68        LFF99  PLA
+   88  FF9A  60        LFF9A  RTS
+   89                  
+   90  FF9B  48        LFF9B  PHA
+   91  FF9C  A9 01            LDA #$01
+   92  FF9E  D0 F6            BNE LFF96
+   93  FFA0  AD 12 02  LFFA0  LDA $0212
+   94  FFA3  D0 03            BNE LFFA8
+   95  FFA5  4C AE FF         JMP LFFAE
+   96                  
+   97  FFA8  4C 28 A6  LFFA8  JMP $A628  ;<RTS>
+   98                  
+   99  FFAB  4C C0 FF  SFFAB  JMP LFFC0
+  100                  
+  101  FFAE  AD 01 DF  LFFAE  LDA $DF01  ;Test for keypress
+  102  FFB1  30 F5            BMI LFFA8
+  103  FFB3  4C 33 A6         JMP $A633  ;check for CTRL-C
+  104                  
+  105  FFB6  AD 01 FC  LFFB6  LDA $FC01
+  106  FFB9  29 7F            AND #$7F
+  107  FFBB  60               RTS
+  108                  
+  109  FFBC  68        LFFBC  PLA
+  110  FFBD  A8               TAY
+  111  FFBE  68               PLA
+  112  FFBF  AA               TAX
+  113  FFC0  AD 01 DF  LFFC0  LDA $DF01  ;check for key press
+  114  FFC3  30 0D            BMI LFFD2  ;none if msb set
+  115  FFC5  48               PHA
+  116  FFC6  A9 00            LDA #$00
+  117  FFC8  8D 03 02         STA $0203
+  118  FFCB  AD 01 DF  LFFCB  LDA $DF01  ;wait for ASCII Keyboard to finish
+  119  FFCE  10 FB            BPL LFFCB  ;loop until key up
+  120  FFD0  68               PLA
+  121  FFD1  60               RTS
+  122                  
+  123  FFD2  AD 03 02  LFFD2  LDA $0203  ;test LOAD flag
+  124  FFD5  F0 D4            BEQ SFFAB  ;branch if not set
+  125  FFD7  AD 00 FC         LDA $FC00
+  126  FFDA  4A               LSR A
+  127  FFDB  90 CE            BCC SFFAB  ;no serial data, return to loop
+  128  FFDD  4C B6 FF         JMP LFFB6  ;else jump back to read waiting ACIA character
+  129                  
+  130  FFE0  64        LFFE0  .BYTE $64     ; LINE START OFFSET (for video system)
+  131  FFE1  18               .BYTE $18     ; LINE LENGTH - 1
+  132  FFE2  00               .BYTE $00     ; SCREEN RAM 0=1K, 1=2K
+  133  FFE3  00 03            .BYTE $00,$03 ;default BASIC workspace lower bounds
+  134  FFE5  FF 3F            .BYTE $FF,$3F ;default BASIC workspace upper bounds
+  135  FFE7  00 03            .BYTE $00,$03 ;variable workspace lower bounds
+  136  FFE9  FF 3F            .BYTE $FF,$3F ;variable workspace upper bounds
+  137  FFEB  4C AB FF  LFFEB  JMP SFFAB     ; INPUT
+  138  FFEE  4C 6C FF  LFFEE  JMP LFF6C     ; OUTPUT
+  139  FFF1  4C A0 FF  LFFF1  JMP LFFA0     ; CTRL-C check
+  140  FFF4  4C 8E FF  LFFF4  JMP LFF8E     ; LOAD
+  141  FFF7  4C 9B FF  LFFF7  JMP LFF9B     ; SAVE
+  142  FFFA  30 01            .WORD $0130   ;<NMI>
+  143  FFFC  00 FF            .WORD $FF00   ;<RESET>
+  144  FFFE  C0 01            .WORD $01C0   ;<IRQ>
+
+Errors   = 0
+Warnings = 0

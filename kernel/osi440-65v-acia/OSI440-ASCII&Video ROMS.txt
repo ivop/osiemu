@@ -1,0 +1,1 @@
+OSI440-65V-ACIA contains $FFxx System & $FExx Monitor ROM pages for 400/440 video based OSI machines with ASCII keyboard + BASIC

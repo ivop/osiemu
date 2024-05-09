@@ -1,0 +1,150 @@
+    1                  ;Monitor ROM for 440 board 65V monitor (ASCII KB)
+    2                  
+    3  FE00            *=$FE00
+    4  FE00            MONITOR
+    5  FE00  A2 28            LDX #$28
+    6  FE02  9A               TXS          ;set stack ptr, clear decimal
+    7  FE03  D8               CLD
+    8  FE04  AD 06 FB         LDA $FB06    ; reset address of 430 board UART
+    9  FE07  A9 FF            LDA #$FF
+   10  FE09  8D 05 FB         STA $FB05    ; set UART S1883 8N2
+   11  FE0C  A2 D4            LDX #$D4     ;end page of screen blank
+   12  FE0E  A9 D0            LDA #$D0     ;start page of screen blank
+   13  FE10  85 FF            STA $FF
+   14  FE12  A9 00            LDA #$00
+   15  FE14  85 FE            STA $FE
+   16  FE16  85 FB            STA $FB      ;turn off serial input (use KB)
+   17  FE18  A8               TAY
+   18  FE19  A9 20            LDA #$20     ;fill 2K screen $D000-$D7FF with $20 ' '
+   19  FE1B  91 FE     LFE1B  STA ($FE),Y
+   20  FE1D  C8               INY
+   21  FE1E  D0 FB            BNE LFE1B
+   22  FE20  E6 FF            INC $FF
+   23  FE22  E4 FF            CPX $FF
+   24  FE24  D0 F5            BNE LFE1B
+   25  FE26  84 FF            STY $FF      ;zero $FF
+   26  FE28  F0 19            BEQ LFE43    ;always branch
+   27  FE2A  20 E9 FE  LFE2A  JSR SFEE9    ;get char from ascii kb/serial
+   28  FE2D  C9 2F            CMP #$2F
+   29  FE2F  F0 1E            BEQ LFE4F    ;cmd '/'
+   30  FE31  C9 47            CMP #$47
+   31  FE33  F0 17            BEQ LFE4C    ;cmd 'G'
+   32  FE35  C9 4C            CMP #$4C
+   33  FE37  F0 43            BEQ LFE7C    ;cmd 'L'
+   34  FE39  20 93 FE         JSR SFE93
+   35  FE3C  30 EC            BMI LFE2A
+   36  FE3E  A2 02            LDX #$02
+   37  FE40  20 DA FE         JSR SFEDA
+   38  FE43  B1 FE     LFE43  LDA ($FE),Y  ;(initially points to $0000)
+   39  FE45  85 FC            STA $FC
+   40  FE47  20 AC FE         JSR SFEAC    ;display monitor address & data
+   41  FE4A  D0 DE            BNE LFE2A    ;always branch
+   42  FE4C  6C FE 00  LFE4C  JMP ($00FE)
+   43                  
+   44  FE4F  20 E9 FE  LFE4F  JSR SFEE9    ;process '/' cmd -- get char from ascii kb/serial
+   45  FE52  C9 2E            CMP #$2E
+   46  FE54  F0 D4            BEQ LFE2A    ;'.' exits
+   47  FE56  C9 0D            CMP #$0D
+   48  FE58  D0 0F            BNE LFE69    ;<CR> increments monitor address
+   49  FE5A  E6 FE            INC $FE
+   50  FE5C  D0 02            BNE LFE60
+   51  FE5E  E6 FF            INC $FF
+   52  FE60  A0 00     LFE60  LDY #$00
+   53  FE62  B1 FE            LDA ($FE),Y
+   54  FE64  85 FC            STA $FC
+   55  FE66  4C 77 FE         JMP LFE77
+   56                  
+   57  FE69  20 93 FE  LFE69  JSR SFE93    ;hex char is stored, others ignored
+   58  FE6C  30 E1            BMI LFE4F
+   59  FE6E  A2 00            LDX #$00
+   60  FE70  20 DA FE         JSR SFEDA
+   61  FE73  A5 FC            LDA $FC
+   62  FE75  91 FE            STA ($FE),Y
+   63  FE77  20 AC FE  LFE77  JSR SFEAC
+   64  FE7A  D0 D3            BNE LFE4F
+   65  FE7C  85 FB     LFE7C  STA $FB
+   66  FE7E  F0 CF     LFE7E  BEQ LFE4F    ;*read 7bit byte from ACIA
+   67  FE80  AD 00 FC  LFE80  LDA $FC00
+   68  FE83  4A               LSR A
+   69  FE84  90 FA            BCC LFE80    ;wait for byte ready
+   70  FE86  AD 01 FC         LDA $FC01
+   71  FE89  EA               NOP
+   72  FE8A  EA               NOP
+   73  FE8B  EA               NOP
+   74  FE8C  29 7F            AND #$7F
+   75  FE8E  60               RTS
+   76                  
+   77  FE8F  00               BRK
+   78  FE90  00               BRK
+   79  FE91  00               BRK
+   80  FE92  00               BRK
+   81  FE93  C9 30     SFE93  CMP #$30     ;< 0?  *ascii char to hex value
+   82  FE95  30 12            BMI LFEA9
+   83  FE97  C9 3A            CMP #$3A     ;<':' ?
+   84  FE99  30 0B            BMI LFEA6
+   85  FE9B  C9 41            CMP #$41     ;< 'A' ?
+   86  FE9D  30 0A            BMI LFEA9
+   87  FE9F  C9 47            CMP #$47     ;>= 'G' >
+   88  FEA1  10 06            BPL LFEA9
+   89  FEA3  38               SEC
+   90  FEA4  E9 07            SBC #$07
+   91  FEA6  29 0F     LFEA6  AND #$0F
+   92  FEA8  60               RTS
+   93                  
+   94  FEA9  A9 80     LFEA9  LDA #$80
+   95  FEAB  60               RTS
+   96                  
+   97  FEAC  A2 03     SFEAC  LDX #$03      ;hex output 4 bytes @ $FF to $FC
+   98  FEAE  A0 00            LDY #$00      ;display bytes in $FF, $FE, $FD, $FC
+   99  FEB0  B5 FC     LFEB0  LDA $FC,X
+  100  FEB2  4A               LSR A
+  101  FEB3  4A               LSR A
+  102  FEB4  4A               LSR A
+  103  FEB5  4A               LSR A
+  104  FEB6  20 CA FE         JSR SFECA
+  105  FEB9  B5 FC            LDA $FC,X
+  106  FEBB  20 CA FE         JSR SFECA
+  107  FEBE  CA               DEX
+  108  FEBF  10 EF            BPL LFEB0
+  109  FEC1  A9 20            LDA #$20      ;blank  extra chars on display (from $FD)
+  110  FEC3  8D CA D0         STA $D0CA
+  111  FEC6  8D CB D0         STA $D0CB
+  112  FEC9  60               RTS
+  113                  
+  114  FECA  29 0F     SFECA  AND #$0F      ;display hex nibble @D0C6+
+  115  FECC  09 30            ORA #$30
+  116  FECE  C9 3A            CMP #$3A
+  117  FED0  30 03            BMI LFED5
+  118  FED2  18               CLC
+  119  FED3  69 07            ADC #$07
+  120  FED5  99 C6 D0  LFED5  STA $D0C6,Y
+  121  FED8  C8               INY
+  122  FED9  60               RTS
+  123                  
+  124  FEDA  A0 04     SFEDA  LDY #$04      ;shift nibble into memory
+  125  FEDC  0A               ASL A
+  126  FEDD  0A               ASL A
+  127  FEDE  0A               ASL A
+  128  FEDF  0A               ASL A
+  129  FEE0  2A        LFEE0  ROL A
+  130  FEE1  36 FC            ROL $FC,X
+  131  FEE3  36 FD            ROL $FD,X
+  132  FEE5  88               DEY
+  133  FEE6  D0 F8            BNE LFEE0
+  134  FEE8  60               RTS
+  135                  
+  136  FEE9  A5 FB     SFEE9  LDA $FB      ;controls ASCII KB or serial input
+  137  FEEB  D0 91            BNE LFE7E
+  138  FEED  AD 01 DF  LFEED  LDA $DF01    ;entry for chr-in
+  139  FEF0  30 FB            BMI LFEED    ;wait for msb bit to go low signaling character present
+  140  FEF2  48               PHA          ;save KB value
+  141  FEF3  AD 01 DF  LFEF3  LDA $DF01    ;wait for msb to go hi, indicating no keypress
+  142  FEF6  10 FB            BPL LFEF3
+  143  FEF8  68               PLA          ;return KB value
+  144  FEF9  60               RTS
+  145  FEFA  30 01             .BYTE $30, $01 ;NMI vector (unused at current address)
+  146  FEFC  00 FE             .BYTE $00, $FE ;Reset vector
+  147  FEFE  C0 01             .BYTE $C0, $01 ;IRQ vector
+
+Errors   = 0
+Warnings = 0

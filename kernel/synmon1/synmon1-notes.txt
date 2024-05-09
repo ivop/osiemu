@@ -1,0 +1,41 @@
+// SYNMON1 OSI 440/540/Serial boot notes
+//
+// Page 0  FE00 OSI 440 board 65V monitor (ASCII KB)
+// Page 1  FF00 OSI 440 board 2K video C/W/M  BASIC boot (ASCII KB)
+// Page 2  *FD00 C2/540 Polled Keyboard routine
+// Page 3  *FE00 C2/540 65V Monitor
+// Page 4  *FF00 C2/540 BASIC Boot (C/W/M?)
+// Page 5  FD00 initializes HDisk controller (CD-74/CD-36 winchester HD)
+// Page 6  FE00/FF00 OSI 65A Serial Monitor
+//         Cmds 'R' reset, 
+//              'P' <address> - dump data at supplied address until keypress
+//              'L' <address><data> - read hex data from acia until 'R' encountered
+//              'G' go address @ 012E+
+// Page 7  *FF00 C2/540 disk boot (H/D/M?) works with serial or video
+// *(same as SYN600)
+
+// So it can support: 
+//  440 video/ASCII KB, BASIC in ROM  (C/W/M)(FF00-pg1, FE00-pg0)
+//  440 video/ASCII KB, Disk/HD system(H/D/M)(FF00-pg7, FE00-pg0, FD00-pg5-if HD) 
+//  540 video/Polled KB, BASIC in ROM (C/W/M)(FF00-pg4, FE00-pg3, FD00-pg2)
+//  540 video/Polled KB, Disk, noHD   (H/D/M)(FF00-pg7, FE00-pg3, FD00-pg2)
+//  C3 Serial Disk/HD system          (H/D/M)(FF00-pg7, FE00-pg6  FD00-pg5-if HD)
+
+65V monitor commands
+L - enable ACIA input
+. - change address mode
+/ - change data mode
+G - execute at address
+0-9,A-F hex digit
+
+65A monitor commands
+R - Reset
+L - <2 Byte Address in hex><data as hex> R to exit
+P - <2 Byte Address in hex> dump data at address, Any key to exit
+G - $012D=K, $012A=X, $0129=Y, $012B=A, ($012F,$012E) = RTI
+0-9, A-F
+
+BASIC-in-ROM screen configuration controls (for pages 0,4 above)
+FFE0  initial cursor pos after CR, LF ($64 for OSI440/C1P,$40 for OSI540)
+FFE1  default terminal width/characters per line -1 ( $18 for OSI440/C1P, $3F for OSI540 )
+FFE2  video memory size $00 = 1K (32x32 OSI440/C1P) else ($01 for 2K 64x32 OSI540)

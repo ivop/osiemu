@@ -1,0 +1,10 @@
+
+Monitor ROM from OSI510 3-CPU card with 6800 support
+Page 0: (FF00) 6800 Serial Monitor (65A like) for OSI 510 board
+Page 1: (FF00) Basic boot (C/W/M) for serial systems w/ $FC00 ACIA, OSI430 UART for cassette
+Page 2: (FD00) Polled Keyboard routine OSI540
+Page 3: (FE00) 65V ROM Monitor for OSI540
+Page 4: (FF00) Basic boot (C/W/M) for video systems OSI540
+Page 5: (FD00) HardDisk CD-74/36 boot support
+Page 6: (FE00) 65A Serial Monitor for $FC00 ACIA
+Page 7: (FF00) H/D/M disk boot

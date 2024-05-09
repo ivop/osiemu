@@ -1,0 +1,11 @@
+OSI C3D monitor ROM for OSI510 and CD-7 10M Hard Disk
+Labeled "C3DMON Rev1"
+
+Page 0  empty ($FF)
+Page 1  FD00 Hard disk loader for CD-7 (OSI 590/596/525 set or 598)
+Page 2  FE00 OSI 65A serial monitor use with H/D/M FFxx rom
+Page 3  FF00 standard disk based OSI 505/510 H/D/M block
+Page 4  empty ($FF)
+Page 5  FD00 Hard disk loader for CD-7 (duplicate copy)
+page 6  FE00 OSI 65A serial monitor (duplicate copy)
+Page 7  FF00 standard disk based OSI 505/510 H/D/M block (duplicate copy)

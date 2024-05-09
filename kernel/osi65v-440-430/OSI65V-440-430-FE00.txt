@@ -1,0 +1,2 @@
+This is the OSI 65V monitor ROM for OSI440 video using OSI 430 UART, and ASCII keyboard
+ROM is located at $FE00

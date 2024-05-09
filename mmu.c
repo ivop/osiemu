@@ -15,6 +15,7 @@
 #include "mmu.h"
 #include "keyboard.h"
 #include "video.h"
+#include "tape.h"
 
 // ----------------------------------------------------------------------------
 
@@ -93,24 +94,36 @@ uint8_t read6502(uint16_t address) {
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
     }
-
+    fprintf(stderr, "mmu: read: %04x\n", address);
+    if (address >= 0xf000 && address <= 0xf003) {
+        return tape_read(address);
+    }
     return 0xff;
 }
 
 void write6502(uint16_t address, uint8_t value) {
-    if (address < mmu_ram_top) {
+    if (address <= mmu_ram_top) {
         RAM[address] = value;
+        return;
     }
     if (video_enabled) {
         if (address >= 0xd000 && address <= 0xd7ff) {
             SCREEN[address - 0xd000] = value;
+            return;
         }
         if (address >= 0xe000 && address <= 0xe7ff) {
             COLOR[address - 0xe000] = value;
+            return;
         }
     }
     if (address == 0xdf00) {
         keyboard_write(value);
+        return;
+    }
+    fprintf(stderr, "mmu: write: %04x value: %02x\n", address, value);
+    if (address >= 0xf000 && address <= 0xf003) {
+        tape_write(address, value);
+        return;
     }
 }
 

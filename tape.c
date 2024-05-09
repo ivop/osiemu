@@ -10,30 +10,12 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "acia.h"
 #include "tape.h"
 
-static struct acia tape_acia;
 static FILE *inputf;
 static FILE *outputf;
 
-int tape_input(void) {
-    return inputf ? fgetc(inputf) : -1;
-}
-
-int tape_output(uint8_t byte) {
-    if (outputf) {
-        fputc(byte, outputf);
-        return 0;
-    } else {
-        return -1;
-    }
-}
-
 bool tape_init(char *input_file, char *output_file, double cpu_clock) {
-    tape_acia.input = tape_input;
-    tape_acia.output = tape_output;
-
     if (input_file) {
         if (!(inputf = fopen(input_file, "rb"))) {
             fprintf(stderr, "error: cannot open %s\n", input_file);
@@ -48,18 +30,16 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
         }
     }
 
-    acia_init(&tape_acia, cpu_clock);
     return true;
 }
 
 void tape_tick(void) {
-    acia_tick(&tape_acia);
 }
 
 uint8_t tape_read(uint16_t address) {
-    return acia_read(&tape_acia, address);
+    fprintf(stderr, "tape: read: %04x\n", address);
 }
 
 void tape_write(uint16_t address, uint8_t value) {
-    acia_write(&tape_acia, address, value);
+    fprintf(stderr, "tape: write: %04x <-- %02x\n", address, value);
 }

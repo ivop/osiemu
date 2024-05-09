@@ -28,7 +28,7 @@
 static char *basic_filename = "basic/basic-osi.rom";
 static char *kernel_filename = "kernel/synmon-alt.rom";
 static char *tape_input_filename = NULL;
-static char *tape_output_filename = "tape_output.dat";
+static char *tape_output_filename = "tapeout.dat";
 
 // How fast does our 6502 run?
 
@@ -56,6 +56,9 @@ static void usage(void) {
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals\n"
 "\n"
+"    -t/--tape-input file       specify tape input file (default: none)\n"
+"    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -71,12 +74,16 @@ static struct option long_options[] = {
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
     { "video-mode",     required_argument,  0, 'm' },
+    { "tape-input",     required_argument,  0, 't' },
+    { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
     { "zoom",           no_argument,        0, 'z' },
 };
 
 int main(int argc, char **argv) {
     int option, index;
+
+    printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
     while ((option = getopt_long(argc, argv, "b:df:hik:m:vz",
                                  long_options, &index)) != -1) {
@@ -138,6 +145,12 @@ int main(int argc, char **argv) {
         case 'i':
             keyboard_inverted ^= 1;
             break;
+        case 't':
+            tape_input_filename = strdup(optarg);
+            break;
+        case 'T':
+            tape_output_filename = strdup(optarg);
+            break;
         case 'h':
             usage();
             return 1;
@@ -146,8 +159,6 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
-
-    printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
     if (mmu_basic_enabled) {
         if (!mmu_load_file(BASIC, 8192, basic_filename, false))
@@ -178,7 +189,9 @@ int main(int argc, char **argv) {
 
     reset6502();
     keyboard_init();
-    tape_init(tape_input_filename, tape_output_filename, cpu_clock);
+    if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
+        return 1;
+    }
 
     // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
 

@@ -23,10 +23,5 @@ extern int screen_height;
 extern int osi_width;
 extern int osi_height;
 
-extern SDL_Window *window;
-extern SDL_Surface *winsurface;
-extern SDL_Surface *screen;
-extern SDL_Surface *font;
-
 bool screen_init(void);
 void screen_update(void);

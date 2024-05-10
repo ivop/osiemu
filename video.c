@@ -39,10 +39,10 @@ int screen_height = 256;
 int osi_width = 64;
 int osi_height = 32;
 
-SDL_Window *window;
-SDL_Surface *winsurface;
-SDL_Surface *screen;
-SDL_Surface *font;
+static SDL_Window *window;
+static SDL_Surface *winsurface;
+static SDL_Surface *screen;
+static SDL_Surface *font;
 
 enum mono_colors {
     COLOR_GREEN = 0,
@@ -161,4 +161,3 @@ bool screen_init(void) {
 }
 
 // ----------------------------------------------------------------------------
-

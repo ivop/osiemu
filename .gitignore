@@ -3,3 +3,7 @@
 fake6502/*.o
 osiemu
 .depend
+tools/bin2lod
+tools/*.bin
+tools/*.lod
+tapeout.dat

@@ -24,6 +24,8 @@ static int baud_timer;
 static int baud_div;
 
 static bool running = false;
+static bool reading = false;
+static bool writing = false;
 
 static uint8_t control;
 static uint8_t status;
@@ -80,47 +82,63 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     return true;
 }
 
-void tape_rewind(void) {
+static void tape_rewind_input(void) {
     if (inputf) {
         printf("tape: rewinding input tape\n");
         fseek(inputf, 0, SEEK_SET);
-        running = 0;
     }
 }
 
+void tape_rewind(void) {
+    tape_rewind_input();
+    running = false;
+    reading = false;
+    writing = false;
+}
+
 void tape_tick(double ticks) {
-     timer += ticks;
-     if (timer < ticks_per_clock) return;
+    timer += ticks;
+    if (timer < ticks_per_clock) return;
 
-     timer -= ticks_per_clock;
+    timer -= ticks_per_clock;
 
-     if (!running) return;
+    if (!running) return;
 
-     baud_timer--;
+    baud_timer--;
 
-     if (baud_timer) return;
+    if (baud_timer) return;
 
-     baud_timer = baud_div;
+    baud_timer = baud_div;
 
-     bits_remaining--;
+    bits_remaining--;
 
-     if (bits_remaining <= 0) {
-         if (inputf) {
-             // receiving...
-             int v = fgetc(inputf);
-             if (v < 0) {                           // end-of-file
-                 setbit(status, STATUS_FE_MASK);
-             } else {
-                 RDR = v;
-                 if (getbit(status, STATUS_RDRF_MASK)) {
-                     setbit(status, STATUS_OVRN_MASK);
-                 }
-                 setbit(status, STATUS_RDRF_MASK);
-             }
-         }
-         // wait again...
-         bits_remaining = bits_per_byte;
-     }
+    if (bits_remaining <= 0) {
+        bits_remaining = 0;
+        if (reading && inputf) {
+            // receiving...
+            int v = fgetc(inputf);
+            if (v < 0) {                           // end-of-file
+                setbit(status, STATUS_FE_MASK);
+            } else {
+                RDR = v;
+                if (getbit(status, STATUS_RDRF_MASK)) {
+                    setbit(status, STATUS_OVRN_MASK);
+                }
+                setbit(status, STATUS_RDRF_MASK);
+            }
+            bits_remaining = bits_per_byte;
+        }
+        if (writing && outputf) {
+            // transmitting...
+            if (!(status & STATUS_TDRE_MASK)) {
+                fputc(TDR, outputf);
+                setbit(status, STATUS_TDRE_MASK);
+                bits_remaining = bits_per_byte;
+            } else {
+                bits_remaining = 1;
+            }
+        }
+    }
 }
 
 uint8_t tape_read(uint16_t address) {
@@ -128,7 +146,9 @@ uint8_t tape_read(uint16_t address) {
     case 0:                     // status register
         if (!running) {
             printf("tape: reading status, activate tape\n");
-            running = 1;
+            running = true;
+            printf("tape: assume reading\n");
+            reading = true;     // assume reading, unless TDR is written
         }
         return status;
         break;
@@ -168,8 +188,16 @@ void tape_write(uint16_t address, uint8_t value) {
         bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
         break;
     case 1:                     // transmit register
-        TDR = value;
-        clrbit(status, STATUS_TDRE_MASK);   // not empty
+        if (running) {
+            if (!writing) {
+                tape_rewind_input();
+                printf("tape: switch to writing\n");
+                reading = false;
+                writing = true;     // switch to writing
+            }
+            TDR = value;
+            clrbit(status, STATUS_TDRE_MASK);   // not empty
+        }
         break;
     }
 }

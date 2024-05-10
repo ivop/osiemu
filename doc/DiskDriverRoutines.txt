@@ -1,0 +1,972 @@
+    Disk Driver Routines
+	        for 
+	OSI's Disk Basic
+	        in RAM
+			
+	
+	Commented by Chris McIntosh May, 1980		
+	    
+
+
+   
+    The following is a brief description of how the chips used to
+    read and write to the disc drives are initialized and programmed.
+    Only the options used by OSI will be explained here although the
+    chips can be programmed for many other options.
+    
+    The chip used by OSI (6820 PIO chip) to read and write to the
+    disk drive has two ports with three registers for each port,
+    making six registers in the chip in total. Only four of these
+    resisters can be specified, however, which means that some extra
+    Programming has to be done. The six registers are listed below:
+
+    CRA       - controls interrupt handling and handshaking, Bit 2
+              selects DRA or DDRA as follows:
+    
+                0 selects DDRA
+                1 selects DRA
+    
+    DRA       - if Port A set for input (normally the case)
+              indicates status of disk drive.
+    DDRA      - controls whether data on the data bus is to be
+              input or output (A normally set for input).
+    
+    CRB       - same as CRA. Bit 2 selects DRB or DDRB in the
+              manner described above for CRA.
+    
+    DRB       - if Port B set for output (normally the     
+              case) used to control the disk drive.
+    
+    DDRB      -controls whether data on the data bus is to      
+              be input or output (B normally set for            
+              output).
+    
+    The addresses of the above registers are listed below:
+    
+    CRA  -C001
+    DRA  -C000 (if bit 2 of C001 is set)
+    DDRA -C000 (if bit 2 of C001 is clear)
+    CRB  -C003 
+    DRB  -C002 (if bit 2 of C003 is set) 
+    DDRB -C002 (if bit 2 of C003 is clear)
+    
+    When the BREAK and D keys are hit, code in ROM is executed to
+    initialize port A for input and port B for output. This can be
+    done with the following code:
+    
+    LDA #0
+    STA $C001     ;select DDRA.
+    STA $C000     ;0's in DDRA indicate input.
+    LDA #4
+    STA $C001     ;select DRA. Any LDA's from $COOO
+                  ;will read data from DRA.
+    LDA #0
+    STA $C003     ;select DDRB.
+    LDA #$FF
+    STA $CO02     ;1's in DDRB indicate output.
+    LDA #4        ;select DRB, Any STA's to $C002
+                  ;will write data to DRB.
+    
+  
+
+       After DRA has been initialized for input with code similar
+       to that above, the status of the disk drive can be
+       determined reading from location C000. The following
+       table can be used to determine what the various bits in this
+       location mean, Only the bits used by OSI are explained.
+
+        BIT          OFF (CLEAR)                            ON (SET)
+        ----         ------------                           --------
+
+           0         drive 1 reads                          drive 1 not ready
+           1         head above track 0                     not above track 0
+           4         drive 2 reads                          drive 2 not ready
+           5         disk write protected                   disk is read/write
+           6         select drive 2                         select drive 1
+           7         above index hole                       not above index hole
+
+      After DRB has been initialized for output with code similar
+      to that above, the disk drive can be controlled by writing
+      to location C002. The following  table indicates what bits the various
+      bits in this location control
+
+        BIT          OFF (CLEAR)                            ON (SET)
+        ----         ------------                           --------
+           0         write to disk                          read from disk
+           1                                                erase enable; keep on        
+           2         direction = to track 39                direction = to track 0
+           3         move a track (movement                 get ready to move
+                     occurs when this bit is
+                     changed from 1 to 0)
+           4                                                fault reset; keep on
+           5         turn drive off                         turn drive on
+           6                                                low current; keep on
+           7         put head on disk                       lift head from disk
+
+     The other two addresses used are the address of the disk status and the data
+     registers. These are:
+
+      C010  -            disk status location. Only two numbers are                                                                                                                                                                                                                                                                                                disk status location. Only two numbers are
+                         written to this location by OSI.
+                         $03     master reset; resets the whole chip.
+                         $58     selects 8 bits, even parity, 1 stop bit.
+                                 Disables transmit interrupt logic
+                                 disables receive interrupt logic.
+
+                        The only bits read are bits 0, 1 and 6:
+                        bit  0 set - read buffer full; data reads
+                                     to be read from data register.
+                        bit  1 set - write buffer empty; data can
+                                     be written to data register.
+                        bit  6 set - a parity error occurred when
+                                     the last byte was read from C011
+                        
+
+       C011  -          this location is the disk data register. A
+                        byte is read from disk by 'LDA C001' when
+                        bit 0 of COlO is set; a byte is written to
+                        disk by `STA CO1l' when bit 1 of C010 is set.
+            
+            Below follows a disassembled and commented copy of OSI's
+            Floppy Disk Driver routines, The code starts at. location
+            2663, The comments above will hopefully make some of what
+            follows more understandable.
+            
+			;--------------------------------------------
+            ; START OF DISK DRIVERS.
+            ;--------------------------------------------
+            ;
+            ;--------------------------------------------            
+            ; ROUTINE TO GO TO TRACK 0
+            ;--------------------------------------------
+            
+            2663 208A26 JSR $268A ;move 1 track towards track 39
+            ;
+            2666 207826 JSR  $2678   ;wait loop subroutine
+            ;
+            2669 8C5D26 STY  $265D   ;$265D=track head is above. Set to 0.
+            ;
+            266C A902   LDA  #$02    ;if on track 0, go into
+            266E 2C00C0 BIT  $C000   ;wait loop, then return
+            2671 F005   BEQ  $2678   ;to calling program
+            ;
+            2673 208326 JSR  $2683   ;if not, set direction for track 0,
+            2676 F0F4   BED  $266C   ;move a track, wait, and loop back
+            ;
+            2678 A2OC   LDX  #$0C    ;wait loop subroutine. A JSR $2678
+            267A A0C7   LDY  #$C7    ;will set both X (outer decrement)
+            267C 88     DEY          ;and Y (inner decrement). If a
+            267D D0FD   BNE  $267C   ;longer or shorter wait is wanted
+            267F CA     DEX          ;the user can set X themselves
+            2680 D0F8   BNE  $267A   ;and JSR $267A
+            2682 60     RTS
+            ;
+            2683 AD02C0 LDA  $C002   ;set direction towards track 0,
+            2686 0904   ORA  #$04    ;jump to store & wait routines
+            2688 D005   BNE  $268F
+            ;
+            268A A9FB   LDA  $$FB    ;set direction towards track 39,
+            268C 2D02C0 AND  $C002   ;store head direction below
+            ;
+            268F 8D02C0 STA  $C002   ;store head direction
+            2692 208226 JSR  $2682   ;short wait
+            ;
+            2695 29F7   AND  #$F7    ;move over one track
+            2697 8D02C0 STA  $C002
+            269A 208226 JSR  $2682   ;short wait loop
+            269D 0908   ORA  #$08    ;reset bit 3 to 1. ready for
+            269F 8D02C0 STA  $C002   ;next move when it changes to a 0
+            ;
+            26A2 A208   LDX  #$08    ;set `outer' decrement value and
+            26A4 D0D4   BNE $267A    ;jump to wait routine, then return
+            
+            ;--------------------------------------------
+            ; MOVE DISK HEAD TO DECIMAL TRACK NUMBER 
+            ; STORED IN LOCATION $2662
+            ;--------------------------------------------                                        
+            26A6 AD6226 LDA $2662    ;Load track no. for USR(X) routine
+            ;
+            26A9 38     SEC          ;convert decimal track number
+            26AA A2FF   LDX #$FF     ;in accumulator into BCD,
+            26AC ES     INX          ;store in location IFA
+            26AD E9OA   SBC #$0A     ;and put on the stack
+            26AF BOFB   BCS $26AC
+            26B1 690A   ADC #$0A
+            26B3 85FA   STA $FA
+            26B5 BA     TXA
+            26B6 0A     ASL A
+            26B7 0A     ASL A
+            26B8 0A     ASL A
+            26B9 0A     ASL A
+            26BA 05FA   ORA $FA
+            26BC B5FA   STA $FA
+            26BE 48     PHA
+            ;
+            26BF 2C9E26 BIT $269E    ; if low digit less than 8,
+            26C2 F004   BEQ $26C8    ;perform next validity check
+            ;					    
+            26C4 2906   AND #$06     ;it low digit treater than 9 (ie. a
+            26C6 D005   BNE $26CD    ;hex digit), loto ERROR #8 routine
+            ;					    
+            26C8 68     PLA          ; if track # less than 40, OK
+            26C9 C940   CMP #$40                  .
+            26CB 9004   BCC $26D1   
+            ;					    
+            26CD A908   LDA #$08     ;load return code (B in this case)
+            26CF D00D   BNE $26DE    ; and Jump to ERROR routine
+            ;					    
+            26D1 AD5C26 LDA $265C    ; load disk drive number
+            26D4 2901   AND $#01     ;( 0=drive 1, 2=drive 2)
+            ;					    
+            26D6 A8     TAY          ;see if disk is ready
+            26D7 20DA29 JSR $29DA   
+            ;					    
+            26DA 9005   BCC $26E1    ;it ready, continue at $26E1
+            ;					    
+            26DC A906   LDA #$06     ;not ready, load return code (6=disk
+            26DE 4C4B2A JMP $2A4B    ;not ready), Jump to ERROR routine
+            ;					    
+            26E1 F8     SED          ;compare $FA (track you want) with
+            26E2 A6FA   LDX $FA      ;$265D (track head is above).
+            2614 ECSD26 CPX $265D    ;if emual, clean up and return
+            26E7 F01C   BED $2705   
+            ;					    
+            26E9 B00D   BCS $26F8    ;if low, move towards track 39
+            ;					    
+            26EB A999   LDA #$99     ;track you are above is too high,
+            26ED 6D5D26 ADC $265D    ;subtract 1 from $265D (points to
+            26F0 8D5D26 STA $265D    ;track head is above) and move
+            26F3 208326 JSR $2683    ;one more track towards track 0
+            ;					    
+            26F6 FOE9   BEQ $26E1    ;loop to see if above correct track
+            ;					    
+            26F8 A900   LDA #$00     ;track you are above is too low,
+            26FA 6D5D26 ADC $265D    ;add 1 (carry is set) to $265D (points
+            26FD 8D5D26 STA $265D    ;to track head is above) and move
+            2700 208A26 JSR $268A    ;one more track towards track 39
+            ;
+            2703 FODC   BEQ $26E1    ;loop to see if above correct track
+            ;					    
+            2705 D8     CLD          ;finished. Clear decimal mode,
+            2706 4C7826 JMP $2678    ;go to wait loop, and return.
+            ;
+            ;--------------------------------------------------; 
+            ;  SELECT CORRECT CURRENT (HIGH OR LOW)            ;
+            ;  DEPENDING ON WHETHER DISK HEAD OVER A           ;
+            ;  TRACK <= TRACK 42 OR A TRACK > TRACK 42.        ;
+            ;---------------------------------------------------
+            ;                                                    
+            2709 ADO2CO LDA $C002
+            270C A242   LDX #$42
+            270E EC5D26 CPX $265D    ;see if disk head on a track
+            2711 9004   BCC $2717    ;less than or Ireater than 42
+            2713 0940   ORA #$40     ;head <= track 42, set current bit
+            2715 D002   BNE $2719    ;store current bit
+            ;					    
+            2717 29EF   AND #$BF     ;head > track 42, clear current bit
+            2719 8D02C0 STA $C002    ;store correct current
+            271C 60     RTS          ;and return
+            ;
+            ;-------------------------------------------------; 
+            ; ROUTINE TO WAIT FOR DISKETTE TO REVOLVE TO      ;
+            ; FIRST BYTE PAST THE INDEX HOLE.                 ;
+            ;-------------------------------------------------;                                                   
+            271D AD00C0 LDA $C000    ;load status of disk drive
+            2720 3OFB   BMI $271D    ;if not above index hole, loop
+            2722 AD00C0 LDA $C000    ;above index hole, load disk status
+            2725 1OFB   BPL $2722    ;loop until past index hole
+            2727 60     RTS          ;then return
+            
+            ;-------------------------------------------------;                                                   
+            ; ROUTINE TO PUT HEAD ON DISK, FIND FIRST BYTE    ;
+            ; OF DATA, AND INITIALIZE PlO CHIP.               ;
+            ;-------------------------------------------------;  
+            2728 205427 JSR $2754    ;subroutine to put disk head on disk
+            2720 201D27 JSR $2710    ;subroutine to ,find 1st byte of data
+            272E A903   LDA #$03     ;reset the chip
+            2730 8D10C0 STA $C010  
+            ;					   
+            2733 A958   LDA #$58     ;select 8 bits, even parity, 1 stop
+            2735 8D1OCO STA $C010    ;bit, disable interrupt logic
+            2738 60     RTS          ;return
+            
+            ;-------------------------------------------------;                                                   
+            ; READ A TRACK INTO THE MEMORY LOCATIONS          ;
+            ; POINTED TO BY LOCATIONS (FE,FF) (low,high),     ;
+            ;-------------------------------------------------;                                                   
+            2739 202827 JSR $2728    ;routine gets ready to read 1st bwte
+            ;					      
+            273C AD00C0 LDA $C000    ;if over index hole, clean
+            273F 1020   BPL $2761    ;up and return
+            ;					    
+            2741 AD10C0 LDA $C010    ;if not reads to read a byte,
+            2744 4A     LSR A        ;loop to check position anin
+            2745 90F5   BCC $273C   
+            					    
+            2747 AD11CO LDA $C011    ;read a byte from disk
+            274A 91FE   STA ($FE),Y  ;store in memory
+            274C C8     INY          ;increment index V
+            274D DOED   BNE $273C    ;if Y=0 (256 bytes stored), then
+            274F E6FF   INC $FF      ;inc FF (high byte of mem. pointer)
+            ;					    
+            2751 4C3C27 JMP $273C    ;loop to check position again
+            ;
+            ;--------------------------------------------
+            ; ROUTINE TO PLACE DISK HEAD ON DISKETTE,   ;
+            ; JUMP TO WAIT LOOP, AND RETURN.            ;
+            ;--------------------------------------------
+            2754 A97F   LDA #$7F     ;turn off bit 7 of C002
+            2756 2D02C0 AND $C002    ;to put head on diskette
+            2759 8D02C0 STA $C002
+            ;
+            275C A228   LDX #$28     ;set X (outer decrement) to hex 28
+            275E 4C7A26 JMP $267A    ;and Jump to wait loop, then return
+            ;
+            ;----------------------------------------------
+            ; ROUTINE TO LIFT DISK HEAD FROM DISKETTE,    ;
+            ; JUMP TO WAIT LOOP, THEN RETURN              ;
+            ; TIME, THEN RETURN.                          ;
+            ;----------------------------------------------
+            2761 A980   LDA  #$80    ;turn on bit 7 of C002
+            2763 0D02C0 ORA  $C002
+            ;
+            2766 DOF1   BNE  $2759   ;store value in C002, wait, return
+            ;
+            ;----------------------------------------------
+            ; INITIALIZATION ROUTINE. WRITES HEADER        ;
+            ; INFORMATION ON TO ALL 39 TRACKS OF DISKETTE. ;
+            ;----------------------------------------------;
+            2768 A939   LDA #$39    ;store hex 39 at $E5
+            276A 85E5   STA $E5 
+            ;
+            276C 206326 JSR $2663   ;move to track 0
+            ;
+            276F 20832C JSR $2C83   ;move to the next track
+            ;
+            2772 207D27 JSR $277D   ;write track header information
+            ;
+            2775 AD5D26 LDA $265D   ;load track no. head is above
+            ;
+            2778 C939   CMP #$39    ;if not eoual to 39, rereat
+            277A DOF3   BNE $276F   ;code from $276F again
+            ;
+            277C 60     RTS         ;disk initialized, return
+            ;
+            ;---------------------------------------------
+            ; ROUTINE TO WRITE TRACK HEADER INFORMATION  ;
+            ; ON A TRACK OF DISKETTE.                    ;
+            ;---------------------------------------------
+            277D A902   LDA #$02    ;check to see if head above
+            277F 2COOCO BIT $C000   ;track 0. If not, continue
+            2782 D004   BNE $2788
+            ;
+            2784 A903   LDA #$03    ;on track 0, load error code of 3.
+            2786 D009   BNE $2791   ;(can't write header on track 0)
+            ;
+            2788 A920   LDA #$20    ;check to see if disk is write
+            278A 2COOCO BIT $C000   ;protected. If not, continue
+            278D D005   BNE $2794
+            ;
+            278F A904   LDA #$04    ;write protected disk, load error
+            2791 4C4B2A JMP $2A4B   ;code of 4, Jump to error routine
+            ;
+            2794 202827 JSR $2728   ;get ready to read 1st bwte of data
+            ;
+            2797 A9FC   LDA #$FC    ;enable write circuits
+            2799 2002C0 AND $C002
+            279C 8D02C0 STA $C002
+            ;
+            279F A2OA   LDX #$0A    ;store outer decrement of 10 in X,
+            27A1 207A26 JSR $267A   ;Jump to wait loop (1 millisecond)
+            ;
+            27A4 A243   LDX #$43    ;write the two byte start code
+            27A6 20C227 JSR $27C2   ;of $43, $57
+            27A9 A257   LDX #$57
+            27AB 20C227 JSR $27C2
+            ;
+            27AE AE5D26 LDX $265D   ;load BCD track number disk head is
+            27B1 20C227 JSR $27C2   ;initializing, write it to disk
+            ;
+            27B4 A258   LDX #$58    ;write the track type code to disk
+            27B6 20C227 JSR $27C2   ; (always a hex 58)
+            ;
+            27B9 AD00C0 LDA $C000   ;wait until index hole found
+            27BC 3OFB   BMI $27B9
+            ;
+            27BE A983   LDA #$83    ;lift head, disable write, set erase
+            27C0 D0A1   BNE $2763   ;enable to 1, store, wait & return
+            ;
+            ;-------------------------------------------------------                 
+            ; ROUTINE TO WRITE A BYTE TO DISK.                     ;
+            ;-------------------------------------------------------
+            27C2 AD10C0 LDA $C010   ;loop to wait until write
+            27C5 4A     LSR A       ;buffer is empty
+            27C6 4A     LSR A
+            27C7 90F9   BCC $27C2
+            ;
+            27C9 8E11C0 STX $C011   ;write the byte in X reg to disk
+            ;
+            27CC 60     RTS         ;return
+            ;					    
+            ;-------------------------------------------------------
+            ; ROUTINE TO READ A BYTE FROM DISK.
+            ;-------------------------------------------------------
+            27CD AD10C0 LDA $C010   ;loop to wait until read
+            27D0 4A     LSR A       ;buffer is full
+            27D1 90FA   BCC $27CD
+            27D3 AD11C0 LDA $C011   ;load acc. with byte from disk
+            ;
+            27D6 60     RTS         ;return
+            ;
+            ;---------------------------------------------;
+            ; WRITE A SECTOR TO DISK WITH ERROR CHECK     ; 
+            ;---------------------------------------------;             
+            27D7 AD6026 LDA $2660   ;load ($FE,$FF) with buffer
+            27DA 85FE   STA $FE     ;address for read/write operation
+            27DC AD6126 LDA $2661   
+            27DF 85FF   STA $FF	    
+            ;					    
+            27E1 AD5F26 LDA $265F   ;load page count
+            ;					    
+            27E4 F002   BEQ $27E8   ;if 0, load error routine code
+            27E6 1004   BPL $27EC   ;of B (bad sector length value)
+            27E8 A9OB   LDA #$OB    ;and Jump to ERROR routine
+            27EA D0A5   BNE $2791   
+            ;					    
+            27EC C969   CMP #$09    ;if sector length >= 9, Jump to
+            27EE 10F8   BPL $27E8   ;ERROR routine with code of B
+            ;					    
+            27F0 A902   LDA #$02    ;if on track 0, return
+            27F2 2COOCO BIT $C000   ;(can't write a sector to track 0
+            27F5 FODF   BEQ $27D6   ;without special utilitw)
+            ;					    
+            27F7 4A     LSR A       ;store a 1 in memory
+            27F8 85FA   STA $FA     ;location $FA
+            ;					    
+            27FA A920   LDA  #$20   ;if disk not write protected,
+            27FC 2C00C0 BIT  $C000  ;then continue
+            27FF D004   BNE  $2805  
+            ;					    
+            2801 A904   LDA #$04    ;disk. write protected, load error
+            2803 D0E5   BNE $27EA   ;code of 4 and Jump to ERROR routine
+            ;					    
+            2805 A901   LDA #$01    ;initialize $F6 and $F8 with
+            2807 85F6   STA $F6     ;number of tries to read data back
+            2809 A903   LDA #$03    ;after writing before jumping
+            280B 85F8   STA $F8     ;to ERROR *2 routine
+            ;					    
+            280D 20C428 JSR $28C4   ;position head above correct sector
+            ;					    
+            2810 209F28 JSR $289F   ;wait 400 us X last sector lenflh
+            ;					    
+            2813 A9FE   LDA #$FE    ;enable write circuits
+            2815 2D02C0 AND $C002   
+            2818 8D02C0 STA $C002   
+            ;					    
+            28lB A225   LDX #$25    ;short wait loop
+            281D CA     DEX		    
+            281E DOFD   BNE $281D   
+            ;					    
+            2820 A9FF   LDA #$FF    ;do nothing, wait loop (?)
+            2822 2D02C0 AND $C002   
+            2825 8D02C0 STA $C002   
+            ;					    
+            2828 209F28 JSR $289F   ;wait 400 us X last sector length
+            ;
+            282B A276    LDX #$76   ;write sector start code to disk
+            282D 20C227  JSR $27C2
+            ;
+            2830 AE5E26  LDX $265E  ;write sector number to disk
+            2833 20C227  JSR $27C2
+            ;
+            2836 AE5F26  LDX $265F  ;store sector length in
+            2839 86FD    STX $FD    ;memorv location $FD
+            283B 20C227  JSR $27C2  ;write sector length to disk
+            ;
+            283E A000    LDY #$00   ;init Y, index register
+            ;
+            2840 B1FE    LDA ($FE),Y
+            2843 20C227  JSR $27C2  ;write correct number of
+            2846 C8      INY        ;pages to disk
+            2847 D0F7    BNE $2840
+            2849 E6FF    INC $FF
+            284B C6FD    DEC $FD
+            284D D0F1    BNE $2240
+            ;
+            284F A247    LDX #$47   ;write a hex 47 to disk
+            2851 20C227  JSR $27C2
+            ;
+            2854 A253    LDX #$53   ;write a hex 53 to disk
+            2856 20C227  JSR $27C2
+            ;
+            2859 AD5F26  LDA $265F  ;calculate 6 times the
+            285C 0A      ASL A      ;page count (sector length)
+            285D 85FD    STA $FD
+            285F 0A      ASL A
+            2860 18      CLC
+            2861 65FD    ADC $FD
+            ;
+            2863 20A428  JSR $28A4  ;wait 300 us X page count
+            ;					    
+            2866 AD02C0  LDA $C002  ;enable read circuits
+            2869 0901    ORA #$01
+            286B 8D02C0  STA $C002
+            ;
+            286E A269    LDX #$69   ;short wait loop
+            2870 CA      DEX
+            2871 DOFD    BNE $2870
+            ;
+            2873 0902    ORA #$02   ;set erase enable bit on
+            2875 8D02C0  STA $C002
+            ;
+            2878 18      CLC        ;reset memory location $FF
+            2879 8A      TXA        ;to point back to the beginning
+            287A 65FF    ADC $FF    ;of memorw buffer Just written
+            287C 38      SEC        ;to disk
+            287D ED5F26  SBC $265F
+            2880 85FF    STA $FF
+            ;
+            2882 200529  JSR $2905  ;verify that data written to disk OK
+            ;
+            2885 B013    BCS $289A  ;if carry set; data written OK
+            ;
+            2887 C6F8    DEC $F8    ;data not read back OK. Try
+            2889 D0ED    BNE $2878  ;again if RETRY counter not < 0
+            ;
+            288B C6F6   DEC $F6      ;if all RETRIES exhausted, go to
+            288D 300C   BMI $289B    ;ERROR #2 routine
+            288F BA     TXA          ;reset memory location $FF to point
+            2890 65FF   ADC $FF      ;to buffer written to disk
+            2892 38     SEC
+            2893 EDSF26 SBC $265F
+            2896 85FF   STA $FF
+            ;
+                                     ;NOTE: Code below incorrect,
+                                     ;Stack will be incorrect, as
+                                     ;code at $2909 causes one byte
+                                     ;to be pulled from the stack
+                                     ;which has been pushed at $2905.
+            ;
+            2898 DO6F   BNE $2909    ;one more try. (See above note)
+            289A 60     RTS          ;return
+            2898 A9O2   LDA #$02     ;load return code (2=can't write
+            289D DO22   BNE $28C1    ;sector) and Jump to ERROR routine
+            ;
+            ;------------------------------------------------
+            ;  ROUTINE TO WAIT 400 MICROSECONDS OF DELAY    ;
+            ;  TIMES THE NUMBER STORED IN MEMORY LOCATION   ;
+            ;  $FA (USUALLY THE LENGTH OF THE SECTOR JUST   ;
+            ;  READ FROM DISK OR JUST SPACED OVER ON DISK). ;
+            ;  (NOTE: THIS IS HALF OF THE DELAY WAITED IN   ;
+            ;  BETWEEN WRITING DIFFERENT SECTORS TO DISK.)  ;
+            ;------------------------------------------------          
+            289F A5FA   LDA $FA      ;load previous sector lensth
+            ;
+            28A1 0A     ASL A        ;multiply by 8
+            28A2 0A     ASL A
+            28A3 0A     ASL A
+            ;
+            28A4 A8     TAY          ;store in Y (outer decrement)
+            28A5 A212   LDX   #$12   ;loop to wait 50 microseconds of
+            28A7 CA     DEX          ;delay times the number stored
+            28A8 D0FD   BNE  $28A7   ;in the Y resister
+            28AA EA     NOP
+            28AB EA     NOP
+            28AC 88     DEY
+            28AD D0F6   BNE  $28A5
+            ;
+            28AF 60     RTS         ;return
+            ;
+            ;------------------------------------------------
+            ; READ A BYTE FROM DISK WITH ERROR CHECKING.     ;
+            ; FOR USE IN SEARCHING FOR TRACK HEADERS.        ;
+            ;------------------------------------------------
+            28B0 AD00C0 LDA $C000   ;if index found, go to
+            28B3 100A   BPL $28BF   ;ERROR *9 routine
+            
+            28B5 AD10C0 LDA $C010   ;wait until read buffer full
+            2BB8 4A     LSR A
+            28B9 90F5   BCC $28B0
+            ;
+            28BB AD11C0 LDA $C011   ;read a byte from disk
+            28BE 60     RTS         ;return
+            ;
+            28BF A909   LDA #$09    ;load return code of 9 (can't find
+            28C1 4C4B2A JMP $2A4B   ;track header), Jump to ERROR routine
+            ;
+            ;------------------------------------------------ 
+            ; ROUTINE TO POSITION HEAD ABOVE SECTOR NUMBER  ;
+            ; STORED IN LOCATION $265E ON THE TRACK YOU ARE ;
+            ; CURRENTLY ON.                                 ;
+            ;------------------------------------------------ 
+            28C4 202B27 JSR  $272B  ;get ready to read 1st bwte of data
+            28C7 20B028 JSR  $28B0  ;search for two byte
+            2BCA C943   CMP  #$43   ;track start code of $43, $57
+            28CC DOF9   BNE  $28C7
+            28CE 20B028 JSR  $28B0
+            28D1 C957   CMP  #$57
+            28D3 D0F5   BNE  $28CA
+            ;
+            20D5 20CD27 JSR $27CD   ;read BCD track number from disk
+            ;
+            28DB CD5D26 CMP $265D   ;see if it matches track number
+            28DB F004   BEQ $28E1   ;disk head is above. If so, continue
+            28DD A905   LDA #$05    ;track no. from disk <> track no.
+            28DF D0E0   BNE $28C1   ;disk head is above. ERROR #5
+            ;
+            28E1 20CD27 JSR $27CD   ;read track type code
+            ;
+            28E4 CE5E26 DEC $265E   ;if sector 1 wanted, return
+            28E7 F014   BED $28FD
+            ;
+            28E9 A900   LDA #$00    ;init $F9 (sector counter)
+            28EB 85F9   STA $F9     ;to 0.
+            ;
+            28ED 209829 JSR $2998   ;read east a sector
+            28F0 900F   BCC $2901   ;if carry clear, ERROR #A occurred
+            ;
+            28F2 AD5E26 LDA $265E   ;if not on correct sector,
+            28F5 C5F9   CMP $F9     ;loop to read past another sector
+            28F7 DOF4   BNE $28ED
+            ;
+            28F9 C5FB   CMP $FB     ;if last sector read had the wrong
+            28FB D004   BNE $2901   ;sector number, ERROR #A occurred
+            28FD EE5E26 INC $265E   ;inc $265E (decremented earlier)
+            ;
+            2900 60     RTS         ;return
+            ;
+            2901 A9OA   LDA #$0A    ;load return code (A=can't find sector
+            2903 DOBC   BNE $28C1   ;before one requested), go to ERROR
+            ;
+            ;-----------------------------------------------
+            ; RE-READ SECTOR JUST WRITTEN TO MAKE SURF IT   ;
+            ; COMPARES WITH WHAT WAS SUPPOSED TO HAVE BEEN  ;
+            ; WRITTEN TO DISK.                              ;
+            ;------------------------------------------------
+            2905 48     PHA         ;acc has high byte of buffer address
+            ;
+            2906 20C428 JSR  $28C4  ;position head on correct sector
+            ;
+            2909 20B028 JSR  $28B0  ;loop until sector start
+            290C C976   CMP  #$76   ;code found on disk
+            290E D0F9   BNE  $2909
+            ;
+            2910 20CD27 JSR  $27CD  ;read sector number from disk, if
+            2913 CD5E26 CMP  $265E  ;it equals sector no. Just written,
+            2916 F003   BEQ  $291B  ;then continue at $291B
+            ;
+            2918 68     PLA         ;pull ace. stored at $2905,
+            2919 18     CLC         ;carry clear indicates error
+            ;
+            291A 60     RTS         ;return
+            ;
+            291B 20CD27 JSR  $27CD  ;read page count written to disk
+            291E AA     TAX         ;store in X reg and at $265F
+            291F 8D5F26 STA  $265F
+            ;
+            2922 A000   LDY  #$00   ;init Y index reg to 0
+            ;
+            2924 68     PLA         ;stack=f lag. 0.=read from disk into
+            2925 F01C   BEO  $2943  ;buffer, NOT 0=compare disk with buffer
+            ;
+            2927 AD10C0 LDA  $C010  ;wait until read buffer full
+            292A 4A     LSR  A
+            292B 90FA   BCC  $2927
+            ;
+            292D AD11C0 LDA  $C011  ;read a byte from disk
+            ;
+            2930 2C10C0 BIT  $C010  ;if parity error, set error flag
+            2933 70E4   BVS  $2919  ;and return
+            ;
+            2935 D1FE   CMP  ($FE),Y ;compare buffer with disk data
+            2937 DOEO   BNE  $2919  ;if not eeual, set error, return
+            ;
+            2939 C8     INY         ;increment index register V
+            293A DOEB   BNE  $2927  ;and if necessary
+            293C E6FF   INC  $FF    ;high byte of buffer pointer
+            ;
+            293E CA     DEX         ;if not done, loop to continue
+            293F DOE6   BNE $2927   ;checking until sector verified
+            ;
+            2941 38     SEC         ;carry set means all OK.
+            ;
+            2942 60     RTS         ;return
+            ;
+            ;------------------------------------------------    
+            ; READ THE SECTOR YOU ARE ON INTO MEMORY
+            ; LOCATIONS POINTED TO BY ($FE,FF) WITH
+            ; ERROR CHECKING. PAGE COUNT IS IN REG. X.
+            ;------------------------------------------------
+            2943 AD10C0 LDA $C010   ;wait until read buffer is full
+            2946 4A     LSR A
+            2947 9OFA   BCC $2943
+            ;
+            2949 AD11CO LDA $C011   ;read a byte from disk
+            294C 2C1OCO BIT $C010   ;if paritry errors set error fin
+            294F 70C8   BVS $2919   ;and return
+            ;
+            2951 91FE   STA ($FE),Y ;store byte read in correct iocation
+            ;
+            2953 C8     INY         ;increment index reg Y
+            2954 D0ED   BNE $2943   ;and if necessary
+            2956 E6FF   INC $FF     ;high byte of buffer pointer
+            ;
+            2958 CA     DEX         ;bit not done, read some
+            2959 D0E8   BNE $2943   ;more data from sector
+            295B 38     SEC         ;carry set means all OK
+            295C 60     RTS         ;return
+            ;
+            ;-------------------------------------------------
+            ; READ SECTOR WITH ERROR CHECKING AND RETRIES    ;
+            ; IF FIRST READ NOT SUCCESSFUL.                  ;
+            ;-------------------------------------------------
+            295D AD6026 LDA $2660   ;store buffer address where data
+            2960 85FE   STA $FE     ;is to go in iocations ($FE,$FF)
+            2962 AD6126 LDA $2661
+            2965 85FF   STA $FF 
+            ;
+            2967 A903   LDA #$03    ;initiaiize $F7 and $F8 with
+            2969 85F7   STA $F7     ;the number of times to try to
+            296B A907   LDA #$07    ;read sector before giving up
+            296D 85F8   STA $F8     ;on parity error
+            ;
+            296F A900   LDA #$00    ;0=flag indicating read from disk
+            ;
+            2971 200529 JSR $2905   ;Jump to read/compare routine
+            ;
+            2974 9004   BCC $297A   ;if carry ciear,Y error occurred
+            ;
+            2976 60     RTS         ;return
+            ;
+            2977 C6FF   DEC $FF     ;error occurred trying to read
+            2979 E8     INX         ;sector from disk. Restore buffer
+            297A EC5F26 CPX $265F   ;pointer in location $FF
+            297D D0F8   BNE $2977
+            ;
+            297F C6F8   DEC $F8     ;if inner NO OF RETRIES <> 0
+            2981 DOEC   BNE $296F   ;then ioop back to try again
+            ;
+            2983 208326 JSR $2683   ;move one track towards track 0
+            2986 207826 JSR $2678   ;wait loop
+            ;
+            2989 208A26 JSR $268A   ;move one track towards track 39
+            298C 207826 JSR $2678   ;wait ioop
+            ;
+            298F C6F7   DEC $F7     ;if outer NO OF RETRIES <> 0
+            2991 10D8   BPL $296B   ;then ioop back to try again
+            ;
+            2993 A901   LDA #$01    ;couldn't read data, set return code
+            2995 4C4B2A JMP $2A4B   ;to 1 (parity error); go to ERROR
+            ;
+            ;----------------------------------------------------
+            ; READS PAST A SECTOR. CARRY SET TO 1 IF READ       ;
+            ; SUCCESSFUL, SET TO 0 IF NOT SUCCESSFUL.           ;
+            ;----------------------------------------------------
+            2998 AD00C0 LDA $C000   ;if above index hole, clear
+            299B 1027   BPL $29C4   ;carry and return
+            ;
+            299D AD10C0 LDA $C010   ;wait until read buffer full
+            29A0 4A     LSR A
+            29A1 90F5   BCC $2998
+            ;
+            29A3 AD11C0 LDA $C011   ;read a byte from disk
+            ;
+            29A6 C976   CMP #$76    ;if not a sector start code,
+            29A8 DOEE   BNE $2998   ;keep reading
+            ;
+            29AA 20CD27 JSR $27CD   ;read sector number, store in
+            29AD 85FB   STA $FB     ;memory location $FB
+            ;
+            29AF 20CD27 JSR $27CD   ;read sector length, store in
+            29B2 85FA   STA $FA     ;memory location $FA
+            ;
+            29B4 E6F9   INC $F9     ;increment sector number counter
+            ;
+            29B6 A8     TAY         ;init reg V to sector length,
+            29B7 A200   LDX #$00    ;and reg X to 0
+            ;
+            29B9 20CD27 JSR $27CD   ; read past this sector
+            29BC CA     DEX
+            29BD DOFA   BNE $29B9
+            29BF 88     DEY
+            29C0 DOF7   BNE $29B9
+            ;
+            29C2 38     SEC          ;carry set means read successful
+            ;
+            29C3 60     RTS          ; return
+            ;
+            29C4 18     CLC          ;carry clear means error
+            ;
+            29C5 60     RTS          ; return
+            ;
+            ;---------------------------------------------------
+            ; ROUTINE TO SELECT DISK DRIVE AND SEE IF IT       ;
+            ; IS READY TO BE USED.                             ;
+            ;---------------------------------------------------
+            29C6 8D5C26 STA $265C    ;store disk drive # in $265C
+            ;
+            29C9 0A     ASL A        ;X=drive number times 2
+            29CA AA     TAX
+            ;
+            29CB 2902   AND #$02     ;drive=1, Y=2. drive=2, Y=0
+            29CD A8     TAY
+            ;
+            29CE BDE929 LDA $29E9,X  ;load old status of the disk drive
+            29D1 8DOOCO STA $C000    ;you are selecting
+            29D4 BDEA29 LDA $29EA,X
+            29D7 8DO2CO STA $C002
+            ;
+            29DA ADOOCO  LDA $C000   ;put DISK READY bit in carry
+            29DD 4A      LSR A       ;bit (1=not ready)
+            ;
+            29DE 08      PHP         ;save status bits
+            ;
+            29DF C000    CPY #$00    ;if drive 1 selected, return
+            29E1 D006    BNE $29E9
+            ;
+            29E3 28      PLP         ;restore status and stack
+            ;
+            29E4 4A      LSR A       ;disk drive 2 selected, so use
+            29E5 4A      LSR A       ;bit 4 as DISK READY bit
+            29E6 4A      LSR A       ;instead of bit 0
+            29E7 4A      LSR A
+            ;
+            29E8 60      RTS         ;return
+            ;
+            29E9 28      PLP         ;drive 1 selected. Restore status
+            ;                               
+            29EA 60      RTS         ;return
+            
+            Below is listed some code that can be used to accomplish
+            various tasks.
+            
+            
+            To place disk head above track 0.
+            
+              JSR $2663
+            
+            
+            To move disk head of a specific disk drive to a specific
+            track. TRCKNO is the track number you want to move the disk
+            head to, and DRIVNO is the drive you want to move the head
+            of,
+            
+              LDA #TRCKNO
+              STA $2662
+              LDA #DRIVNO
+              STA $265C
+              JSR $26A6
+            
+            
+            To wait for first byte past index hole.
+            
+              JSR $271D
+            
+            
+            To put head on disk, initialize PIO chip, and wait until
+            diskette revolves to first byte of data. (After executing
+            this routine, a LDA $C011 (after making sure the read buffer
+            is full) will read the first byte of data on a track.)
+            
+              JSR $2728
+            
+            
+            Read the track you are on into memory, (MEMLO and MEMHI
+            point to the memory locations the track is to be read into.)
+            
+              LDA #MEMLO
+              STA $FE
+              LDA #MEMHI
+              STA $FF
+              LDY #0
+              JSR $2739
+            
+            
+            Routine to place disk head on diskette.
+            
+              JSR $2754
+            
+            
+            Routine to lift disk head from diskette.
+            
+              JSR $2761
+            
+            
+            To initialize a new disk by writing track header information
+            on all 39 tracks of diskette.
+                                           
+              JSR $2768
+            
+            
+            To initialize the track disk head is above.
+              JSR $277D                            .
+            
+            
+            To write a byte to disk.
+            
+              LDX #BYTE
+              JSR $27C2
+            
+            
+            To read a byte from disk.
+            
+              JSR $27CD ;byte is returned in accumulator
+            
+            
+            To write a sector to disk with error checking. MEMHI and
+            MEMLO point to the memory locations that are to be written
+            to disk, NSECTR is the number of the sector you want to
+            write to disk, and NPAGES is the number of pages you want to
+            write to disk.
+            
+              LDA #MEMLO
+              STA $2660
+              LDA #MEMHI
+              STA $2661
+              LDA #NSECTR
+              STA $265E
+              LDA #NPAGES
+              STA $265F
+              JSR $27D7
+            
+            To place disk head above sector NSECT on the track disk head
+            is above.
+            
+              LDA #NSECT
+              STA $265E
+              JSR $28C4
+            
+            
+            To read a sector from the track you are on into memorw.
+            MEMHI and MEMLO point to where the data is to go, and NSECT
+            is the sector that is to be read. If the carry is set on
+            return from this routines it means the read was successful.
+            If the carry is clears it means a parity error occurred and
+            all data maw not have been read or maw be in error.
+            
+              LDA #MEMLO
+              STA $2660
+              LDA #MEMHI
+              STA $2661
+              LDA INSECT
+              STA $265E
+              JSR $2943
+                                          
+            
+            
+            
+            
+            To read a sector from the track wou are on into memory.
+            MEMHI and MEMLO point to where the data is to go, and NSECT
+            is the sector that is to be read. This routine will perform
+            retries if the first attempt to read the data is not
+            successful.
+            
+              LDA #MEMLO
+              STA $2660
+              LDA #MEMHI
+              STA $2661
+              LDA INSECT
+              STA $265E
+              JSR $295D
+            

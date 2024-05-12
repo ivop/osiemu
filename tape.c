@@ -22,8 +22,9 @@ static int bits_per_byte;               // inluding start, parity, stop
 static int bits_remaining;
 static int baud_timer;
 static int baud_div;
+static int activity;
 
-static bool running = false;
+bool tape_running = false;
 static bool reading = false;
 static bool writing = false;
 
@@ -91,7 +92,7 @@ static void tape_rewind_input(void) {
 
 void tape_rewind(void) {
     tape_rewind_input();
-    running = false;
+    tape_running = false;
     reading = false;
     writing = false;
 }
@@ -102,7 +103,7 @@ void tape_tick(double ticks) {
 
     timer -= ticks_per_clock;
 
-    if (!running) return;
+    if (!tape_running) return;
 
     baud_timer--;
 
@@ -135,18 +136,25 @@ void tape_tick(double ticks) {
                 setbit(status, STATUS_TDRE_MASK);
                 bits_remaining = bits_per_byte;
             } else {
-                bits_remaining = 1;
+                bits_remaining = bits_per_byte;
             }
         }
+        activity--;
+        if (activity < 0) {
+            printf("tape: no activity, stopping\n");
+            tape_running = false;
+        }
     }
+
 }
 
 uint8_t tape_read(uint16_t address) {
+    activity = 300;
     switch (address & 1) {
     case 0:                     // status register
-        if (!running) {
+        if (!tape_running) {
             printf("tape: reading status, activate tape\n");
-            running = true;
+            tape_running = true;
             printf("tape: assume reading\n");
             reading = true;     // assume reading, unless TDR is written
         }
@@ -161,7 +169,7 @@ uint8_t tape_read(uint16_t address) {
 }
 
 void tape_write(uint16_t address, uint8_t value) {
-//    fprintf(stderr, "tape: write: %04x <-- %02x\n", address, value);
+    activity = 300;
     switch (address & 1) {
     case 0:                     // control register
         control = value;
@@ -180,7 +188,7 @@ void tape_write(uint16_t address, uint8_t value) {
             break;
         case 3:
             printf("tape: master reset\n");
-            running = 0;
+            tape_running = 0;
             status = 0;
             setbit(status, STATUS_TDRE_MASK);   // empty
             break;
@@ -188,7 +196,7 @@ void tape_write(uint16_t address, uint8_t value) {
         bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
         break;
     case 1:                     // transmit register
-        if (running) {
+        if (tape_running) {
             if (!writing) {
                 tape_rewind_input();
                 printf("tape: switch to writing\n");

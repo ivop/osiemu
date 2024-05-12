@@ -16,6 +16,7 @@
 #include <SDL2_rotozoom.h>
 
 #include "video.h"
+#include "tape.h"
 
 // ----------------------------------------------------------------------------
 
@@ -43,6 +44,9 @@ static SDL_Window *window;
 static SDL_Surface *winsurface;
 static SDL_Surface *screen;
 static SDL_Surface *font;
+static SDL_Surface *tape_icon;
+
+static SDL_Rect tape_dst_rect = { 16, 16, 64, 64 };
 
 enum mono_colors {
     COLOR_GREEN = 0,
@@ -132,6 +136,10 @@ void screen_update(void) {
         SDL_BlitSurface(news, 0, winsurface, 0);
         SDL_FreeSurface(news);
     }
+    if (tape_running) {
+        SDL_BlitSurface(tape_icon, 0, winsurface, &tape_dst_rect);
+    }
+
     SDL_UpdateWindowSurface(window);
 }
 
@@ -154,6 +162,11 @@ bool screen_init(void) {
     if (!(font = load_optimized(window, font_filename))) {
         return false;
     }
+
+    if (!(tape_icon = load_optimized(window, "icons/tape.png"))) {
+        return false;
+    }
+    SDL_SetColorKey(tape_icon, SDL_TRUE, SDL_MapRGB(tape_icon->format,0,0,0));
 
     winsurface = SDL_GetWindowSurface(window);
     screen = empty_surface(window, screen_width, screen_height);

@@ -1,0 +1,86 @@
+Emulation (65D files)
+=====================
+
+5.25"
+-----
+number of tracks:   40          (0-39)
+track size:         0x0900      (less for a real disk)
+sectors per track:  8
+sector size:        256
+OS65D directory:    12          (directory track)
+
+8"
+--
+number of tracks:   77          (0-76)
+track size:         0x0f00      (less for a real disk)
+sectors per track:  12
+sector size:        256
+OS65D directory:    8           (directory track)
+
+
+Real numbers:
+=============
+
+5.25", 40 tracks, 8 sectors/track, 256 bytes/sectors
+-----
+rotation:   300rpm      200ms/rotation
+baudrate:   125kHz      125000 * 0.2s / 11 bits = 2272 bytes/track
+fluxrate:   250kbps
+
+bitstream to ACIA: without flux overhead, 125000 * (1/5) = 25000 bits
+
+8", 77 tracks, 12 sectors/track, 256 bytes/sectors, 11 bits/byte (8E1)
+--
+rotation:   360rpm      166.6ms/rotation
+baudrate:   250kHz      250000 * (1/6)s / 10 bits = 4166.65 bytes/track
+fluxrate:   500kbps
+
+bitstream to ACIA: without flux overhead, 250000 * (1/6) = 41666.5 bits
+
+
+
+OSI BITSTREAM FORMAT 
+====================
+
+I want to preserve timing without all the HFE overhead.
+
+For one 5.25" track, we need at least 25000 / 8 = 3125 bytes.
+For one 8" track, we need at least 41667 / 8 = 5208.375 --> 5209 bytes
+
+5.25", one track, 0x0d00 (3328) bytes (rounded up to 13 blocks of 256 bytes)
+8"   , one track, 0x1500 (5376) bytes (rounded up to 21 blocks of 256 bytes)
+
+File format:
+
+"OSIDISKBITSTREAM"      16 bytes ID
+
+0x01    Version
+0x00    Type
+0x01    File offset to first track in 256 byte blocks
+
+0xff    Reserved until start of first track
+
+Version 1
+
+Type    0x00    5.25", 40 tracks, 125kbps, tracksize = 0x0d00
+        0x01    8"   , 77 tracks, 250kbps, tracksize = 0x1500
+
+8E1 encoding: start bit, 8 data bits, 1 parity bit (E), 1 stop bit = 11 bits
+8N1 encoding: start bit, 8 data bits,                 , 1 stop bit = 10 bits
+
+Data bits order: 0, 1, 2, 3, 4, 5, 6, 7 (what ACIA receives)
+
+5.25" OS65D is 8E1
+8" OS65U is 8E1 for track header, but 8N1 for sectors
+support should be automatic if we acknowledge at least these two modes
+settings; do people still use 8" on real hardware ???
+
+Datastream is stored, starting at MSB of byte, so:
+
+ byte 0            byte 1            byte 2
+[7 6 5 4 3 2 1 0] [7 6 5 4 3 2 1 0] [7 6 5 4 3 2 1 0]
+
+ 1 1 1 1 1 1 0 x   x x x x x x x P   1 etc...
+             |                       |
+ lead-in     start  data bits        stop bit
+                    in ACIA order

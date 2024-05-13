@@ -1,7 +1,7 @@
 CC ?= gcc
-CFLAGS = -flto -O3 $$(pkg-config --cflags sdl2 SDL2_image SDL2_gfx) -g3
+CFLAGS = -flto -O3 $$(sdl2-config --cflags) -g3
 LFLAGS = -flto
-LIBS = $$(pkg-config --libs sdl2 SDL2_image SDL2_gfx)
+LIBS = $$(sdl2-config --libs) -lSDL2_image -lSDL2_gfx
 
 SRC_FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
 			cooked.c

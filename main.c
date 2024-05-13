@@ -13,6 +13,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <getopt.h>
+#ifndef DONT_USE_NANOSLEEP
+#include <time.h>
+#endif
+
 #include "fake6502/fake6502.h"
 
 #include <SDL.h>
@@ -269,8 +273,14 @@ int main(int argc, char **argv) {
 
         cpu_target += ticks_per_frame;
 
-        while (SDL_GetTicks() < target)
-            ;
+        while (SDL_GetTicks() < target) {
+#ifndef DONT_USE_NANOSLEEP
+            struct timespec wait = { 0, 100000 };   // 0.1ms
+            nanosleep(&wait,NULL);
+#else
+            SDL_Delay(1);                           // 1ms, less accurate
+#endif
+        }
     }
 
 exit_out:

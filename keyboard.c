@@ -51,7 +51,7 @@ static void clear_matrix(void) {
 // ----------------------------------------------------------------------------
 
 void keyboard_init(double cpu_clock) {
-    interval = cpu_clock / 50.0;
+    interval = cpu_clock / 10000.0;     // 100us @ 1MHz
     clear_matrix();
     SDL_StartTextInput();
 }

@@ -40,10 +40,15 @@ static uint8_t keyboard_matrix[8][8] = {
 
 static uint8_t keyboard_osi_matrix[8];
 static uint8_t keyboard_osi_row;
+static char fake_input[2] = " ";
+
+// ----------------------------------------------------------------------------
 
 static void clear_matrix(void) {
     memset(keyboard_osi_matrix, keyboard_inverted ? 0xff : 0, 8);
 }
+
+// ----------------------------------------------------------------------------
 
 void keyboard_init(double cpu_clock) {
     interval = cpu_clock / 50.0;
@@ -51,7 +56,7 @@ void keyboard_init(double cpu_clock) {
     SDL_StartTextInput();
 }
 
-static char fake_input[2] = " ";
+// ----------------------------------------------------------------------------
 
 void keyboard_press_key(SDL_Keysym *key) {
     int i, row, col;
@@ -77,6 +82,8 @@ void keyboard_press_key(SDL_Keysym *key) {
         return;
     }
 
+    // RAW keyboard
+
     if (key->sym > 127 || !key->sym) return;
 
     for (i = 0; i < 64; i++) {
@@ -85,8 +92,6 @@ void keyboard_press_key(SDL_Keysym *key) {
         if (keyboard_matrix[row][col] == key->sym) break;
     }
     if (i == 64) return;    // not found
-
-//    printf("\tfound row %d col %d\n", row, col);
 
     clear_matrix();
 
@@ -102,9 +107,13 @@ void keyboard_press_key(SDL_Keysym *key) {
         keyboard_osi_matrix[0] ^= 1 << 6;
 }
 
+// ----------------------------------------------------------------------------
+
 void keyboard_release_key(SDL_Keysym *key) {
     clear_matrix();
 }
+
+// ----------------------------------------------------------------------------
 
 void keyboard_text_input(char *text) {
     if (!keyboard_cooked) {
@@ -130,6 +139,8 @@ void keyboard_text_input(char *text) {
     }
 }
 
+// ----------------------------------------------------------------------------
+
 void keyboard_tick(double ticks) {
     if (!keyboard_cooked) {
         return;
@@ -143,9 +154,13 @@ void keyboard_tick(double ticks) {
     keyboard_ticks -= interval;
 }
 
+// ----------------------------------------------------------------------------
+
 uint8_t keyboard_read(void) {
     return keyboard_osi_matrix[keyboard_osi_row];
 }
+
+// ----------------------------------------------------------------------------
 
 void keyboard_write(uint8_t value) {
     if (keyboard_inverted) value ^= 0xff;

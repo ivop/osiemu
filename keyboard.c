@@ -15,8 +15,14 @@
 #include <SDL.h>
 
 #include "keyboard.h"
+#include "cooked.h"
 
 bool keyboard_inverted = true;
+bool keyboard_cooked = true;
+
+static double keyboard_ticks;
+static double interval;
+static bool cooked_pressed;
 
 // ----------------------------------------------------------------------------
 
@@ -35,12 +41,41 @@ static uint8_t keyboard_matrix[8][8] = {
 static uint8_t keyboard_osi_matrix[8];
 static uint8_t keyboard_osi_row;
 
-void keyboard_init(void) {
+static void clear_matrix(void) {
     memset(keyboard_osi_matrix, keyboard_inverted ? 0xff : 0, 8);
 }
 
+void keyboard_init(double cpu_clock) {
+    interval = cpu_clock / 50.0;
+    clear_matrix();
+    SDL_StartTextInput();
+}
+
+static char fake_input[2] = " ";
+
 void keyboard_press_key(SDL_Keysym *key) {
     int i, row, col;
+
+    if (keyboard_cooked) {
+        if ( (key->sym != SDLK_LCTRL && (key->mod & KMOD_LCTRL)) ||
+             (key->sym != SDLK_RCTRL && (key->mod & KMOD_RCTRL)) ) {
+            // Control combinations don't generate TEXTINPUT events
+            if (key->sym >= SDLK_a && key->sym <= SDLK_z) {
+                fake_input[0] = key->sym - SDLK_a + 1;
+                keyboard_text_input(fake_input);
+            }
+        } else if (key->sym == SDLK_RETURN) {
+            fake_input[0] = 28;
+            keyboard_text_input(fake_input);
+        } else if (key->sym == SDLK_ESCAPE) {
+            fake_input[0] = 27;
+            keyboard_text_input(fake_input);
+        } else if (key->sym == SDLK_BACKSPACE) {
+            fake_input[0] = 127;
+            keyboard_text_input(fake_input);
+        }
+        return;
+    }
 
     if (key->sym > 127 || !key->sym) return;
 
@@ -53,7 +88,7 @@ void keyboard_press_key(SDL_Keysym *key) {
 
 //    printf("\tfound row %d col %d\n", row, col);
 
-    keyboard_init();
+    clear_matrix();
 
     keyboard_osi_matrix[row] ^= 1 << col;
 
@@ -68,17 +103,55 @@ void keyboard_press_key(SDL_Keysym *key) {
 }
 
 void keyboard_release_key(SDL_Keysym *key) {
-    keyboard_init();
+    clear_matrix();
+}
+
+void keyboard_text_input(char *text) {
+    if (!keyboard_cooked) {
+        return;
+    }
+    if (isprint(text[0])) {
+        printf("%c\n", text[0]);
+    } else {
+        printf("$%02x\n", text[0]);
+    }
+    char key = text[0] & 0x7f;
+    if (cooked_lut[key].row > 0) {
+        keyboard_osi_matrix[cooked_lut[key].row] ^= 1 << cooked_lut[key].col;;
+
+        char shift = cooked_lut[key].shift;
+
+        if (shift == 1) {
+            keyboard_osi_matrix[0] ^= 1 << 2;   // lshift
+        } else if (shift == 2) {
+            keyboard_osi_matrix[0] ^= 1 << 1;   // rshift
+        } else if (shift == 3) {
+            keyboard_osi_matrix[0] ^= 1 << 0;   // caps
+        }
+        if (cooked_lut[key].control) {
+            keyboard_osi_matrix[0] ^= 1 << 6;   // ctrl
+        }
+    }
+}
+
+void keyboard_tick(double ticks) {
+    if (!keyboard_cooked) {
+        return;
+    }
+
+    keyboard_ticks += ticks;
+    if (keyboard_ticks < interval) {
+        return;
+    }
+
+    keyboard_ticks -= interval;
 }
 
 uint8_t keyboard_read(void) {
-//    printf("keyb read, osi_row %d\n", keyboard_osi_row);
-//    printf("bitmap: %02x\n", keyboard_osi_matrix[keyboard_osi_row]);
     return keyboard_osi_matrix[keyboard_osi_row];
 }
 
 void keyboard_write(uint8_t value) {
-//    printf("keyb write %02x\n", value);
     if (keyboard_inverted) value ^= 0xff;
     for (int i=0; i<8; i++) {
         if (value & (1<<i)) keyboard_osi_row = i;

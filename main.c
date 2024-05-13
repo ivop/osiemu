@@ -49,10 +49,14 @@ static void usage(void) {
 "    -f/--font filename.rom     specify font (8x2048 image)\n"
 "\n"
 "    -d/--disable-basic         disable BASIC (default: enabled)\n"
-"    -v/--disable-video         disable video RAM (default: enabled)\n"
 "\n"
+"    -v/--disable-video         disable video RAM (default: enabled)\n"
 "    -m/--video-mode mode       select mode: 64x32 (default), 64x16, or 32x32\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
+"    -z/--zoom                  increase display size by 2\n"
+"    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
+"\n"
+"    -r/--raw-keyboard          enable raw keyboard mode\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals\n"
 "\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
@@ -75,6 +79,7 @@ static struct option long_options[] = {
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
     { "video-mode",     required_argument,  0, 'm' },
+    { "raw-keyboard",   no_argument,        0, 'r' },
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
@@ -166,6 +171,9 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "error: unknown tape location\n");
             }
             break;
+        case 'r':
+            keyboard_cooked = false;
+            break;
         case 'h':
             usage();
             return 1;
@@ -203,7 +211,7 @@ int main(int argc, char **argv) {
     if (!screen_init()) return 1;
 
     reset6502();
-    keyboard_init();
+    keyboard_init(cpu_clock);
     if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
         return 1;
     }
@@ -246,6 +254,9 @@ int main(int argc, char **argv) {
                     break;
                 }
                 break;
+            case SDL_TEXTINPUT:
+                keyboard_text_input(e.text.text);
+                break;
             }
         }
 
@@ -253,6 +264,7 @@ int main(int argc, char **argv) {
             double ticks = step6502();
             cpu_ticks += ticks;
             tape_tick(ticks);
+            keyboard_tick(ticks);
         }
 
         cpu_target += ticks_per_frame;

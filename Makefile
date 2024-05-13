@@ -1,6 +1,6 @@
 CC ?= gcc
 SDL2CONFIG ?= sdl2-config
-CFLAGS = -flto -O3 $$($(SDL2CONFIG) --cflags) -g3
+CFLAGS = -flto -O3 $$($(SDL2CONFIG) --cflags) -g3 $(DEFINES)
 LFLAGS = -flto
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lSDL2_gfx
 

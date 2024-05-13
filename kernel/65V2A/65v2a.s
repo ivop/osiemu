@@ -23,9 +23,12 @@ IRQ = $01c0
 DISABLE = 0
 ENABLE  = 1
 
-FLAG_LOAD         = $0203
-FLAG_SAVE         = $0205
-FLAG_IGNORE_CTRLC = $0212
+CURRENT_SCREEN_POS = $0200
+TEMP_CHAR_PRINT    = $0201
+FLAG_LOAD          = $0203
+FLAG_SAVE          = $0205
+CRT_TIME_DELAY     = $0206
+FLAG_IGNORE_CTRLC  = $0212
 
 
 BASIC_CHECK_CTRLC = $a633
@@ -54,12 +57,11 @@ RESET:
     sty FLAG_IGNORE_CTRLC
     sty FLAG_LOAD
     sty FLAG_SAVE
-
-    sty $0206
-    lda settings    ; #$40
-    sta $0200
-    lda #$20        ; clear 2k screen
-    sta $0201
+    sty CRT_TIME_DELAY
+    lda settings
+    sta CURRENT_SCREEN_POS
+    lda #' '
+    sta TEMP_CHAR_PRINT
     sta $020f
 
 clear_screen:

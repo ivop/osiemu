@@ -177,6 +177,7 @@ int main(int argc, char **argv) {
             break;
         case 'r':
             keyboard_cooked = false;
+            keyboard_ascii_enable = false;
             break;
         case 'h':
             usage();
@@ -206,6 +207,9 @@ int main(int argc, char **argv) {
     printf("cpu clock: %d Hz\n", cpu_clock);
     printf("frame rate: %.2lf fps\n", fps);
     printf("ticks per frame: %.2lf\n", ticks_per_frame);
+
+    printf("matrix keyboard mode: %s\n", keyboard_cooked ? "cooked" : "raw");
+    printf("ascii keyboard: %s\n", keyboard_ascii_enable ? "enabled" : "disabled");
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         fprintf(stderr, "error: SDL init failed\n");

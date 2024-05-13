@@ -3,6 +3,7 @@
 
 extern bool keyboard_inverted;
 extern bool keyboard_cooked;
+extern bool keyboard_ascii_enable;
 
 void keyboard_init(double cpu_clock);
 void keyboard_press_key(SDL_Keysym *key);
@@ -12,3 +13,5 @@ void keyboard_tick(double ticks);
 
 uint8_t keyboard_read(void);
 void keyboard_write(uint8_t value);
+
+uint8_t keyboard_ascii_read(void);

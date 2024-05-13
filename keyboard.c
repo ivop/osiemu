@@ -19,10 +19,21 @@
 
 bool keyboard_inverted = true;
 bool keyboard_cooked = true;
+bool keyboard_ascii_enable = true;
 
 static double keyboard_ticks;
 static double interval;
 static bool cooked_pressed;
+
+static uint8_t ascii_value = 0x80;
+
+enum ascii_state_e {
+    STATE_IDLE,
+    STATE_PULSE_DOWN,
+    STATE_PULSE_UP
+};
+
+static enum ascii_state_e ascii_state = STATE_IDLE;
 
 // ----------------------------------------------------------------------------
 
@@ -51,7 +62,7 @@ static void clear_matrix(void) {
 // ----------------------------------------------------------------------------
 
 void keyboard_init(double cpu_clock) {
-    interval = cpu_clock / 10000.0;     // 100us @ 1MHz
+    interval = cpu_clock / 50.0;
     clear_matrix();
     SDL_StartTextInput();
 }
@@ -119,7 +130,17 @@ void keyboard_text_input(char *text) {
     if (!keyboard_cooked) {
         return;
     }
+
     char key = text[0] & 0x7f;
+
+    if (keyboard_ascii_enable) {
+        ascii_value = key | 0x80;
+        if (ascii_value == (28 | 0x80)) {
+            ascii_value = 13 | 0x80;
+        }
+        ascii_state = STATE_PULSE_DOWN;
+    }
+
     if (cooked_lut[key].row > 0) {
         clear_matrix();
         keyboard_osi_matrix[cooked_lut[key].row] ^= 1 << cooked_lut[key].col;;
@@ -142,7 +163,7 @@ void keyboard_text_input(char *text) {
 // ----------------------------------------------------------------------------
 
 void keyboard_tick(double ticks) {
-    if (!keyboard_cooked) {
+    if (!keyboard_ascii_enable) {
         return;
     }
 
@@ -152,6 +173,19 @@ void keyboard_tick(double ticks) {
     }
 
     keyboard_ticks -= interval;
+
+    switch (ascii_state) {
+    case STATE_IDLE:
+        break;
+    case STATE_PULSE_DOWN:
+        ascii_value &= 0x7f;
+        ascii_state = STATE_PULSE_UP;
+        break;
+    case STATE_PULSE_UP:
+        ascii_value |= 0x80;
+        ascii_state = STATE_IDLE;
+        break;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -167,6 +201,12 @@ void keyboard_write(uint8_t value) {
     for (int i=0; i<8; i++) {
         if (value & (1<<i)) keyboard_osi_row = i;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+uint8_t keyboard_ascii_read(void) {
+    return ascii_value;
 }
 
 // ----------------------------------------------------------------------------

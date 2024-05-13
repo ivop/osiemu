@@ -92,13 +92,13 @@ void keyboard_press_key(SDL_Keysym *key) {
 
     keyboard_osi_matrix[row] ^= 1 << col;
 
-    if (key->mod == KMOD_CAPS)
+    if (key->mod & KMOD_CAPS)
         keyboard_osi_matrix[0] ^= 1 << 0;
-    if (key->mod == KMOD_LSHIFT)
+    if (key->mod & KMOD_LSHIFT)
         keyboard_osi_matrix[0] ^= 1 << 2;
-    if (key->mod == KMOD_RSHIFT)
+    if (key->mod & KMOD_RSHIFT)
         keyboard_osi_matrix[0] ^= 1 << 1;
-    if (key->mod == KMOD_LCTRL || key->mod == KMOD_RCTRL)
+    if (key->mod & KMOD_LCTRL || key->mod & KMOD_RCTRL)
         keyboard_osi_matrix[0] ^= 1 << 6;
 }
 
@@ -110,13 +110,9 @@ void keyboard_text_input(char *text) {
     if (!keyboard_cooked) {
         return;
     }
-    if (isprint(text[0])) {
-        printf("%c\n", text[0]);
-    } else {
-        printf("$%02x\n", text[0]);
-    }
     char key = text[0] & 0x7f;
     if (cooked_lut[key].row > 0) {
+        clear_matrix();
         keyboard_osi_matrix[cooked_lut[key].row] ^= 1 << cooked_lut[key].col;;
 
         char shift = cooked_lut[key].shift;

@@ -136,7 +136,7 @@ void keyboard_text_input(char *text) {
     if (keyboard_ascii_enable) {
         ascii_value = key | 0x80;
         if (ascii_value == (28 | 0x80)) {
-            ascii_value = 13 | 0x80;
+            ascii_value = 13 | 0x80;        // CR --> ^M
         }
         ascii_state = STATE_PULSE_DOWN;
     }

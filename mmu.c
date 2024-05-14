@@ -16,6 +16,7 @@
 #include "keyboard.h"
 #include "video.h"
 #include "tape.h"
+#include "floppy.h"
 
 // ----------------------------------------------------------------------------
 
@@ -79,6 +80,14 @@ uint8_t read6502(uint16_t address) {
             return BASIC[address - 0xa000];
         }
     }
+    if (floppy_enable) {
+        if (address >= 0xc000 && address <= 0xc003) {
+            return floppy_pia_read(address);
+        }
+        if (address >= 0xc010 && address <= 0xc011) {
+            return floppy_acia_read(address);
+        }
+    }
     if (video_enabled) {
         if (address >= 0xd000 && address <= 0xd7ff) {
             return SCREEN[address - 0xd000];
@@ -109,6 +118,14 @@ void write6502(uint16_t address, uint8_t value) {
     if (address <= mmu_ram_top) {
         RAM[address] = value;
         return;
+    }
+    if (floppy_enable) {
+        if (address >= 0xc000 && address <= 0xc003) {
+            return floppy_pia_write(address, value);
+        }
+        if (address >= 0xc010 && address <= 0xc011) {
+            return floppy_acia_write(address, value);
+        }
     }
     if (video_enabled) {
         if (address >= 0xd000 && address <= 0xd7ff) {

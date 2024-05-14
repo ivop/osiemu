@@ -25,6 +25,7 @@
 #include "keyboard.h"
 #include "video.h"
 #include "tape.h"
+#include "floppy.h"
 
 // ----------------------------------------------------------------------------
 
@@ -223,6 +224,8 @@ int main(int argc, char **argv) {
     if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
         return 1;
     }
+    floppy_enable = true;
+    floppy_init();
 
     // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
 

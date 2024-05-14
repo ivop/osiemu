@@ -5,7 +5,7 @@ LFLAGS = -flto
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lSDL2_gfx
 
 SRC_FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
-			cooked.c
+			cooked.c floppy.c
 
 OBJ_FILES = $(SRC_FILES:%.c=%.o)
 

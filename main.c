@@ -33,6 +33,8 @@ static char *basic_filename = "basic/basic-osi-fix.rom";
 static char *kernel_filename = "kernel/synmon-alt.rom";
 static char *tape_input_filename = NULL;
 static char *tape_output_filename = "tapeout.dat";
+static char *drive0_filename = NULL;
+static char *drive1_filename = NULL;
 
 // How fast does our 6502 run?
 
@@ -51,7 +53,7 @@ static void usage(void) {
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"
 "    -k/--kernel filename.rom   specify kernel ROM\n"
-"    -f/--font filename.rom     specify font (8x2048 image)\n"
+"    -c/--font filename.rom     specify character set font (8x2048 image)\n"
 "\n"
 "    -d/--disable-basic         disable BASIC (default: enabled)\n"
 "\n"
@@ -68,6 +70,9 @@ static void usage(void) {
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
 "    -C/--tape-location         ACIA location: f000 (default), fc00\n"
 "\n"
+"    -f/--floppy0 file          specify floppy0 file (default: none)\n"
+"    -F/--floppy1 file          specify floppy1 file (default: none)\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -77,9 +82,11 @@ static void usage(void) {
 static struct option long_options[] = {
     { "aspect",         required_argument,  0, 'a' },
     { "basic",          required_argument,  0, 'b' },
+    { "font",           required_argument,  0, 'c' },
     { "tape-location",  required_argument,  0, 'C' },
     { "disable-basic",  no_argument,        0, 'd' },
-    { "font",           required_argument,  0, 'f' },
+    { "floppy0",        required_argument,  0, 'f' },
+    { "floppy1",        required_argument,  0, 'F' },
     { "help",           no_argument,        0, 'h' },
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
@@ -98,7 +105,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:C:df:hik:m:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hik:m:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -122,7 +129,7 @@ int main(int argc, char **argv) {
         case 'b':
             basic_filename = strdup(optarg);
             break;
-        case 'f':
+        case 'c':
             font_filename = strdup(optarg);
             break;
         case 'k':
@@ -180,6 +187,12 @@ int main(int argc, char **argv) {
             keyboard_cooked = false;
             keyboard_ascii_enable = false;
             break;
+        case 'f':
+            drive0_filename = strdup(optarg);
+            break;
+        case 'F':
+            drive1_filename = strdup(optarg);
+            break;
         case 'h':
             usage();
             return 1;
@@ -224,8 +237,9 @@ int main(int argc, char **argv) {
     if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
         return 1;
     }
-    floppy_enable = true;
-    floppy_init();
+    if (!floppy_init(drive0_filename, drive1_filename, cpu_clock)) {
+        return 1;
+    }
 
     // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
 
@@ -276,6 +290,7 @@ int main(int argc, char **argv) {
             cpu_ticks += ticks;
             tape_tick(ticks);
             keyboard_tick(ticks);
+            floppy_tick(ticks);
         }
 
         cpu_target += ticks_per_frame;

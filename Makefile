@@ -21,7 +21,7 @@ strip: osiemu
 	strip $<
 
 clean:
-	rm -f *~ osiemu *.o fake6502/*.o .depend */*~
+	rm -f *~ osiemu osiemu.exe *.o fake6502/*.o .depend */*~
 
 .depend: $(SRC_FILES)
 	rm -f $@

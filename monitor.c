@@ -18,6 +18,8 @@
 
 #include <SDL.h>
 
+#include "video.h"
+
 // ----------------------------------------------------------------------------
 
 static void help(void) {
@@ -25,6 +27,8 @@ static void help(void) {
            "help            - print this help\n"
            "quit            - exit emulator\n"
            "cont            - continue emulation\n"
+           "show            - show emulation window\n"
+           "hide            - hide emulation window\n"
            "d mem           - dump memory contents\n"
            "c mem val ...   - change memory to value(s)\n"
           );
@@ -126,6 +130,11 @@ bool monitor(void) {
             return true;
         } else if (!strcmp(p, "help")) {
             help();
+        } else if (!strcmp(p, "hide")) {
+            screen_hide();
+        } else if (!strcmp(p, "show")) {
+            screen_unhide();
+            screen_update();
         } else if (!strcmp(p, "d")) {
             dump();
         } else if (!strcmp(p, "c")) {

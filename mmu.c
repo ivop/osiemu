@@ -90,7 +90,7 @@ uint8_t read6502(uint16_t address) {
     }
     if (video_enabled) {
         if (address >= 0xd000 && address <= 0xd7ff) {
-            return SCREEN[address - 0xd000];
+            return screen_read(address);
         }
         if (color_enabled) {
             if (address >= 0xe000 && address <= 0xe7ff) {
@@ -129,7 +129,7 @@ void write6502(uint16_t address, uint8_t value) {
     }
     if (video_enabled) {
         if (address >= 0xd000 && address <= 0xd7ff) {
-            SCREEN[address - 0xd000] = value;
+            screen_write(address, value);
             return;
         }
         if (address >= 0xe000 && address <= 0xe7ff) {

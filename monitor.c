@@ -18,8 +18,8 @@
 
 #include <SDL.h>
 
+#include "monitor.h"
 #include "video.h"
-
 #include "disasm.h"
 
 static struct distabitem *distab;
@@ -27,17 +27,19 @@ static struct distabitem *distab;
 // ----------------------------------------------------------------------------
 
 static void help(void) {
-    printf("commands: (all values are in hexadecimal)\n"
-           "help            - print this help\n"
-           "quit            - exit emulator\n"
-           "cont            - continue emulation\n"
+    puts("commands: (all values are in hexadecimal)\n"
+           "h,help          - print this help\n"
+           "q,quit          - exit emulator\n"
+           "c,cont          - continue emulation\n"
            "show            - show emulation window\n"
            "hide            - hide emulation window\n"
            "regs            - show CPU registers\n"
            "setcpu type     - set CPU type to nmos|undef|cmos\n"
+           "setbp mem       - set breakpoint\n"
+           "clrbp           - clear breakpoint\n"
            "d [mem]         - dump memory contents\n"
            "c mem val ...   - change memory to value(s)\n"
-           "u [mem]         - unassemble memory\n"
+           "u [mem]         - unassemble memory"
           );
 }
 
@@ -89,7 +91,7 @@ static void change(void) {
     return;
 
 err_out:
-    printf("usage: c mem val ...\n");
+    puts("usage: c mem val ...");
 }
 
 // ----------------------------------------------------------------------------
@@ -187,13 +189,50 @@ static void unassemble(void) {
 
 // ----------------------------------------------------------------------------
 
+static uint16_t bp;
+static bool bp_enable;
+
+// ----------------------------------------------------------------------------
+
+static void setbp(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        puts("usage: setbp mem");
+        return;
+    }
+
+    bp = strtol(p, NULL, 16);
+    printf("breakpoint set at PC=%04x\n", bp);
+    bp_enable = true;
+}
+
+// ----------------------------------------------------------------------------
+
+static void clrbp(void) {
+    bp_enable = false;
+}
+
+// ----------------------------------------------------------------------------
+
+void monitor_checkbp(void) {
+    if (PC == bp) {
+        screen_hide();
+        puts("BREAKPOINT ENCOUNTERED");
+        monitor();
+        screen_unhide();
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 bool monitor(void) {
     char *lineptr = NULL;
     size_t size = 0;
 
     signal(SIGINT, SIG_IGN);
 
-    printf("MONITOR\n");
+    puts("MONITOR");
     do_setcpu("nmos");
     regs();
 
@@ -209,11 +248,11 @@ bool monitor(void) {
 
         if (!p) continue;
 
-        if (!strcmp(p, "quit")) {
+        if (!strcmp(p, "quit") || !strcmp(p, "q")) {
             return false;
-        } else if (!strcmp(p, "cont")) {
+        } else if (!strcmp(p, "cont") || !strcmp(p, "c")) {
             return true;
-        } else if (!strcmp(p, "help")) {
+        } else if (!strcmp(p, "help") || !strcmp(p, "h")) {
             help();
         } else if (!strcmp(p, "hide")) {
             screen_hide();
@@ -230,6 +269,10 @@ bool monitor(void) {
             setcpu();
         } else if (!strcmp(p, "u")) {
             unassemble();
+        } else if (!strcmp(p, "setbp")) {
+            setbp();
+        } else if (!strcmp(p, "clrbp")) {
+            clrbp();
         } else {
             puts("huh?");
         }

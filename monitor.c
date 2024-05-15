@@ -20,6 +20,10 @@
 
 #include "video.h"
 
+#include "disasm.h"
+
+static struct distabitem *distab;
+
 // ----------------------------------------------------------------------------
 
 static void help(void) {
@@ -29,8 +33,11 @@ static void help(void) {
            "cont            - continue emulation\n"
            "show            - show emulation window\n"
            "hide            - hide emulation window\n"
-           "d mem           - dump memory contents\n"
+           "regs            - show CPU registers\n"
+           "setcpu type     - set CPU type to nmos|undef|cmos\n"
+           "d [mem]         - dump memory contents\n"
            "c mem val ...   - change memory to value(s)\n"
+           "u [mem]         - unassemble memory\n"
           );
 }
 
@@ -87,7 +94,7 @@ err_out:
 
 // ----------------------------------------------------------------------------
 
-static void cpu(void) {
+static void regs(void) {
     uint8_t status = getP();
     printf("PC=%04x A=%02x X=%02x Y=%02x SP=%04x P=", PC, A, X, Y, SP+0x0100);
     putchar(status & 0x80 ? 'N' : '-');
@@ -103,6 +110,83 @@ static void cpu(void) {
 
 // ----------------------------------------------------------------------------
 
+static void do_setcpu(char *cputype) {
+    printf("CPU type set to ");
+    if (!strcmp(cputype, "undef")) {
+        distab = distabNMOS6502UNDEF;
+        puts("NMOS w/ undefined opcodes");
+    } else if (!strcmp(cputype, "cmos")) {
+        distab = distabCMOS65C02;
+        puts("CMOS");
+    } else {
+        distab = distabNMOS6502;
+        puts("NMOS");
+    }
+}
+
+static void setcpu(void) {
+    char *p = strtok(NULL, " \t\n\r");
+    if (!p) {
+        puts("usage: setcpu (nmos|undef|cmos)");
+    } else {
+        do_setcpu(p);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+static void unassemble(void) {
+    static uint16_t loc;
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (p) {
+        loc = strtol(p, NULL, 16);
+    }
+
+    int lines = 0;
+    while (lines < 23) {
+        printf("%04x: ", loc);
+
+        int opcode = read6502(loc++);
+        printf("%02x ", opcode);
+
+        int mode = distab[opcode].mode;
+
+        int n = isizes[mode];
+        int operand, operand2 = 0;
+        
+        if (n > 1) {
+            operand = read6502(loc++);
+            printf("%02x ", operand);
+
+            if (n > 2) {
+                int t = read6502(loc++);
+                operand |= t << 8;
+                printf("%02x ", t);
+            } else {
+                printf("   ");
+            }
+        } else {
+            printf("      ");
+        }
+
+        if (mode == MODE_REL) {
+            operand += loc - (operand & 0x80 ? 0x100 : 0);
+        } else if (mode == MODE_ZP_REL) {
+            operand2 = operand >> 8;
+            operand &= 0xff;
+            operand2 += loc - (operand2 & 0x80 ? 0x100 : 0);
+        }
+
+        printf("    %s ", distab[opcode].inst);
+        printf(fmts[mode], operand, operand2);
+        putchar('\n');
+        lines++;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 bool monitor(void) {
     char *lineptr = NULL;
     size_t size = 0;
@@ -110,7 +194,8 @@ bool monitor(void) {
     signal(SIGINT, SIG_IGN);
 
     printf("MONITOR\n");
-    cpu();
+    do_setcpu("nmos");
+    regs();
 
     while (1) {
         printf(">");
@@ -139,8 +224,14 @@ bool monitor(void) {
             dump();
         } else if (!strcmp(p, "c")) {
             change();
-        } else if (!strcmp(p, "cpu")) {
-            cpu();
+        } else if (!strcmp(p, "regs")) {
+            regs();
+        } else if (!strcmp(p, "setcpu")) {
+            setcpu();
+        } else if (!strcmp(p, "u")) {
+            unassemble();
+        } else {
+            puts("huh?");
         }
     }
 

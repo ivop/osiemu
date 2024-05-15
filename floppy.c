@@ -53,36 +53,48 @@ struct drive {
     unsigned int ntracks;
     unsigned int trksize;
     unsigned int offset;
+
     unsigned int curtrk;
+    bool ready;
+    bool r_w;
+    bool hole;
 };
 
 struct drive drives[2];
+static int curdrive;
 
 static double floppy_ticks;
 static double interval;
+static int bits_per_revolution;
 
 // ----------------------------------------------------------------------------
 
+#define DATA_DIRECTION_ACCESS   0x04        // bit 2, 0 active(!)
+
 // PORTA input bits
 
-#define DATA_DIRECTION_ACCESS   0x04        // bit 2, 0 active(!)
-#define DRIVE0_READ_MASK        0x01        // 0 = drive0 reads, 1 = not ready
-#define HEAD_TRACK0_MASK        0x02        // 0 = above, 1 = not above
-#define DRIVE1_READ_MASK        0x10        // 0 = drive1 reads, 1 = not ready
-#define DISK_PROTECTED_MASK     0x20        // 0 = protected, 1 = r/w
-#define DRIVE_SELECT_MASK       0x40        // 0 = drive1, 1 = drive0
-#define INDEX_HOLE_MASK         0x80        // 0 = above hole, 1 = not above
+#define DRIVE0_NOT_READY_MASK   0x01        // 0 = drive0 reads, 1 = not ready
+#define HEAD_NOT_TRACK0_MASK    0x02        // 0 = above, 1 = not above
+#define DRIVE1_NOT_READY_MASK   0x10        // 0 = drive1 reads, 1 = not ready
+#define DISK_R_W_MASK           0x20        // 0 = protected, 1 = r/w
+#define DRIVE0_SELECT_MASK      0x40        // 0 = drive1, 1 = drive0
+#define NOT_INDEX_HOLE_MASK     0x80        // 0 = above hole, 1 = not above
 
 // PORTB output bits
 
-#define WRITE_TO_DISK_MASK      0x01        // 0 = write, 1 = read
+#define READ_FROM_DISK_MASK     0x01        // 0 = write, 1 = read
 #define ERASE_ENABLE_MASK       0x02        // 0 = disabled, 1 = enabled
 #define DIRECTION_MASK          0x04        // 0 = to track 39, 1 = to track 0
 #define MOVE_HEAD_MASK          0x08        // 1->0 move, 1 = steady
 #define FAULT_RESET_MASK        0x10        // 0 = reset, 1 = normal
-#define DRIVE_ONOFF_MASK        0x20        // 0 = off, 1 = on
+#define DRIVE_ENABLE_MASK       0x20        // 0 = drive1, 1 = drive0
 #define LOW_CURRENT_MASK        0x40        // 0 = high?, 1 = low
 #define HEAD_ON_DISK_MASK       0x80        // 0 = head on disk, 1 = lift head
+
+#define setbit(v,msk)   (v) |= (msk)
+#define clrbit(v,msk)   (v) &= ~(msk)
+#define getbit(v,msk)   (v & (msk))
+#define cpybit(v,msk,b) { if (b) setbit(v,msk); else clrbit(v,msk); }
 
 // ----------------------------------------------------------------------------
 
@@ -164,6 +176,17 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         floppy_enable = true;
         printf("floppy: enabled\n");
     }
+
+    pia.porta.output_value = 0xff;      // for drivesel bit out (PA6)
+    curdrive = 0;
+
+    setbit(pia.porta.input_value, DRIVE0_NOT_READY_MASK);
+    setbit(pia.porta.input_value, DRIVE1_NOT_READY_MASK);
+    setbit(pia.porta.input_value, HEAD_NOT_TRACK0_MASK);
+    setbit(pia.porta.input_value, DISK_R_W_MASK);
+    setbit(pia.porta.input_value, DRIVE0_SELECT_MASK);
+    setbit(pia.porta.input_value, NOT_INDEX_HOLE_MASK);
+
     return true;
 }
 
@@ -205,7 +228,7 @@ uint8_t floppy_pia_read(uint16_t address) {
 // ----------------------------------------------------------------------------
 
 void floppy_pia_write(uint16_t address, uint8_t value) {
-    printf("floppy: pia write $%04x, $%02x\n", address, value);
+//    printf("floppy: pia write $%04x, $%02x\n", address, value);
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
@@ -215,6 +238,9 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
         } else {
             printf("floppy: porta: output value $%02x\n", value);
             pia.porta.output_value = value;
+            if (pia.porta.output_mask & DRIVE0_SELECT_MASK) {
+                curdrive = !getbit(value, DRIVE0_SELECT_MASK);
+            }
         }
         break;
     case 1:     // CRA

@@ -21,6 +21,7 @@
 
 #include <SDL.h>
 
+#include "monitor.h"
 #include "mmu.h"
 #include "keyboard.h"
 #include "video.h"
@@ -44,6 +45,8 @@ static char *drive1_filename = NULL;
 static int cpu_clock = CPU_CLOCK_UK101;
 static double fps = 60.0;
 static double ticks_per_frame;
+
+static bool hide_window_monitor;
 
 // ----------------------------------------------------------------------------
 
@@ -74,6 +77,8 @@ static void usage(void) {
 "    -f/--floppy0 file          specify floppy0 file (default: none)\n"
 "    -F/--floppy1 file          specify floppy1 file (default: none)\n"
 "\n"
+"    -H/--hide-window           hide window when monitor is active\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -90,6 +95,7 @@ static struct option long_options[] = {
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
     { "help",           no_argument,        0, 'h' },
+    { "hide-window",    no_argument,        0, 'H' },
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
     { "video-mode",     required_argument,  0, 'm' },
@@ -107,7 +113,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hik:m:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hHik:m:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -198,6 +204,9 @@ int main(int argc, char **argv) {
         case 'F':
             drive1_filename = strdup(optarg);
             break;
+        case 'H':
+            hide_window_monitor = true;
+            break;
         case 'h':
             usage();
             return 1;
@@ -275,6 +284,13 @@ int main(int argc, char **argv) {
                 case SDLK_F5:
                     reset6502();
                     tape_rewind();
+                    break;
+                case SDLK_F8:
+                    if (hide_window_monitor) {
+                        screen_hide();
+                    }
+                    if (!monitor()) goto exit_out;
+                    screen_unhide();
                     break;
                 case SDLK_F9:
                     goto exit_out;

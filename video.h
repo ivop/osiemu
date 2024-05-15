@@ -25,6 +25,7 @@ extern int osi_height;
 
 bool screen_init(void);
 void screen_update(void);
+void screen_hide(void);
+void screen_unhide(void);
 uint8_t screen_read(uint16_t address);
 void screen_write(uint16_t address, uint8_t value);
-

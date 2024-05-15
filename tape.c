@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "tape.h"
 
-#define TX_RX_CLOCK     19200.0
+double tape_baseclock = 19200.0;
 
 static FILE *inputf;
 static FILE *outputf;
@@ -78,7 +78,7 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
         }
     }
 
-    ticks_per_clock = cpu_clock / TX_RX_CLOCK;
+    ticks_per_clock = cpu_clock / tape_baseclock;
     bits_per_byte = 11;
     return true;
 }
@@ -175,15 +175,15 @@ void tape_write(uint16_t address, uint8_t value) {
         control = value;
         switch (control & CONTROL_DIV_MASK) {
         case 0:
-            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 1);
+            printf("tape: set baud rate to %.1f\n", tape_baseclock / 1);
             baud_div = baud_timer = 1;
             break;
         case 1:
-            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 16);
+            printf("tape: set baud rate to %.1f\n", tape_baseclock / 16);
             baud_div = baud_timer = 16;
             break;
         case 2:
-            printf("tape: set baud rate to %.1f\n", TX_RX_CLOCK / 64);
+            printf("tape: set baud rate to %.1f\n", tape_baseclock / 64);
             baud_div = baud_timer = 64;
             break;
         case 3:

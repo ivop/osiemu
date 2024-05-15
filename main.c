@@ -41,7 +41,7 @@ static char *drive1_filename = NULL;
 #define CPU_CLOCK_C1P   (3932160/4)     // 1P / Superboard II Service Manual
 #define CPU_CLOCK_UK101 (8000000/8)     // WinOSI, source???
 
-static int cpu_clock = CPU_CLOCK_C1P;
+static int cpu_clock = CPU_CLOCK_UK101;
 static double fps = 60.0;
 static double ticks_per_frame;
 
@@ -69,6 +69,7 @@ static void usage(void) {
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
 "    -C/--tape-location         ACIA location: f000 (default), fc00\n"
+"    -B/--tape-baseclock        set baseclock (default: 19200)\n"
 "\n"
 "    -f/--floppy0 file          specify floppy0 file (default: none)\n"
 "    -F/--floppy1 file          specify floppy1 file (default: none)\n"
@@ -82,6 +83,7 @@ static void usage(void) {
 static struct option long_options[] = {
     { "aspect",         required_argument,  0, 'a' },
     { "basic",          required_argument,  0, 'b' },
+    { "tape-baseclock", required_argument,  0, 'B' },
     { "font",           required_argument,  0, 'c' },
     { "tape-location",  required_argument,  0, 'C' },
     { "disable-basic",  no_argument,        0, 'd' },
@@ -182,6 +184,9 @@ int main(int argc, char **argv) {
             } else {
                 fprintf(stderr, "error: unknown tape location\n");
             }
+            break;
+        case 'B':
+            tape_baseclock = strtod(optarg, NULL);
             break;
         case 'r':
             keyboard_cooked = false;

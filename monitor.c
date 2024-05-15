@@ -22,7 +22,7 @@
 #include "video.h"
 #include "disasm.h"
 
-static struct distabitem *distab;
+static struct distabitem *distab = distabNMOS6502;
 
 // ----------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ static void help(void) {
     puts("commands: (all values are in hexadecimal)\n"
            "h,help          - print this help\n"
            "q,quit          - exit emulator\n"
-           "c,cont          - continue emulation\n"
+           "cont            - continue emulation\n"
            "show            - show emulation window\n"
            "hide            - hide emulation window\n"
            "regs            - show CPU registers\n"
@@ -215,13 +215,15 @@ static void clrbp(void) {
 
 // ----------------------------------------------------------------------------
 
-void monitor_checkbp(void) {
+bool monitor_checkbp(void) {
+    bool ret = true;
     if (PC == bp) {
         screen_hide();
         puts("BREAKPOINT ENCOUNTERED");
-        monitor();
+        ret = monitor();
         screen_unhide();
     }
+    return ret;
 }
 
 // ----------------------------------------------------------------------------
@@ -233,7 +235,6 @@ bool monitor(void) {
     signal(SIGINT, SIG_IGN);
 
     puts("MONITOR");
-    do_setcpu("nmos");
     regs();
 
     while (1) {
@@ -250,7 +251,7 @@ bool monitor(void) {
 
         if (!strcmp(p, "quit") || !strcmp(p, "q")) {
             return false;
-        } else if (!strcmp(p, "cont") || !strcmp(p, "c")) {
+        } else if (!strcmp(p, "cont")) {
             return true;
         } else if (!strcmp(p, "help") || !strcmp(p, "h")) {
             help();

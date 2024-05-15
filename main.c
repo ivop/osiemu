@@ -302,7 +302,7 @@ int main(int argc, char **argv) {
             tape_tick(ticks);
             keyboard_tick(ticks);
             floppy_tick(ticks);
-            monitor_checkbp();
+            if (!monitor_checkbp()) goto exit_out;
         }
 
         cpu_target += ticks_per_frame;

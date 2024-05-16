@@ -6,8 +6,8 @@
 ;
 ; Special block: 02E0-02E1 contains RUN address
 ;
-; Assemble with: mads -o:test.bin test.s
-; Convert with: bin2lod < test.bin > test.lod
+; Assemble with: mads -o:test.xex test.s
+; Convert with: xex2lod < test.xex > test.lod
 
 SCREEN = $d000
 

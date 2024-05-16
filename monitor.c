@@ -26,27 +26,6 @@ static struct distabitem *distab = distabNMOS6502;
 
 // ----------------------------------------------------------------------------
 
-static void help(void) {
-    puts("commands: (all values are in hexadecimal)\n"
-           "h,help              - print this help\n"
-           "q,quit              - exit emulator\n"
-           "cont                - continue emulation\n"
-           "show                - show emulation window\n"
-           "hide                - hide emulation window\n"
-           "regs                - show CPU registers\n"
-           "setcpu type         - set CPU type to nmos|undef|cmos\n"
-           "setbp mem           - set breakpoint\n"
-           "clrbp               - clear breakpoint\n"
-           "d [mem]             - dump memory contents\n"
-           "c mem val ...       - change memory to value(s)\n"
-           "u [mem]             - unassemble memory\n"
-           "l mem file          - load raw data file to mem\n"
-           "s start end file    - save raw data to file"
-          );
-}
-
-// ----------------------------------------------------------------------------
-
 static void dump(void) {
     static uint16_t loc;
     char *p = strtok(NULL, " \t\n\r");
@@ -139,7 +118,7 @@ static void setcpu(void) {
 
 // ----------------------------------------------------------------------------
 
-static void unassemble(void) {
+static void unasm(void) {
     static uint16_t loc;
     char *p = strtok(NULL, " \t\n\r");
 
@@ -306,7 +285,109 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+static void setpc(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        puts("usage: setpc mem");
+        return;
+    }
+
+    PC = strtol(p, NULL, 16);
+    regs();
+}
+
+static void setbyte(uint8_t *byte, char *name) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        printf("usage: set%s val\n", name);
+        return;
+    }
+
+    *byte = strtol(p, NULL, 16);
+    regs();
+}
+
+static void seta(void) {
+    setbyte(&A, "a");
+}
+
+static void setx(void) {
+    setbyte(&X, "x");
+}
+
+static void sety(void) {
+    setbyte(&Y, "y");
+}
+
+static void setsp(void) {
+    setbyte(&SP, "sp");
+}
+
+// ----------------------------------------------------------------------------
+
+static void show(void) {
+    screen_unhide();
+    screen_update();
+}
+
+// ----------------------------------------------------------------------------
+
+static void hide(void) {
+    screen_hide();
+}
+
+// ----------------------------------------------------------------------------
+
+static void help(void);
+
+static struct command {
+    char *name;
+    void(*func)(void);
+    char *args;
+    char *desc;
+} commands[] = {
+    { "help",   help,   "",            "print this help" },
+    { "show",   show,   "",            "show emulation window" },
+    { "hide",   hide,   "",            "hide emulation window" },
+    { "d",      dump,   "[mem]",       "dump memory contents" },
+    { "c",      change, "mem val ...", "change memory to value(s)" },
+    { "regs",   regs,   "",            "display CPU registers" },
+    { "setcpu", setcpu, "type",        "set CPU type to nmos|undef|cmos" },
+    { "u",      unasm,  "[mem]",       "unassemble memory" },
+    { "setbp",  setbp,  "mem",         "set breakpoint" },
+    { "clrbp",  clrbp,  "",            "clear breakpoint" },
+    { "l",      load,   "mem file",    "load raw data from file to mem" },
+    { "s",      save,   "beg end file","save raw data to file" },
+    { "setpc",  setpc,  "val",         "set PC to value" },
+    { "seta",   seta,   "val",         "set A to value" },
+    { "setx",   setx,   "val",         "set X to value" },
+    { "sety",   sety,   "val",         "set Y to value" },
+    { "setsp",  setsp,  "val",         "set SP to value" },
+    { "", NULL, "", "" }
+};
+
+// ----------------------------------------------------------------------------
+
+static void help(void) {
+    char temp[21];
+
+    puts("commands: (all values are in hexadecimal)\n"
+           "q,quit              - exit emulator\n"
+           "cont                - continue emulation");
+
+    for (int i=0; commands[i].func; i++) {
+        snprintf(temp, 21, "%s %s", commands[i].name, commands[i].args);
+        printf("%-20s- %s\n", temp, commands[i].desc);
+    }
+}
+
+
+// ----------------------------------------------------------------------------
+
 bool monitor(void) {
+    int i;
     char *lineptr = NULL;
     size_t size = 0;
 
@@ -331,35 +412,17 @@ bool monitor(void) {
             return false;
         } else if (!strcmp(p, "cont")) {
             return true;
-        } else if (!strcmp(p, "help") || !strcmp(p, "h")) {
-            help();
-        } else if (!strcmp(p, "hide")) {
-            screen_hide();
-        } else if (!strcmp(p, "show")) {
-            screen_unhide();
-            screen_update();
-        } else if (!strcmp(p, "d")) {
-            dump();
-        } else if (!strcmp(p, "c")) {
-            change();
-        } else if (!strcmp(p, "regs")) {
-            regs();
-        } else if (!strcmp(p, "setcpu")) {
-            setcpu();
-        } else if (!strcmp(p, "u")) {
-            unassemble();
-        } else if (!strcmp(p, "setbp")) {
-            setbp();
-        } else if (!strcmp(p, "clrbp")) {
-            clrbp();
-        } else if (!strcmp(p, "l")) {
-            load();
-        } else if (!strcmp(p, "s")) {
-            save();
+        }
+        for (i=0; commands[i].func; i++) {
+            if (!strcmp(p, commands[i].name)) break;
+        }
+        if (commands[i].func) {
+            commands[i].func();
         } else {
             puts("huh?");
         }
     }
+
 
     signal(SIGINT, SIG_DFL);
     return true;

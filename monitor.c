@@ -306,7 +306,7 @@ static void setbyte(uint8_t *byte, char *name) {
     }
 
     *byte = strtol(p, NULL, 16);
-    regs();
+    if (name[0] != 'p') regs();
 }
 
 static void seta(void) {
@@ -323,6 +323,15 @@ static void sety(void) {
 
 static void setsp(void) {
     setbyte(&SP, "sp");
+}
+
+static void setp(void) {
+    uint8_t P, Q = P = getP();
+    setbyte(&P, "p");
+    if (P != Q) {
+        setP(P);
+        regs();
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -365,6 +374,7 @@ static struct command {
     { "setx",   setx,   "val",         "set X to value" },
     { "sety",   sety,   "val",         "set Y to value" },
     { "setsp",  setsp,  "val",         "set SP to value" },
+    { "setp",   setp,   "val",         "set P to value" },
     { "", NULL, "", "" }
 };
 

@@ -28,18 +28,20 @@ static struct distabitem *distab = distabNMOS6502;
 
 static void help(void) {
     puts("commands: (all values are in hexadecimal)\n"
-           "h,help          - print this help\n"
-           "q,quit          - exit emulator\n"
-           "cont            - continue emulation\n"
-           "show            - show emulation window\n"
-           "hide            - hide emulation window\n"
-           "regs            - show CPU registers\n"
-           "setcpu type     - set CPU type to nmos|undef|cmos\n"
-           "setbp mem       - set breakpoint\n"
-           "clrbp           - clear breakpoint\n"
-           "d [mem]         - dump memory contents\n"
-           "c mem val ...   - change memory to value(s)\n"
-           "u [mem]         - unassemble memory"
+           "h,help              - print this help\n"
+           "q,quit              - exit emulator\n"
+           "cont                - continue emulation\n"
+           "show                - show emulation window\n"
+           "hide                - hide emulation window\n"
+           "regs                - show CPU registers\n"
+           "setcpu type         - set CPU type to nmos|undef|cmos\n"
+           "setbp mem           - set breakpoint\n"
+           "clrbp               - clear breakpoint\n"
+           "d [mem]             - dump memory contents\n"
+           "c mem val ...       - change memory to value(s)\n"
+           "u [mem]             - unassemble memory\n"
+           "l mem file          - load raw data file to mem\n"
+           "s start end file    - save raw data to file"
           );
 }
 
@@ -228,6 +230,82 @@ bool monitor_checkbp(void) {
 
 // ----------------------------------------------------------------------------
 
+static void load(void) {
+    uint16_t loc;
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: l mem file");
+        return;
+    }
+
+    loc = strtol(p, NULL, 16);
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    FILE *f = fopen(p, "rb");
+    if (!f) {
+        printf("error: cannot open '%s'\n", p);
+        return;
+    }
+
+    int c;
+
+    while ((c = fgetc(f)) >= 0) {
+        write6502(loc++, c);
+    }
+
+    fclose(f);
+}
+
+// ----------------------------------------------------------------------------
+
+static void save(void) {
+    uint16_t start, end;
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: s start end file");
+        return;
+    }
+
+    start = strtol(p, NULL, 16);
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    end = strtol(p, NULL, 16);
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    if (start > end) {
+        printf("error: start > end\n");
+        goto err_usage;
+    }
+
+    FILE *f = fopen(p, "wb");
+
+    if (!f) {
+        printf("error: cannot open '%s'\n", p);
+        return;
+    }
+
+    while (start <= end) {
+        fputc(read6502(start++), f);
+    }
+
+    fclose(f);
+}
+
+// ----------------------------------------------------------------------------
+
 bool monitor(void) {
     char *lineptr = NULL;
     size_t size = 0;
@@ -274,6 +352,10 @@ bool monitor(void) {
             setbp();
         } else if (!strcmp(p, "clrbp")) {
             clrbp();
+        } else if (!strcmp(p, "l")) {
+            load();
+        } else if (!strcmp(p, "s")) {
+            save();
         } else {
             puts("huh?");
         }

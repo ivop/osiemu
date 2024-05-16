@@ -13,4 +13,4 @@ test.xex: test.s
 	$(CC) -O3 -s -o $@ $<
 
 clean:
-	rm -f *~ bin2lod test.xex test.lod hfe2osi
+	rm -f *~ xex2lod test.xex test.lod hfe2osi

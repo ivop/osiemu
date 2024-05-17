@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 #include "floppy.h"
 
 // ----------------------------------------------------------------------------
@@ -256,6 +257,7 @@ uint8_t floppy_pia_read(uint16_t address) {
         return pia.crb;
         break;
     }
+    assert(false);  // unreachable
 }
 
 // ----------------------------------------------------------------------------
@@ -304,6 +306,15 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
 // ----------------------------------------------------------------------------
 
 uint8_t floppy_acia_read(uint8_t address) {
+    switch (address & 1) {
+    case 0:
+        return 0;
+        break;
+    case 1:
+        return 0;
+        break;
+    }
+    assert(false);
 }
 
 // ----------------------------------------------------------------------------

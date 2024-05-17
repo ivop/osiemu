@@ -1,7 +1,8 @@
 CC ?= gcc
 SDL2CONFIG ?= sdl2-config
 DEBUG ?= -g3
-CFLAGS = -flto=auto -O3 $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)
+WARN ?= -W -Wall -Wextra
+CFLAGS = -flto=auto -O3 $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)
 LFLAGS = -flto=auto
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lSDL2_gfx
 

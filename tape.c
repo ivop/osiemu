@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <assert.h>
+#include "portability.h"
 #include "tape.h"
 
 double tape_baseclock = 19200.0;
@@ -167,7 +167,7 @@ uint8_t tape_read(uint16_t address) {
         return RDR;
         break;
     }
-    assert(false);  // unreachable
+    unreachable();
 }
 
 void tape_write(uint16_t address, uint8_t value) {

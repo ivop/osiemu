@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "portability.h"
 #include "fake6502/fake6502.h"
 
 #include <SDL.h>
@@ -23,7 +24,6 @@ bool keyboard_ascii_enable = true;
 
 static double keyboard_ticks;
 static double interval;
-static bool cooked_pressed;
 
 static uint8_t ascii_value = 0x80;
 
@@ -120,7 +120,7 @@ void keyboard_press_key(SDL_Keysym *key) {
 
 // ----------------------------------------------------------------------------
 
-void keyboard_release_key(SDL_Keysym *key) {
+void keyboard_release_key(SDL_Keysym *key UNUSED) {
     clear_matrix();
 }
 
@@ -131,7 +131,7 @@ void keyboard_text_input(char *text) {
         return;
     }
 
-    char key = text[0] & 0x7f;
+    unsigned char key = text[0] & 0x7f;
 
     if (keyboard_ascii_enable) {
         ascii_value = key | 0x80;

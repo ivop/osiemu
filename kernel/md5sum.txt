@@ -12,6 +12,7 @@ cbc104a7937f7ba88135c932a6e5908e  cegmonjsc.rom
 5fafce35f2e2d2384dd0c648cad73c5a  cegmon.rom
 7dd4e5cbf65fc46e43b4435b7a500548  cegmonuk16.rom
 a09a72736d2f19cd3103011fc1e09bec  cegmonuk32.rom
+3a89098ff3d69731bc2220c2aaa6c35b  chguk101.rom
 7e868386b821943282ee07df5bf66323  dabug_iii_ep2c_c1p_s2.rom
 7c286f000eadcf31646f1e0f6c3fa037  eprom1_uk54.rom
 af76d2aceef81877403acb60f96b3474  eprom1_v54max.rom

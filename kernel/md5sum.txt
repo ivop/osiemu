@@ -22,17 +22,14 @@ dabb2581fd9170f7d43852a62f5a2ce2  eprom1_v54xmax.rom
 b3368ded4bdce87c1a21cff4733172d7  eprom2c1.rom
 f661bbc9432271a851058fa0f6ebfb87  eprom_hgr.rom
 8ae5c27ac10f7f0a6e0074e108165856  exmon.rom
-4f70e06b42da873a27ca6e632c82daeb  monde.rom
 871a0f2cb5dedfd4a11837c00360d0a4  monuk01.rom
 6912b3a20682641fe3fcedc08440e990  monuk01x32.rom
 b0e3fa095918c0eb83827886066abebf  monuk02.rom
 bdc8f71ab1921875f50709540dc87c8e  monuk03.rom
 23b89f91e0a2e3f15523ac71400b2936  newmon.rom
 3de72592a4155de897e7646f36e676a8  osi_600_baer.rom
-b0e3fa095918c0eb83827886066abebf  romc1s.rom
 340e6c8b3ef6a5a5195c7b15f121f65c  sjgmon012-sb.rom
 4f70e06b42da873a27ca6e632c82daeb  syn600.rom
-4f70e06b42da873a27ca6e632c82daeb  synmon-alt.rom
 2a713633fd5c670e057275d8dd4b6cfb  synmon.rom
 8393cb5a782959a4c3b102934bd0cfac  toolkit.rom
 631c7c84b6aea63467e933ecc8431477  uk101cegmon_serial.rom

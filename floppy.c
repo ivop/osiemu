@@ -57,7 +57,6 @@ struct drive {
     unsigned int curtrk;
     bool ready;
     bool r_w;
-    bool hole;
 };
 
 struct drive drives[2];
@@ -65,7 +64,11 @@ static int curdrive;
 
 static double floppy_ticks;
 static double interval;
+
+static int bits_done;
+static int bits_per_hole;
 static int bits_per_revolution;
+static bool hole;
 
 // ----------------------------------------------------------------------------
 
@@ -146,6 +149,8 @@ static bool login_drive(struct drive *d, double cpu_clock) {
 
     d->offset = fgetc(d->f);
     d->curtrk = 7;                  // just somewhere not track 0
+    d->ready = true;
+    d->r_w = true;
 
     printf("floppy: inserted disk %s\n", d->fname);
     printf("floppy: type %s\n", disk_type ? "8\" SS" : "5\" SS");
@@ -192,6 +197,33 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
 
 // ----------------------------------------------------------------------------
 
+static void determine_porta_input_value(void) {
+    uint8_t v = 0;      // start with bits cleared
+
+    if (!drives[0].ready) {
+        setbit(v, DRIVE0_NOT_READY_MASK);
+    }
+    if (drives[curdrive].curtrk != 0) {
+        setbit(v, HEAD_NOT_TRACK0_MASK);
+    }
+    if (!drives[1].ready) {
+        setbit(v, DRIVE1_NOT_READY_MASK);
+    }
+    if (drives[curdrive].r_w) {
+        setbit(v, DISK_R_W_MASK);
+    }
+    if (!curdrive) {
+        setbit(v, DRIVE0_SELECT_MASK);
+    }
+    if (!hole) {
+        setbit(v, NOT_INDEX_HOLE_MASK);
+    }
+
+    pia.porta.input_value = v;
+}
+
+// ----------------------------------------------------------------------------
+
 static uint8_t merge_pins(struct port *p) {
     return (p->input_value  & p->input_mask) |
            (p->output_value & p->output_mask);
@@ -206,6 +238,7 @@ uint8_t floppy_pia_read(uint16_t address) {
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
             return pia.porta.output_mask;
         } else {
+            determine_porta_input_value();
             return merge_pins(&pia.porta);
         }
         break;
@@ -223,6 +256,11 @@ uint8_t floppy_pia_read(uint16_t address) {
         return pia.crb;
         break;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+static void act_on_portb_output_value(void) {
 }
 
 // ----------------------------------------------------------------------------
@@ -254,6 +292,7 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
         } else {
             printf("floppy: portb: output value $%02x\n", value);
             pia.portb.output_value = value;
+            act_on_portb_output_value();
         }
         break;
     case 3:     // CRB

@@ -11,4 +11,4 @@ extern uint16_t mmu_ram_top;
 extern bool mmu_basic_enabled;
 extern uint16_t tape_location;
 
-bool mmu_load_file(uint8_t *buf, int size, char *filename, bool iskernel);
+bool mmu_load_file(uint8_t *buf, unsigned int size, char *filename, bool iskernel);

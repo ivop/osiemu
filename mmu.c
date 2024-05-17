@@ -157,7 +157,7 @@ void write6502(uint16_t address, uint8_t value) {
 // of the buffer.
 // Return false if file I/O failed.
 //
-bool mmu_load_file(uint8_t *buf, int size, char *filename, bool iskernel) {
+bool mmu_load_file(uint8_t *buf, unsigned int size, char *filename, bool iskernel) {
     printf("loading %s\n", filename);
     FILE *f = fopen(filename, "rb");
     if (!f) {
@@ -166,7 +166,7 @@ bool mmu_load_file(uint8_t *buf, int size, char *filename, bool iskernel) {
     }
 
     fseek(f, 0, SEEK_END);
-    int filesize = ftell(f);
+    unsigned long filesize = ftell(f);
 
     if (filesize > size) {
         fprintf(stderr, "warning: %s is larger than buffer size %d, "

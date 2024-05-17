@@ -38,9 +38,6 @@ struct pia {
 
 static struct pia pia;
 
-static FILE *drive1 = NULL;
-static FILE *drive2 = NULL;
-
 enum osi_disk_type {
     TYPE_525_SS,
     TYPE_8_SS
@@ -51,8 +48,6 @@ static int disk_type = -1;
 struct drive {
     FILE *f;
     char *fname;
-    unsigned int ntracks;
-    unsigned int trksize;
     unsigned int offset;
 
     unsigned int curtrk;
@@ -66,8 +61,17 @@ static int curdrive;
 static double floppy_ticks;
 static double interval;
 
-static int bits_done;
+static unsigned int ntracks;
+static unsigned int trksize;
+static double rpm;
+static double bitrate;
+static double hole_length;      // time of index hole in ms (5.0 or 5.5)
+static double seek_time;        // track-to-track seek time in ms (3.0)
+
+static int bits_counter;
+static int seek_counter;
 static int bits_per_hole;
+static int bits_per_seek;
 static int bits_per_revolution;
 static bool hole;
 
@@ -102,7 +106,7 @@ static bool hole;
 
 // ----------------------------------------------------------------------------
 
-static bool login_drive(struct drive *d, double cpu_clock) {
+static bool login_drive(struct drive *d) {
     d->f = fopen(d->fname, "r+b");
     if (!d->f) {
         fprintf(stderr, "floppy: unable to open %s for R/W\n", d->fname);
@@ -132,30 +136,12 @@ static bool login_drive(struct drive *d, double cpu_clock) {
     }
     disk_type = type;
 
-    switch (disk_type) {
-    case TYPE_525_SS:
-        d->ntracks = 40;
-        d->trksize = 0x0d00;
-        interval = cpu_clock / 125000.0;
-        break;
-    case TYPE_8_SS:
-        d->ntracks = 77;
-        d->trksize = 0x1500;
-        interval = cpu_clock / 250000.0;
-        break;
-    default:
-        fprintf(stderr, "floppy: unknown type %d\n", disk_type);
-        return false;
-    }
-
     d->offset = fgetc(d->f);
     d->curtrk = 7;                  // just somewhere not track 0
     d->ready = true;
     d->r_w = true;
 
     printf("floppy: inserted disk %s\n", d->fname);
-    printf("floppy: type %s\n", disk_type ? "8\" SS" : "5\" SS");
-    printf("floppy: number of tracks: %d\n", d->ntracks);
 
     return true;
 }
@@ -172,7 +158,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
 
     for (int i=0; i<=1; i++) {
         if (drives[i].fname) {
-            if (!login_drive(&drives[i], cpu_clock)) {
+            if (!login_drive(&drives[i])) {
                 return false;
             }
         }
@@ -180,8 +166,45 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
 
     if (drives[0].f || drives[1].f) {
         floppy_enable = true;
-        printf("floppy: enabled\n");
+        puts("floppy: enabled");
+    } else {
+        return true;
     }
+
+    switch (disk_type) {
+    case TYPE_525_SS:
+        ntracks = 40;
+        trksize = 0x0d00;
+        rpm = 300;
+        bitrate = 125000.0;
+        hole_length = 5.5;
+        seek_time = 3.0;
+        break;
+    case TYPE_8_SS:
+        ntracks = 77;
+        trksize = 0x1500;
+        rpm = 360;
+        bitrate = 250000.0;
+        hole_length = 5.0;
+        seek_time = 3.0;
+        break;
+    }
+
+    interval = cpu_clock / bitrate;
+    bits_per_hole = bitrate / 1000 * hole_length;
+    bits_per_seek = bitrate / 1000 * seek_time;
+    bits_per_revolution = bitrate / (rpm / 60.0);
+
+    printf("floppy: type %s\n", disk_type ? "8\" SS" : "5\" SS");
+    printf("floppy: number of tracks: %d\n", ntracks);
+    printf("floppy: bit interval %.2lf ticks\n", interval);
+    printf("floppy: bits per index hole: %d (%.2lf ms)\n", bits_per_hole,
+                                                           hole_length);
+    printf("floppy: bits per track-to-track seek: %d (%.2lf ms)\n",
+                                              bits_per_seek, seek_time);
+    printf("floppy: bits per revolution: %d\n", bits_per_revolution);
+
+    bits_counter = 0;
 
     pia.porta.output_value = 0xff;      // for drivesel bit out (PA6)
     curdrive = 0;
@@ -335,6 +358,31 @@ void floppy_tick(double ticks) {
     }
 
     floppy_ticks -= interval;
+
+    if (bits_counter < bits_per_hole) {
+        hole = true;
+    } else {
+        hole = false;
+    }
+
+    bits_counter++;
+    if (bits_counter >= bits_per_revolution) {
+        bits_counter = 0;
+//        drives[curdrive].pos = 0;     // reset position in curtrk of curdrive
+    }
+
+    if (bits_counter < bits_per_hole) {
+        hole = true;
+    } else {
+        hole = false;
+    }
+
+    if (seek_counter) {     // do nothing during track-to-track seek
+        seek_counter--;
+        return;
+    }
+
+    // collect serial framed bits and pass on to ACIA
 }
 
 // ----------------------------------------------------------------------------

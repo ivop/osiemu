@@ -70,26 +70,25 @@ static void put_bit(bool bit) {
 }
 
 static uint8_t *phtrkbuf;
-static uint8_t phbyte, phhalf;
+static uint8_t phbyte, phbit;
 static int phpos;
+
+static bool xget_bit(void) {
+    bool x;
+    if (!phbit) {
+        phbyte = phtrkbuf[phpos++];
+        phbit = 0x01;
+    }
+    x = phbyte & phbit;
+    phbit <<= 1;
+    return x;
+}
 
 static bool get_bit(void) {
     bool x;
-    if (!phhalf) {
-        phbyte = phtrkbuf[phpos] & 0x0f;
-        phhalf = 1;
-    } else {
-        phbyte = phtrkbuf[phpos] >> 4;
-        phpos++;
-        phhalf = 0;
-    }
-    if (phbyte == 0x0a) return 1;
-    else if (phbyte == 0x02) return 0;
-    else if (phbyte == 0x00) return 0;
-    else {
-        fprintf(stderr, "weird bit %x\n", phbyte);
-        exit(1);
-    }
+    while (!(x = xget_bit())) ;     // find next clock bit
+    xget_bit();                     // skip
+    return xget_bit();              // data bit
 }
 
 static void fixLE16(void *p) {
@@ -200,7 +199,7 @@ int main(int argc, char **argv) {
             length -= 512;
         }
 
-        phpos = phhalf = opos = 0;
+        phpos = phbit = opos = 0;
         obit = 0x80;
 
         while (phpos < phlut[i].length/2 && opos < trksize) {

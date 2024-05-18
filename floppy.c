@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/mman.h>
 #include "portability.h"
 #include "floppy.h"
 
@@ -48,7 +49,8 @@ static int disk_type = -1;
 struct drive {
     FILE *f;
     char *fname;
-    unsigned int offset;
+    off_t offset;
+    char *map;
 
     unsigned int curtrk;
     bool ready;
@@ -136,13 +138,30 @@ static bool login_drive(struct drive *d) {
     }
     disk_type = type;
 
-    d->offset = fgetc(d->f);
+    d->offset = fgetc(d->f) * 256;
     d->curtrk = 7;                  // just somewhere not track 0
     d->ready = true;
     d->r_w = true;
 
     printf("floppy: inserted disk %s\n", d->fname);
 
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+
+static bool init_memory_mapped_io(struct drive *d) {
+    fseek(d->f, 0, SEEK_END);
+    long filesize = ftell(d->f);
+    fseek(d->f, 0, SEEK_SET);
+
+    int fd = fileno(d->f);
+
+    d->map = mmap(NULL, filesize, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    if (d->map == (void*)-1) {
+        perror("floppy: mmap failed!");
+        return false;
+    }
     return true;
 }
 
@@ -164,10 +183,8 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         }
     }
 
-    if (drives[0].f || drives[1].f) {
-        floppy_enable = true;
-        puts("floppy: enabled");
-    } else {
+    if (!(drives[0].f || drives[1].f)) {
+        puts("floppy: disabled");
         return true;
     }
 
@@ -190,6 +207,14 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         break;
     }
 
+    for (int i=0; i<=1; i++) {
+        if (drives[i].f) {
+            if (!init_memory_mapped_io(&drives[i])) {
+                return false;
+            }
+        }
+    }
+
     interval = cpu_clock / bitrate;
     bits_per_hole = bitrate / 1000 * hole_length;
     bits_per_seek = bitrate / 1000 * seek_time;
@@ -209,12 +234,8 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
     pia.porta.output_value = 0xff;      // for drivesel bit out (PA6)
     curdrive = 0;
 
-    setbit(pia.porta.input_value, DRIVE0_NOT_READY_MASK);
-    setbit(pia.porta.input_value, DRIVE1_NOT_READY_MASK);
-    setbit(pia.porta.input_value, HEAD_NOT_TRACK0_MASK);
-    setbit(pia.porta.input_value, DISK_R_W_MASK);
-    setbit(pia.porta.input_value, DRIVE0_SELECT_MASK);
-    setbit(pia.porta.input_value, NOT_INDEX_HOLE_MASK);
+    floppy_enable = true;
+    puts("floppy: enabled");
 
     return true;
 }

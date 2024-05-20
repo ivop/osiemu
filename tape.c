@@ -122,9 +122,12 @@ void tape_tick(double ticks) {
             if (v < 0) {                           // end-of-file
                 setbit(status, STATUS_FE_MASK);
             } else {
+                clrbit(status, STATUS_FE_MASK);
                 RDR = v;
                 if (getbit(status, STATUS_RDRF_MASK)) {
                     setbit(status, STATUS_OVRN_MASK);
+                } else {
+                    clrbit(status, STATUS_OVRN_MASK);
                 }
                 setbit(status, STATUS_RDRF_MASK);
             }

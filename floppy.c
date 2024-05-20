@@ -18,6 +18,7 @@
 #include <sys/mman.h>
 #include "portability.h"
 #include "floppy.h"
+#include "acia.h"
 
 // ----------------------------------------------------------------------------
 
@@ -104,11 +105,6 @@ static bool hole;
 #define DRIVE_ENABLE_MASK       0x20        // 0 = drive off, 1 = drive on
 #define LOW_CURRENT_MASK        0x40        // 0 = high?, 1 = low
 #define HEAD_NOT_ON_DISK_MASK   0x80        // 0 = head on disk, 1 = lift head
-
-#define setbit(v,msk)   (v) |= (msk)
-#define clrbit(v,msk)   (v) &= ~(msk)
-#define getbit(v,msk)   (v & (msk))
-#define cpybit(v,msk,b) { if (b) setbit(v,msk); else clrbit(v,msk); }
 
 // ----------------------------------------------------------------------------
 

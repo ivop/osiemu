@@ -62,7 +62,7 @@ struct drive {
     bool r_w;
 };
 
-struct drive drives[2];
+static struct drive drives[2];
 static int curdrive;
 
 static double floppy_ticks;
@@ -81,6 +81,45 @@ static int bits_per_hole;
 static int bits_per_seek;
 static int bits_per_revolution;
 static bool hole;
+
+// ACIA
+
+static uint8_t control;
+static uint8_t status;
+static uint8_t RDR;
+static uint8_t TDR;
+
+enum parity_e {
+    NO_PARITY,
+    EVEN_PARITY,
+    ODD_PARITY
+};
+
+struct framing {
+    uint8_t databits;
+    enum parity_e parity;
+    bool two_stopbits;
+    char *name;
+};
+
+static struct framing word_select[8] = {
+    { 7, EVEN_PARITY, 2, "7E2" },
+    { 7,  ODD_PARITY, 2, "7O2" },
+    { 7, EVEN_PARITY, 1, "7E1" },
+    { 7,  ODD_PARITY, 1, "7O1" },
+    { 8,   NO_PARITY, 2, "8N2" },
+    { 8,   NO_PARITY, 1, "8N1" },
+    { 8, EVEN_PARITY, 1, "8E1" },
+    { 8,  ODD_PARITY, 1, "8O1" }
+};
+
+static uint8_t ndatabits;
+static uint8_t curdatabit;
+static uint8_t databyte;
+
+static enum parity_e parity_type;
+static bool parity_calc;
+static bool two_stopbits;
 
 // ----------------------------------------------------------------------------
 
@@ -450,25 +489,51 @@ void floppy_tick(double ticks) {
     case STATE_WAIT_FOR_STARTBIT:
         if (bit) break;
         acia_state = STATE_COLLECT_DATABITS;
-        // set some value to 8 or whatever was selected and count down later
+        curdatabit = databyte = parity_calc = 0;
         break;
     case STATE_COLLECT_DATABITS:
-        // if all bits are collected, acia_state = STATE_READ_PARITY
-        // if parity, acia_state = STATE_READ_PARITy
-        // else acia_state = STATE_READ_STOPBIT1
+        databyte |= bit << curdatabit;
+        parity_calc += bit;
+        curdatabit++;
+        if (curdatabit == ndatabits) {
+            if (parity_type > NO_PARITY) {
+                acia_state = STATE_READ_PARITY;
+            } else {
+                acia_state = STATE_READ_STOPBIT1;
+            }
+        }
         break;
     case STATE_READ_PARITY:
-        // if (bit != calculated_parity) set PE
+        if (parity_type == EVEN_PARITY && bit != parity_calc) {
+            setbit(status, STATUS_PE_MASK);     // parity error
+        } else if (parity_type == ODD_PARITY && bit != !parity_calc) {
+            setbit(status, STATUS_PE_MASK);     // parity error
+        } else {
+            clrbit(status, STATUS_PE_MASK);
+        }
         acia_state = STATE_READ_STOPBIT1;
         break;
     case STATE_READ_STOPBIT1:
-        if (!bit) break;        // set framing error
-        acia_state = STATE_WAIT_FOR_STARTBIT;   // or STOPBIT2
-        // if last framing bit, copy byte to RDR and set RDRF
+        if (!bit) {
+            setbit(status, STATUS_FE_MASK);     // framing error
+        } else {
+            clrbit(status, STATUS_FE_MASK);
+        }
+        if (two_stopbits) {
+            acia_state = STATE_READ_STOPBIT2;
+            break;
+        }
+        acia_state = STATE_WAIT_FOR_STARTBIT;
+        goto copy_byte_to_rdr;
         break;
     case STATE_READ_STOPBIT2:
-        if (!bit) break;        // set framing error
+        if (!bit) {
+            setbit(status, STATUS_FE_MASK);
+        } else {
+            clrbit(status, STATUS_FE_MASK);
+        }
         acia_state = STATE_WAIT_FOR_STARTBIT;
+copy_byte_to_rdr:
         // copy byte to RDR and set RDRF
         break;
     }

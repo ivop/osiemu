@@ -82,6 +82,13 @@ static int bits_per_seek;
 static int bits_per_revolution;
 static bool hole;
 
+static bool write_enable;
+static bool erase_enable;
+static bool step_to_3976;
+static bool drive_enable;
+static bool low_current;
+static bool head_on_disk;
+
 // ACIA
 
 static uint8_t control;
@@ -136,14 +143,14 @@ static bool two_stopbits;
 
 // PORTB output bits
 
-#define READ_FROM_DISK_MASK     0x01        // 0 = write, 1 = read
-#define ERASE_ENABLE_MASK       0x02        // 0 = disabled, 1 = enabled
-#define DIRECTION_MASK          0x04        // 0 = to track 39, 1 = to track 0
-#define MOVE_HEAD_MASK          0x08        // 1->0 move, 1 = steady
-#define FAULT_RESET_MASK        0x10        // 0 = reset, 1 = normal
-#define DRIVE_ENABLE_MASK       0x20        // 0 = drive off, 1 = drive on
-#define LOW_CURRENT_MASK        0x40        // 0 = high?, 1 = low
-#define HEAD_NOT_ON_DISK_MASK   0x80        // 0 = head on disk, 1 = lift head
+#define READ_FROM_DISK_MASK     0x01    // nWRITE: 0 = write, 1 = read
+#define ERASE_ENABLE_MASK       0x02    // nERASE: 0 = enabled, 1 = disabled
+#define DIRECTION_MASK          0x04    // nSTEPDIR: 0 = to trk 39, 1 = to trk 0
+#define MOVE_HEAD_MASK          0x08    // nSTEP: 1->0 move, 1 = steady
+#define FAULT_RESET_MASK        0x10    // nRESET: 0 = reset, 1 = normal
+#define DRIVE_ENABLE_MASK       0x20    // 0 = drive off, 1 = drive on
+#define LOW_CURRENT_MASK        0x40    // mostly 1, 0 on 8" trk >= 44
+#define HEAD_NOT_ON_DISK_MASK   0x80    // nHEADLOAD 0 = on disk, 1 = lifted
 
 // ----------------------------------------------------------------------------
 
@@ -360,7 +367,32 @@ uint8_t floppy_pia_read(uint16_t address) {
 
 // ----------------------------------------------------------------------------
 
-static void act_on_portb_output_value(void) {
+static void act_on_portb_output_value(uint8_t prev_value) {
+    uint8_t value = pia.portb.output_value;
+
+    write_enable = !(value & READ_FROM_DISK_MASK);
+    erase_enable = !(value & ERASE_ENABLE_MASK);
+    step_to_3976 = !(value & DIRECTION_MASK);
+    drive_enable =   value & DRIVE_ENABLE_MASK;
+    head_on_disk = !(value & HEAD_NOT_ON_DISK_MASK);
+
+    bool move_prev = prev_value & MOVE_HEAD_MASK;
+    bool move_now  =      value & MOVE_HEAD_MASK;
+
+    if (move_prev && !move_now) {
+        printf("floppy: step, curtrk = %d\n", drives[curdrive].curtrk);
+        if (step_to_3976) {
+            if (drives[curdrive].curtrk < ntracks-1) {
+                drives[curdrive].curtrk++;
+            }
+        } else {
+            if (drives[curdrive].curtrk > 0) {
+                drives[curdrive].curtrk--;
+            }
+        }
+        printf("floppy: seek to %d\n", drives[curdrive].curtrk);
+        seek_counter = seek_time;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -391,8 +423,9 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
             pia.portb.input_mask = ~value;
         } else {
             printf("floppy: portb: output value $%02x\n", value);
+            uint8_t prev_value = pia.portb.output_value;
             pia.portb.output_value = value;
-            act_on_portb_output_value();
+            act_on_portb_output_value(prev_value);
         }
         break;
     case 3:     // CRB
@@ -475,7 +508,7 @@ void floppy_tick(double ticks) {
         return;
     }
 
-    if (pia.portb.output_value & HEAD_NOT_ON_DISK_MASK) {
+    if (!head_on_disk) {
         return;
     }
 

@@ -41,11 +41,14 @@ int osi_width = 64;
 int osi_height = 32;
 
 static SDL_Window *window;
-static SDL_Surface *winsurface;
-static SDL_Surface *screen;
-static SDL_Surface *font;
-static SDL_Surface *tape_icon;
+static SDL_Renderer *renderer;
 
+static SDL_Texture *screen;
+
+static SDL_Texture *font;
+static SDL_Texture *tape_icon;
+
+static SDL_Rect tape_src_rect = {  0,  0, 64, 64 };
 static SDL_Rect tape_dst_rect = { 16, 16, 64, 64 };
 
 enum mono_colors {
@@ -54,6 +57,7 @@ enum mono_colors {
     COLOR_WHITE
 };
 
+#if 0
 static int colors [][3] = {
     // 540B colors, 600D colors??? Not sure yet how the colors work
     [0] = { 0xff, 0xff, 0xff },     // yellow
@@ -65,6 +69,7 @@ static int colors [][3] = {
     [6] = { 0x87, 0xce, 0xeb },     // sky blue
     [7] = { 0x00, 0x00, 0x00 },     // black
 };
+#endif
 
 static int monochrome[][3] = {
     // mono colors
@@ -77,70 +82,49 @@ static int mono_color = COLOR_WHITE;
 
 // ----------------------------------------------------------------------------
 
-static void blit_char(SDL_Surface *s, SDL_Surface *font,
-                      int x, int y, unsigned char c, int color) {
+static void blit_char(SDL_Texture *font, int x, int y, unsigned char c,
+                                                       int color) {
     SDL_Rect srcrect = { 0, c*8, 8, 8 };
     SDL_Rect dstrect = { x*8, y*8, 8, 8, };
 
-    SDL_SetSurfaceColorMod(s, monochrome[color][0],
-                              monochrome[color][1],
-                              monochrome[color][2]);
-    SDL_BlitSurface(font, &srcrect, s, &dstrect);
+    SDL_SetRenderTarget(renderer, screen);
+	SDL_RenderCopy(renderer, font, &srcrect, &dstrect);
 }
 
-// ----------------------------------------------------------------------------
-
-static void blit_screenmem(SDL_Surface *s, SDL_Surface *font) {
+static void blit_screenmem(SDL_Texture *font) {
     if (!video_enabled) return;
 
     for (int y = 0; y < osi_height; y++) {
         for (int x = 0; x < osi_width; x++) {
-            blit_char(s, font, x, y, SCREEN[x+y*osi_width], mono_color);
+            blit_char(font, x, y, SCREEN[x+y*osi_width], mono_color);
         }
     }
 }
 
 // ----------------------------------------------------------------------------
 
-static SDL_Surface *load_optimized(SDL_Window *w, char *filename) {
-    SDL_Surface *s, *t = NULL;
-    if ((s = IMG_Load(filename))) {
-        t = SDL_ConvertSurfaceFormat(s, SDL_GetWindowPixelFormat(w), 0);
-        SDL_FreeSurface(s);
-    } else {
-        fprintf(stderr, "error: unable to load %s\n", filename);
+static SDL_Texture *load_texture(char *filename) {
+    SDL_Texture *t = NULL;
+    if (!(t = IMG_LoadTexture(renderer, filename))) {
+        fprintf(stderr, "error: cannot load texture %s\n", filename);
     }
-    return t;
-}
-
-static SDL_Surface *empty_surface(SDL_Window *win, int w, int h) {
-    SDL_Surface *s, *t = NULL;
-    s = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-    t = SDL_ConvertSurfaceFormat(s, SDL_GetWindowPixelFormat(win), 0);
-    SDL_FreeSurface(s);
     return t;
 }
 
 // ----------------------------------------------------------------------------
 
 void screen_update(void) {
-    blit_screenmem(screen, font);
-    if (!video_smooth) {
-        SDL_Rect fillrect = { 0, 0, aspectx * stretchx * zoom * screen_width,
-                                    aspecty * stretchy * zoom * screen_height};
-        SDL_BlitScaled(screen, 0, winsurface, &fillrect);
-    } else {
-        double zoomX = aspectx * stretchx * zoom * screen_width / screen->w;
-        double zoomY = aspecty * stretchy * zoom * screen_height / screen->h;
-        SDL_Surface *news = rotozoomSurfaceXY(screen, 0.0, zoomX, zoomY, 1);
-        SDL_BlitSurface(news, 0, winsurface, 0);
-        SDL_FreeSurface(news);
-    }
+    blit_screenmem(font);
+
+    SDL_SetRenderTarget(renderer, NULL);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, screen, NULL, NULL );
+
     if (tape_running) {
-        SDL_BlitSurface(tape_icon, 0, winsurface, &tape_dst_rect);
+        SDL_RenderCopy(renderer, tape_icon, &tape_src_rect, &tape_dst_rect);
     }
 
-    SDL_UpdateWindowSurface(window);
+    SDL_RenderPresent(renderer);
 }
 
 // ----------------------------------------------------------------------------
@@ -156,20 +140,35 @@ bool screen_init(void) {
                               SDL_WINDOW_SHOWN );
     if( window == NULL ) {
         fprintf(stderr,  "error: cannot create window: %s\n", SDL_GetError() );
-        return 1;
-    }
-
-    if (!(font = load_optimized(window, font_filename))) {
         return false;
     }
 
-    if (!(tape_icon = load_optimized(window, "icons/tape.png"))) {
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    if (!renderer) {
+        fprintf(stderr, "error: cannot create renderer\n");
         return false;
     }
-    SDL_SetColorKey(tape_icon, SDL_TRUE, SDL_MapRGB(tape_icon->format,0,0,0));
 
-    winsurface = SDL_GetWindowSurface(window);
-    screen = empty_surface(window, screen_width, screen_height);
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+
+    if (!(font = load_texture(font_filename))) {
+        return false;
+    }
+
+    if (!(tape_icon = load_texture("icons/tape.png"))) {
+        return false;
+    }
+
+    screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                         SDL_TEXTUREACCESS_TARGET,
+                                         screen_width, screen_height);
+
+    if (!screen) {
+        fprintf(stderr, "error: unable to create blank texture\n");
+        return false;
+    }
+
     return true;
 }
 

@@ -60,6 +60,7 @@ static void usage(void) {
 "\n"
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
 "    -m/--video-mode mode       select mode: 64x32 (default), 64x16, or 32x32\n"
+"    -M/--mono-color color      select monochrome color green, amber or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
@@ -94,6 +95,7 @@ static struct option long_options[] = {
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
     { "video-mode",     required_argument,  0, 'm' },
+    { "mono-color",     required_argument,  0, 'M' },
     { "raw-keyboard",   no_argument,        0, 'r' },
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
@@ -108,7 +110,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hik:m:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hik:m:M:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -166,6 +168,15 @@ int main(int argc, char **argv) {
             } else {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;
+            }
+            break;
+        case 'M':
+            if (!strcmp(optarg, "green")) {
+                mono_color = COLOR_GREEN;
+            } else if (!strcmp(optarg, "amber")) {
+                mono_color = COLOR_AMBER;
+            } else {
+                mono_color = COLOR_WHITE;
             }
             break;
         case 'i':

@@ -1,6 +1,12 @@
 #pragma once
 #include <SDL.h>
 
+enum mono_colors {
+    COLOR_GREEN = 0,
+    COLOR_AMBER,
+    COLOR_WHITE
+};
+
 extern char *font_filename;
 
 extern uint8_t SCREEN[0x0800];
@@ -9,6 +15,7 @@ extern uint8_t COLOR[0x0800];
 extern bool video_enabled;
 extern bool color_enabled;
 extern bool video_smooth;
+extern enum mono_colors mono_color;
 
 extern double aspectx;
 extern double aspecty;

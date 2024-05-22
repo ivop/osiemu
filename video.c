@@ -51,12 +51,6 @@ static SDL_Texture *tape_icon;
 static SDL_Rect tape_src_rect = {  0,  0, 64, 64 };
 static SDL_Rect tape_dst_rect = { 16, 16, 64, 64 };
 
-enum mono_colors {
-    COLOR_GREEN = 0,
-    COLOR_AMBER,
-    COLOR_WHITE
-};
-
 #if 0
 static int colors [][3] = {
     // 540B colors, 600D colors??? Not sure yet how the colors work
@@ -78,7 +72,7 @@ static int monochrome[][3] = {
     [COLOR_WHITE] = { 0xff, 0xff, 0xff }
 };
 
-static int mono_color = COLOR_GREEN;
+enum mono_colors mono_color = COLOR_WHITE;
 
 // ----------------------------------------------------------------------------
 

@@ -296,6 +296,9 @@ int main(int argc, char **argv) {
                 case SDLK_F9:
                     goto exit_out;
                     break;
+                case SDLK_F11:
+                    screen_toggle_fullscreen();
+                    break;
                 default:
                     keyboard_release_key(&e.key.keysym);
                     break;

@@ -28,6 +28,7 @@ uint8_t COLOR[0x0800];       // 2kB Color RAM
 bool video_enabled = true;
 bool color_enabled = false;
 bool video_smooth = false;
+bool fullscreen = false;
 
 int zoom = 1, stretchx = 1, stretchy = 1;
 
@@ -196,3 +197,13 @@ void screen_unhide(void) {
 }
 
 // ----------------------------------------------------------------------------
+
+void screen_toggle_fullscreen(void) {
+    fullscreen = !fullscreen;
+
+    if (fullscreen) {
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    } else {
+        SDL_SetWindowFullscreen(window, 0);
+    }
+}

@@ -17,6 +17,7 @@ extern bool video_enabled;
 extern bool color_enabled;
 extern bool video_smooth;
 extern enum mono_colors mono_color;
+extern bool fullscreen;
 
 extern double aspectx;
 extern double aspecty;
@@ -35,5 +36,6 @@ bool screen_init(void);
 void screen_update(void);
 void screen_hide(void);
 void screen_unhide(void);
+void screen_toggle_fullscreen(void);
 uint8_t screen_read(uint16_t address);
 void screen_write(uint16_t address, uint8_t value);

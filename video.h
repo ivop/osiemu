@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include <stdint.h>
 
 enum mono_colors {
     COLOR_GREEN = 0,

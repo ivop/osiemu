@@ -78,12 +78,11 @@ static int monochrome[][3] = {
     [COLOR_WHITE] = { 0xff, 0xff, 0xff }
 };
 
-static int mono_color = COLOR_WHITE;
+static int mono_color = COLOR_GREEN;
 
 // ----------------------------------------------------------------------------
 
-static void blit_char(SDL_Texture *font, int x, int y, unsigned char c,
-                                                       int color) {
+static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
     SDL_Rect srcrect = { 0, c*8, 8, 8 };
     SDL_Rect dstrect = { x*8, y*8, 8, 8, };
 
@@ -94,9 +93,13 @@ static void blit_char(SDL_Texture *font, int x, int y, unsigned char c,
 static void blit_screenmem(SDL_Texture *font) {
     if (!video_enabled) return;
 
+    SDL_SetTextureColorMod(font, monochrome[mono_color][0],
+                                 monochrome[mono_color][1],
+                                 monochrome[mono_color][2]);
+
     for (int y = 0; y < osi_height; y++) {
         for (int x = 0; x < osi_width; x++) {
-            blit_char(font, x, y, SCREEN[x+y*osi_width], mono_color);
+            blit_char(font, x, y, SCREEN[x+y*osi_width]);
         }
     }
 }
@@ -132,6 +135,8 @@ void screen_update(void) {
 bool screen_init(void) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, video_smooth ? "linear" : "");
 
     window = SDL_CreateWindow("OSIEMU",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,

@@ -198,7 +198,7 @@ static void clrbp(void) {
 
 bool monitor_checkbp(void) {
     bool ret = true;
-    if (PC == bp) {
+    if (bp_enable && PC == bp) {
         screen_hide();
         puts("BREAKPOINT ENCOUNTERED");
         ret = monitor();

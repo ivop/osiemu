@@ -160,6 +160,8 @@ bool screen_init(void) {
         return false;
     }
 
+    SDL_SetTextureColorMod(tape_icon, 0xff, 0x00, 0x00);
+
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                          SDL_TEXTUREACCESS_TARGET,
                                          screen_width, screen_height);

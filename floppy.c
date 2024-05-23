@@ -103,21 +103,21 @@ enum parity_e {
 };
 
 struct framing {
-    uint8_t databits;
+    uint8_t ndatabits;
     enum parity_e parity;
     bool two_stopbits;
     char *name;
 };
 
 static struct framing word_select[8] = {
-    { 7, EVEN_PARITY, 2, "7E2" },
-    { 7,  ODD_PARITY, 2, "7O2" },
-    { 7, EVEN_PARITY, 1, "7E1" },
-    { 7,  ODD_PARITY, 1, "7O1" },
-    { 8,   NO_PARITY, 2, "8N2" },
-    { 8,   NO_PARITY, 1, "8N1" },
-    { 8, EVEN_PARITY, 1, "8E1" },
-    { 8,  ODD_PARITY, 1, "8O1" }
+    { 7, EVEN_PARITY, true,  "7E2" },
+    { 7,  ODD_PARITY, true,  "7O2" },
+    { 7, EVEN_PARITY, false, "7E1" },
+    { 7,  ODD_PARITY, false, "7O1" },
+    { 8,   NO_PARITY, true,  "8N2" },
+    { 8,   NO_PARITY, false, "8N1" },
+    { 8, EVEN_PARITY, false, "8E1" },
+    { 8,  ODD_PARITY, false, "8O1" }
 };
 
 static uint8_t ndatabits;
@@ -164,7 +164,7 @@ enum acia_state_e {
     STATE_READ_STOPBIT2
 };
 
-enum acia_state_e acia_state = STATE_WAIT_FOR_STARTBIT;
+enum acia_state_e acia_receive_state = STATE_WAIT_FOR_STARTBIT;
 
 // ----------------------------------------------------------------------------
 
@@ -298,6 +298,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
     floppy_enable = true;
     puts("floppy: enabled");
 
+    setbit(status, STATUS_TDRE_MASK);   // empty
     return true;
 }
 
@@ -438,11 +439,13 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
 
 uint8_t floppy_acia_read(uint8_t address) {
     switch (address & 1) {
-    case 0:
-        return 0;
+    case 0:                 // status register
+        return status;
         break;
-    case 1:
-        return 0;
+    case 1:                 // receive register
+        clrbit(status, STATUS_RDRF_MASK);
+        clrbit(status, STATUS_OVRN_MASK);
+        return RDR;
         break;
     }
     unreachable();
@@ -451,6 +454,34 @@ uint8_t floppy_acia_read(uint8_t address) {
 // ----------------------------------------------------------------------------
 
 void floppy_acia_write(uint16_t address, uint8_t value) {
+    int ws;
+    switch (address & 1) {
+    case 0:                 // control register
+        control = value;
+        switch (control & CONTROL_DIV_MASK) {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            puts("floppy: master reset");
+            status = 0;
+            setbit(status, STATUS_TDRE_MASK);   // empty
+            break;
+        }
+        ws = (control & CONTROL_WS_MASK) >> 2;
+        ndatabits    = word_select[ws].ndatabits;
+        parity_type  = word_select[ws].parity;
+        two_stopbits = word_select[ws].two_stopbits;
+        printf("floppy: select %s\n", word_select[ws].name);
+        break;
+    case 1:                 // transmit register
+        TDR = value;
+        clrbit(status, STATUS_TDRE_MASK);       // not empty
+        break;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -520,56 +551,70 @@ void floppy_tick(double ticks) {
 
     //printf("floppy: bit: %x\n", bit);
 
-    switch (acia_state) {
+    switch (acia_receive_state) {
     case STATE_WAIT_FOR_STARTBIT:
         if (bit) break;
-        acia_state = STATE_COLLECT_DATABITS;
+        acia_receive_state = STATE_COLLECT_DATABITS;
         curdatabit = databyte = parity_calc = 0;
+//        puts("startbit");
         break;
     case STATE_COLLECT_DATABITS:
+//        printf("databit %c\n", bit ? '1' : '0');
         databyte |= bit << curdatabit;
-        parity_calc += bit;
+        parity_calc ^= bit;     // note: ^= because += does not overflow to 0
         curdatabit++;
-        if (curdatabit == ndatabits) {
+        if (curdatabit >= ndatabits) {
             if (parity_type > NO_PARITY) {
-                acia_state = STATE_READ_PARITY;
+                acia_receive_state = STATE_READ_PARITY;
             } else {
-                acia_state = STATE_READ_STOPBIT1;
+                acia_receive_state = STATE_READ_STOPBIT1;
             }
         }
         break;
     case STATE_READ_PARITY:
+//        printf("paritybit %c\n", bit ? '1' : '0');
         if (parity_type == EVEN_PARITY && bit != parity_calc) {
+//            printf("parity error, calc = %c\n", parity_calc ? '1' : '0');
             setbit(status, STATUS_PE_MASK);     // parity error
         } else if (parity_type == ODD_PARITY && bit != !parity_calc) {
             setbit(status, STATUS_PE_MASK);     // parity error
         } else {
             clrbit(status, STATUS_PE_MASK);
         }
-        acia_state = STATE_READ_STOPBIT1;
+        acia_receive_state = STATE_READ_STOPBIT1;
         break;
     case STATE_READ_STOPBIT1:
+//        puts("stopbit1");
         if (!bit) {
             setbit(status, STATUS_FE_MASK);     // framing error
         } else {
             clrbit(status, STATUS_FE_MASK);
         }
         if (two_stopbits) {
-            acia_state = STATE_READ_STOPBIT2;
+            acia_receive_state = STATE_READ_STOPBIT2;
             break;
         }
-        acia_state = STATE_WAIT_FOR_STARTBIT;
+        acia_receive_state = STATE_WAIT_FOR_STARTBIT;
         goto copy_byte_to_rdr;
         break;
     case STATE_READ_STOPBIT2:
+//        puts("stopbit2");
         if (!bit) {
             setbit(status, STATUS_FE_MASK);
         } else {
             clrbit(status, STATUS_FE_MASK);
         }
-        acia_state = STATE_WAIT_FOR_STARTBIT;
-copy_byte_to_rdr:
-        // copy byte to RDR and set RDRF
+        acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+
+copy_byte_to_rdr:   // copy byte to RDR and set RDRF
+//        printf("byte collected: %02x\n", databyte);
+        RDR = databyte;
+        if (status & STATUS_RDRF_MASK) {
+            setbit(status, STATUS_OVRN_MASK);
+        } else {
+            clrbit(status, STATUS_OVRN_MASK);
+        }
+        setbit(status, STATUS_RDRF_MASK);       // new byte available
         break;
     }
 }

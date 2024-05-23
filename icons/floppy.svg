@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="floppy.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="1.0482005"
+     inkscape:cx="371.58922"
+     inkscape:cy="436.4623"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2">
+    <inkscape:grid
+       type="xygrid"
+       id="grid824" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 3"
+     style="display:inline">
+    <rect
+       style="fill:#000000;fill-opacity:0.999288;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4306"
+       width="179.91667"
+       height="156.10417"
+       x="18.520834"
+       y="58.208332" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2">
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="m 164.04489,103.57627 h -3.96895 v -6.529149 h 3.96895 l 1e-5,-30.034084 H 31.746773 V 197.59602 h 50.273285"
+       id="path1268"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="M 85.989001,197.59602 H 109.80266"
+       id="path2108"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="m 113.7716,197.59602 h 50.27329 v -94.01975"
+       id="path2440"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="M 91.280926,189.76104 V 166.2561 c 1e-6,-2.61166 2.645963,-5.22332 6.614906,-5.22332 3.941508,-0.0213 6.614908,2.61166 6.614908,5.22332 v 23.50494 c 0,2.61165 -1.32298,5.22332 -6.614908,5.22331 -3.968943,1e-5 -6.614905,-2.35048 -6.614906,-5.22331"
+       id="path2949"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <ellipse
+       style="opacity:1;fill:none;fill-opacity:0.513636;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path4092"
+       ry="18.994543"
+       rx="19.183228"
+       cy="132.55714"
+       cx="97.989967"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <ellipse
+       style="fill:none;fill-opacity:0.513636;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.98709;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path4092-4"
+       ry="12.592442"
+       rx="13.543899"
+       cy="132.38644"
+       cx="98.128357"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <ellipse
+       style="fill:none;fill-opacity:0.513636;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path4092-4-8"
+       ry="2.9766695"
+       rx="3.1068926"
+       cy="139.19299"
+       cx="122.44482"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="fill:none;fill-opacity:0.513636;fill-rule:evenodd;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path4092-4-8-2"
+       sodipodi:type="arc"
+       sodipodi:cx="83.926384"
+       sodipodi:cy="-198.1291"
+       sodipodi:rx="1.9063622"
+       sodipodi:ry="1.6791506"
+       sodipodi:start="0"
+       sodipodi:end="3.1351812"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 85.832746,-198.1291 a 1.9063622,1.6791506 0 0 1 -1.900251,1.67914 1.9063622,1.6791506 0 0 1 -1.912434,-1.66838"
+       transform="scale(1,-1)"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="fill:none;fill-opacity:0.513636;fill-rule:evenodd;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path4092-4-8-2-8"
+       sodipodi:type="arc"
+       sodipodi:cx="111.70898"
+       sodipodi:cy="-198.1291"
+       sodipodi:rx="1.9063622"
+       sodipodi:ry="1.6791543"
+       sodipodi:start="0"
+       sodipodi:end="3.1351812"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       transform="scale(1,-1)"
+       d="m 113.61534,-198.1291 a 1.9063622,1.6791543 0 0 1 -1.90025,1.67914 1.9063622,1.6791543 0 0 1 -1.91244,-1.66838"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <rect
+       style="fill:none;fill-opacity:0.999288;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5179"
+       width="74.086952"
+       height="28.728254"
+       x="37.0387"
+       y="72.236359"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="M 42.330622,80.071334 H 105.83372"
+       id="path5258"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="M 42.330622,87.906314 H 105.83372"
+       id="path5258-9"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.993545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       d="M 42.330622,95.741293 H 105.83373"
+       id="path5258-3"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811" />
+  </g>
+</svg>

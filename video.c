@@ -129,7 +129,7 @@ void screen_update(void) {
 
     if (tape_running) {
         SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
-    } else if (drive_enable) {
+    } else if (drive_enable && head_on_disk) {
         int drive, track;
         SDL_Texture *p;
         floppy_get_current_track_and_drive(&track, &drive);

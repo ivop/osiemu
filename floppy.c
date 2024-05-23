@@ -87,7 +87,7 @@ static bool erase_enable;
 static bool step_to_3976;
        bool drive_enable;
 static bool low_current;
-static bool head_on_disk;
+       bool head_on_disk;
 
 // ACIA
 
@@ -381,7 +381,7 @@ static void act_on_portb_output_value(uint8_t prev_value) {
     bool move_now  =      value & MOVE_HEAD_MASK;
 
     if (move_prev && !move_now) {
-        printf("floppy: step, curtrk = %d\n", drives[curdrive].curtrk);
+//        printf("floppy: step, curtrk = %d\n", drives[curdrive].curtrk);
         if (step_to_3976) {
             if (drives[curdrive].curtrk < ntracks-1) {
                 drives[curdrive].curtrk++;
@@ -391,7 +391,7 @@ static void act_on_portb_output_value(uint8_t prev_value) {
                 drives[curdrive].curtrk--;
             }
         }
-        printf("floppy: seek to %d\n", drives[curdrive].curtrk);
+//        printf("floppy: seek to %d\n", drives[curdrive].curtrk);
         seek_counter = seek_time;
     }
 }
@@ -403,11 +403,11 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
-            printf("floppy: set porta I/O mask to $%02x\n", value);
+//            printf("floppy: set porta I/O mask to $%02x\n", value);
             pia.porta.output_mask = value;
             pia.porta.input_mask = ~value;
         } else {
-            printf("floppy: porta: output value $%02x\n", value);
+//            printf("floppy: porta: output value $%02x\n", value);
             pia.porta.output_value = value;
             if (pia.porta.output_mask & DRIVE0_SELECT_MASK) {
                 curdrive = !getbit(value, DRIVE0_SELECT_MASK);
@@ -419,11 +419,11 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
         break;
     case 2:     // ORB or DDRB
         if (!(pia.crb & DATA_DIRECTION_ACCESS)) {
-            printf("floppy: set portb I/O mask to $%02x\n", value);
+//            printf("floppy: set portb I/O mask to $%02x\n", value);
             pia.portb.output_mask = value;
             pia.portb.input_mask = ~value;
         } else {
-            printf("floppy: portb: output value $%02x\n", value);
+//            printf("floppy: portb: output value $%02x\n", value);
             uint8_t prev_value = pia.portb.output_value;
             pia.portb.output_value = value;
             act_on_portb_output_value(prev_value);
@@ -505,6 +505,7 @@ void floppy_tick(double ticks) {
         return;
     }
 
+    // looks like this is never turned off again, do OSD based on head
     if (!(pia.portb.output_value & DRIVE_ENABLE_MASK)) {
         return;
     }

@@ -4,6 +4,7 @@
 
 extern bool floppy_enable;
 extern bool drive_enable;
+extern bool head_on_disk;
 
 bool floppy_init(char *drive0_filename, char *drive1_filename,
                                                         double cpu_clock);

@@ -505,10 +505,12 @@ void floppy_tick(double ticks) {
 
     if (seek_counter) {     // do nothing during track-to-track seek
         seek_counter--;
+        get_bit(&drives[curdrive]);     // drop bit
         return;
     }
 
     if (!head_on_disk) {
+        get_bit(&drives[curdrive]);     // drop bit
         return;
     }
 

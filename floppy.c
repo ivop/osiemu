@@ -85,7 +85,7 @@ static bool hole;
 static bool write_enable;
 static bool erase_enable;
 static bool step_to_3976;
-static bool drive_enable;
+       bool drive_enable;
 static bool low_current;
 static bool head_on_disk;
 
@@ -570,6 +570,13 @@ copy_byte_to_rdr:
         // copy byte to RDR and set RDRF
         break;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void floppy_get_current_track_and_drive(int *track, int *drive) {
+    *drive = curdrive;
+    *track = drives[curdrive].curtrk;
 }
 
 // ----------------------------------------------------------------------------

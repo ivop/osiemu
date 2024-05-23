@@ -17,6 +17,7 @@
 
 #include "video.h"
 #include "tape.h"
+#include "floppy.h"
 
 // ----------------------------------------------------------------------------
 
@@ -48,9 +49,15 @@ static SDL_Texture *screen;
 
 static SDL_Texture *font;
 static SDL_Texture *tape_icon;
+static SDL_Texture *drive1_icon;
+static SDL_Texture *drive2_icon;
+static SDL_Texture *digits;
 
-static SDL_Rect tape_src_rect = {  0,  0, 64, 64 };
-static SDL_Rect tape_dst_rect = { 16, 16, 64, 64 };
+static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
+static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
+
+static SDL_Rect src_rect_digits = {  0,  0, 32, 64 };
+static SDL_Rect dst_rect_digits = { 96, 16, 32, 64 };
 
 #if 0
 static int colors [][3] = {
@@ -118,8 +125,30 @@ void screen_update(void) {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, screen, NULL, NULL );
 
+    // On-Screen-Display
+
     if (tape_running) {
-        SDL_RenderCopy(renderer, tape_icon, &tape_src_rect, &tape_dst_rect);
+        SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
+    } else if (drive_enable) {
+        int drive, track;
+        SDL_Texture *p;
+        floppy_get_current_track_and_drive(&track, &drive);
+        if (drive == 1) {
+            p = drive2_icon;
+        } else {
+            p = drive1_icon;
+        }
+        SDL_RenderCopy(renderer, p, &src_rect_64x64, &dst_rect_64x64);
+        int n = track / 10, m = track % 10;
+        if (n > 9) n = 9;
+
+        src_rect_digits.x = n * 32;
+        dst_rect_digits.x = 96;
+        SDL_RenderCopy(renderer, digits, &src_rect_digits, &dst_rect_digits);
+
+        src_rect_digits.x = m * 32;
+        dst_rect_digits.x = 96 + 32;
+        SDL_RenderCopy(renderer, digits, &src_rect_digits, &dst_rect_digits);
     }
 
     SDL_RenderPresent(renderer);
@@ -160,7 +189,22 @@ bool screen_init(void) {
         return false;
     }
 
+    if (!(drive1_icon = load_texture("icons/floppy1.png"))) {
+        return false;
+    }
+
+    if (!(drive2_icon = load_texture("icons/floppy2.png"))) {
+        return false;
+    }
+
+    if (!(digits = load_texture("icons/digits.png"))) {
+        return false;
+    }
+
     SDL_SetTextureColorMod(tape_icon, 0xff, 0x00, 0x00);
+    SDL_SetTextureColorMod(drive1_icon, 0xff, 0x00, 0x00);
+    SDL_SetTextureColorMod(drive2_icon, 0xff, 0x00, 0x00);
+    SDL_SetTextureColorMod(digits, 0xff, 0x00, 0x00);
 
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                          SDL_TEXTUREACCESS_TARGET,

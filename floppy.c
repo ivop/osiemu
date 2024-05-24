@@ -62,7 +62,7 @@ struct drive {
     bool r_w;
 };
 
-static struct drive drives[2];
+static struct drive drives[4];
 static int curdrive;
 
 static double floppy_ticks;
@@ -85,7 +85,7 @@ static bool hole;
 static bool write_enable;
 static bool erase_enable;
 static bool step_to_3976;
-       bool drive_enable;
+static bool drive_01_23;
 static bool low_current;
        bool head_on_disk;
 
@@ -148,7 +148,7 @@ static bool two_stopbits;
 #define DIRECTION_MASK          0x04    // nSTEPDIR: 0 = to trk 39, 1 = to trk 0
 #define MOVE_HEAD_MASK          0x08    // nSTEP: 1->0 move, 1 = steady
 #define FAULT_RESET_MASK        0x10    // nRESET: 0 = reset, 1 = normal
-#define DRIVE_ENABLE_MASK       0x20    // 0 = drive off, 1 = drive on
+#define DRIVE_01_23_MASK        0x20    // 0 = drive 2/3, 1 = drive 0/1
 #define LOW_CURRENT_MASK        0x40    // mostly 1, 0 on 8" trk >= 44
 #define HEAD_NOT_ON_DISK_MASK   0x80    // nHEADLOAD 0 = on disk, 1 = lifted
 
@@ -193,7 +193,7 @@ static bool login_drive(struct drive *d) {
 
     int type = fgetc(d->f);
     if (disk_type >= 0 && type != disk_type) {
-        fprintf(stderr, "floppy: both drives must be of the same type\n");
+        fprintf(stderr, "floppy: all drives must be of the same type\n");
         return false;
     }
     disk_type = type;
@@ -229,14 +229,17 @@ static bool init_memory_mapped_io(struct drive *d) {
 // ----------------------------------------------------------------------------
 
 bool floppy_init(char *drive0_filename, char *drive1_filename,
+                 char *drive2_filename, char *drive3_filename,
                                                         double cpu_clock) {
     memset(&pia, 0, sizeof(struct pia));
     pia.porta.input_mask = pia.portb.input_mask = 0xff;
 
     drives[0].fname = drive0_filename;
     drives[1].fname = drive1_filename;
+    drives[2].fname = drive2_filename;
+    drives[3].fname = drive3_filename;
 
-    for (int i=0; i<=1; i++) {
+    for (int i=0; i<=3; i++) {
         if (drives[i].fname) {
             if (!login_drive(&drives[i])) {
                 return false;
@@ -244,7 +247,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         }
     }
 
-    if (!(drives[0].f || drives[1].f)) {
+    if (!(drives[0].f || drives[1].f || drives[2].f || drives[3].f)) {
         puts("floppy: disabled");
         return true;
     }
@@ -268,7 +271,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         break;
     }
 
-    for (int i=0; i<=1; i++) {
+    for (int i=0; i<=3; i++) {
         if (drives[i].f) {
             if (!init_memory_mapped_io(&drives[i])) {
                 return false;
@@ -368,14 +371,29 @@ uint8_t floppy_pia_read(uint16_t address) {
 
 // ----------------------------------------------------------------------------
 
+static void determine_current_drive(void) {
+    if (pia.porta.output_mask & DRIVE0_SELECT_MASK) {
+        curdrive = !getbit(pia.porta.output_value, DRIVE0_SELECT_MASK);
+    } else {
+        curdrive = 0;
+    }
+    if (!drive_01_23) {
+        curdrive += 2;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 static void act_on_portb_output_value(uint8_t prev_value) {
     uint8_t value = pia.portb.output_value;
 
     write_enable = !(value & READ_FROM_DISK_MASK);
     erase_enable = !(value & ERASE_ENABLE_MASK);
     step_to_3976 = !(value & DIRECTION_MASK);
-    drive_enable =   value & DRIVE_ENABLE_MASK;
+    drive_01_23  =   value & DRIVE_01_23_MASK;
     head_on_disk = !(value & HEAD_NOT_ON_DISK_MASK);
+
+    determine_current_drive();
 
     bool move_prev = prev_value & MOVE_HEAD_MASK;
     bool move_now  =      value & MOVE_HEAD_MASK;
@@ -409,9 +427,7 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
         } else {
 //            printf("floppy: porta: output value $%02x\n", value);
             pia.porta.output_value = value;
-            if (pia.porta.output_mask & DRIVE0_SELECT_MASK) {
-                curdrive = !getbit(value, DRIVE0_SELECT_MASK);
-            }
+            determine_current_drive();
         }
         break;
     case 1:     // CRA
@@ -505,11 +521,6 @@ void floppy_tick(double ticks) {
         return;
     }
 
-    // looks like this is never turned off again, do OSD based on head
-    if (!(pia.portb.output_value & DRIVE_ENABLE_MASK)) {
-        return;
-    }
-
     floppy_ticks += ticks;
     if (floppy_ticks < interval) {
         return;
@@ -533,6 +544,10 @@ void floppy_tick(double ticks) {
         hole = true;
     } else {
         hole = false;
+    }
+
+    if (!drives[curdrive].f) {      // no floppy loaded
+        return;
     }
 
     if (seek_counter) {     // do nothing during track-to-track seek

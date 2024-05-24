@@ -51,6 +51,8 @@ static SDL_Texture *font;
 static SDL_Texture *tape_icon;
 static SDL_Texture *drive1_icon;
 static SDL_Texture *drive2_icon;
+static SDL_Texture *drive3_icon;
+static SDL_Texture *drive4_icon;
 static SDL_Texture *digits;
 
 static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
@@ -129,16 +131,19 @@ void screen_update(void) {
 
     if (tape_running) {
         SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
-    } else if (drive_enable && head_on_disk) {
+    } else if (head_on_disk) {
         int drive, track;
         SDL_Texture *p;
+
         floppy_get_current_track_and_drive(&track, &drive);
-        if (drive == 1) {
-            p = drive2_icon;
-        } else {
-            p = drive1_icon;
+        switch (drive) {
+        case 0: p = drive1_icon; break;
+        case 1: p = drive2_icon; break;
+        case 2: p = drive3_icon; break;
+        case 3: p = drive4_icon; break;
         }
         SDL_RenderCopy(renderer, p, &src_rect_64x64, &dst_rect_64x64);
+
         int n = track / 10, m = track % 10;
         if (n > 9) n = 9;
 
@@ -184,27 +189,33 @@ bool screen_init(void) {
     if (!(font = load_texture(font_filename))) {
         return false;
     }
-
     if (!(tape_icon = load_texture("icons/tape.png"))) {
         return false;
     }
-
     if (!(drive1_icon = load_texture("icons/floppy1.png"))) {
         return false;
     }
-
     if (!(drive2_icon = load_texture("icons/floppy2.png"))) {
         return false;
     }
-
+    if (!(drive3_icon = load_texture("icons/floppy3.png"))) {
+        return false;
+    }
+    if (!(drive4_icon = load_texture("icons/floppy4.png"))) {
+        return false;
+    }
     if (!(digits = load_texture("icons/digits.png"))) {
         return false;
     }
 
-    SDL_SetTextureColorMod(tape_icon, 0xff, 0x00, 0x00);
-    SDL_SetTextureColorMod(drive1_icon, 0xff, 0x00, 0x00);
-    SDL_SetTextureColorMod(drive2_icon, 0xff, 0x00, 0x00);
-    SDL_SetTextureColorMod(digits, 0xff, 0x00, 0x00);
+#define OSD_COLOR 0xff, 0x00, 0x00
+
+    SDL_SetTextureColorMod(tape_icon,   OSD_COLOR);
+    SDL_SetTextureColorMod(drive1_icon, OSD_COLOR);
+    SDL_SetTextureColorMod(drive2_icon, OSD_COLOR);
+    SDL_SetTextureColorMod(drive3_icon, OSD_COLOR);
+    SDL_SetTextureColorMod(drive4_icon, OSD_COLOR);
+    SDL_SetTextureColorMod(digits,      OSD_COLOR);
 
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                          SDL_TEXTUREACCESS_TARGET,

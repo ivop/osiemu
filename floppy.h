@@ -3,10 +3,10 @@
 #include <stdbool.h>
 
 extern bool floppy_enable;
-extern bool drive_enable;
 extern bool head_on_disk;
 
 bool floppy_init(char *drive0_filename, char *drive1_filename,
+                 char *drive2_filename, char *drive3_filename,
                                                         double cpu_clock);
 
 uint8_t floppy_pia_read(uint16_t address);

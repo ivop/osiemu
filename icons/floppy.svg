@@ -24,14 +24,14 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="1.0482005"
-     inkscape:cx="339.62968"
+     inkscape:cx="327.22747"
      inkscape:cy="436.4623"
      inkscape:window-width="1920"
      inkscape:window-height="1003"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer4">
+     inkscape:current-layer="g873">
     <inkscape:grid
        type="xygrid"
        id="grid824" />
@@ -41,7 +41,7 @@
   <g
      inkscape:groupmode="layer"
      id="layer3"
-     inkscape:label="Layer 3"
+     inkscape:label="black background (do not export)"
      style="display:inline">
     <rect
        style="fill:#000000;fill-opacity:0.999288;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -54,26 +54,26 @@
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="Layer 2">
+     inkscape:label="floppy">
     <path
        style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="m 164.04489,103.57627 h -3.96895 v -6.529149 h 3.96895 l 1e-5,-30.034084 H 31.746773 V 197.59602 h 50.273285"
        id="path1268"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
        style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="M 85.989001,197.59602 H 109.80266"
        id="path2108"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
        style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="m 113.7716,197.59602 h 50.27329 v -94.01975"
        id="path2440"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
@@ -81,7 +81,7 @@
        d="M 91.280926,189.76104 V 166.2561 c 1e-6,-2.61166 2.645963,-5.22332 6.614906,-5.22332 3.941508,-0.0213 6.614908,2.61166 6.614908,5.22332 v 23.50494 c 0,2.61165 -1.32298,5.22332 -6.614908,5.22331 -3.968943,1e-5 -6.614905,-2.35048 -6.614906,-5.22331"
        id="path2949"
        sodipodi:nodetypes="ccccccc"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <ellipse
@@ -91,7 +91,7 @@
        rx="19.183228"
        cy="132.55714"
        cx="97.989967"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <ellipse
@@ -101,7 +101,7 @@
        rx="13.543899"
        cy="132.38644"
        cx="98.128357"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <ellipse
@@ -111,7 +111,7 @@
        rx="3.1068926"
        cy="139.19299"
        cx="122.44482"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
@@ -128,7 +128,7 @@
        sodipodi:arc-type="arc"
        d="m 85.832746,-198.1291 a 1.9063622,1.6791506 0 0 1 -1.900251,1.67914 1.9063622,1.6791506 0 0 1 -1.912434,-1.66838"
        transform="scale(1,-1)"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
@@ -145,7 +145,7 @@
        sodipodi:arc-type="arc"
        transform="scale(1,-1)"
        d="m 113.61534,-198.1291 a 1.9063622,1.6791543 0 0 1 -1.90025,1.67914 1.9063622,1.6791543 0 0 1 -1.91244,-1.66838"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <rect
@@ -155,36 +155,36 @@
        height="28.728254"
        x="37.0387"
        y="72.236359"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
        style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="M 42.330622,80.071334 H 105.83372"
        id="path5258"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
        style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="M 42.330622,87.906314 H 105.83372"
        id="path5258-9"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
     <path
        style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        d="M 42.330622,95.741293 H 105.83373"
        id="path5258-3"
-       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
        inkscape:export-xdpi="12.195811"
        inkscape:export-ydpi="12.195811" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer1"
-     inkscape:label="Layer 4"
-     style="display:inline">
+     inkscape:label="number 1"
+     style="display:none">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:33.8667px;line-height:125%;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -200,7 +200,7 @@
   <g
      inkscape:groupmode="layer"
      id="layer4"
-     inkscape:label="Layer 5"
+     inkscape:label="number 2"
      style="display:none">
     <text
        xml:space="preserve"
@@ -215,5 +215,43 @@
          id="tspan7524"
          x="135.92848"
          y="100.03355">2</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g847"
+     inkscape:label="number 3"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:33.8667px;line-height:125%;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="135.92848"
+       y="100.03355"
+       id="text845"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy4.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811"><tspan
+         sodipodi:role="line"
+         id="tspan867"
+         x="135.92848"
+         y="100.03355">3</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g873"
+     inkscape:label="number 4"
+     style="display:inline">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:33.8667px;line-height:125%;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="135.92848"
+       y="100.03355"
+       id="text871"
+       inkscape:export-filename="/home/ivo/mygit/osiemu/icons/floppy1.png"
+       inkscape:export-xdpi="12.195811"
+       inkscape:export-ydpi="12.195811"><tspan
+         sodipodi:role="line"
+         id="tspan893"
+         x="135.92848"
+         y="100.03355">4</tspan></text>
   </g>
 </svg>

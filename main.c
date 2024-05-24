@@ -36,6 +36,8 @@ static char *tape_input_filename = NULL;
 static char *tape_output_filename = "tapeout.dat";
 static char *drive0_filename = NULL;
 static char *drive1_filename = NULL;
+static char *drive2_filename = NULL;
+static char *drive3_filename = NULL;
 
 // How fast does our 6502 run?
 
@@ -75,6 +77,8 @@ static void usage(void) {
 "\n"
 "    -f/--floppy0 file          specify floppy0 file (default: none)\n"
 "    -F/--floppy1 file          specify floppy1 file (default: none)\n"
+"    -g/--floppy2 file          specify floppy2 file (default: none)\n"
+"    -G/--floppy3 file          specify floppy3 file (default: none)\n"
 "\n"
 "    -h/--help                  show usage information\n"
 );
@@ -91,6 +95,8 @@ static struct option long_options[] = {
     { "disable-basic",  no_argument,        0, 'd' },
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
+    { "floppy2",        required_argument,  0, 'g' },
+    { "floppy3",        required_argument,  0, 'G' },
     { "help",           no_argument,        0, 'h' },
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
@@ -110,7 +116,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:hik:m:M:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:g:G:hik:m:M:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -210,6 +216,12 @@ int main(int argc, char **argv) {
         case 'F':
             drive1_filename = strdup(optarg);
             break;
+        case 'g':
+            drive2_filename = strdup(optarg);
+            break;
+        case 'G':
+            drive3_filename = strdup(optarg);
+            break;
         case 'h':
             usage();
             return 1;
@@ -254,7 +266,8 @@ int main(int argc, char **argv) {
     if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
         return 1;
     }
-    if (!floppy_init(drive0_filename, drive1_filename, cpu_clock)) {
+    if (!floppy_init(drive0_filename, drive1_filename,
+                     drive2_filename, drive3_filename, cpu_clock)) {
         return 1;
     }
 

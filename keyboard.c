@@ -95,7 +95,10 @@ void keyboard_press_key(SDL_Keysym *key) {
 
     // RAW keyboard
 
-    if (key->sym > 127 || !key->sym) return;
+    if (key->sym > 127 || !key->sym) {
+        clear_matrix();
+        goto mod_only;
+    }
 
     for (i = 0; i < 64; i++) {
         row = i / 8;
@@ -108,6 +111,7 @@ void keyboard_press_key(SDL_Keysym *key) {
 
     keyboard_osi_matrix[row] ^= 1 << col;
 
+mod_only:
     if (key->mod & KMOD_CAPS)
         keyboard_osi_matrix[0] ^= 1 << 0;
     if (key->mod & KMOD_LSHIFT)

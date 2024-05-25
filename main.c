@@ -66,6 +66,7 @@ static void usage(void) {
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
+"    -C/--color-mode mode       mode: monochrome (default), 440b\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
@@ -73,7 +74,7 @@ static void usage(void) {
 "\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
-"    -C/--tape-location         ACIA location: f000 (default), fc00\n"
+"    -L/--tape-location         ACIA location: f000 (default), fc00\n"
 "    -B/--tape-baseclock        set baseclock (default: 19200)\n"
 "\n"
 "    -f/--floppy0 file          specify floppy0 file (default: none)\n"
@@ -93,7 +94,7 @@ static struct option long_options[] = {
     { "basic",          required_argument,  0, 'b' },
     { "tape-baseclock", required_argument,  0, 'B' },
     { "font",           required_argument,  0, 'c' },
-    { "tape-location",  required_argument,  0, 'C' },
+    { "color-mode",     required_argument,  0, 'C' },
     { "disable-basic",  no_argument,        0, 'd' },
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
@@ -102,6 +103,7 @@ static struct option long_options[] = {
     { "help",           no_argument,        0, 'h' },
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
+    { "tape-location",  required_argument,  0, 'L' },
     { "video-mode",     required_argument,  0, 'm' },
     { "mono-color",     required_argument,  0, 'M' },
     { "raw-keyboard",   no_argument,        0, 'r' },
@@ -118,7 +120,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hik:m:M:rt:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hik:L:m:M:rt:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -195,6 +197,16 @@ int main(int argc, char **argv) {
                 mono_color = COLOR_WHITE;
             }
             break;
+        case 'C':
+            if (!strcmp(optarg, "monochrome")) {
+                color_mode = COLORS_MONOCHROME;
+            } else if (!strcmp(optarg, "440b")) {
+                color_mode = COLORS_440B;
+            } else {
+                fprintf(stderr, "error: unknown color mode: %s\n", optarg);
+                return 1;
+            }
+            break;
         case 'i':
             keyboard_inverted ^= 1;
             break;
@@ -204,13 +216,14 @@ int main(int argc, char **argv) {
         case 'T':
             tape_output_filename = strdup(optarg);
             break;
-        case 'C':
+        case 'L':
             if (!strcmp(optarg, "f000")) {
                 tape_location = 0xf000;
             } else if (!strcmp(optarg, "fc00")) {
                 tape_location = 0xfc00;
             } else {
                 fprintf(stderr, "error: unknown tape location\n");
+                return 1;
             }
             break;
         case 'B':

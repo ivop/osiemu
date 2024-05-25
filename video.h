@@ -8,6 +8,13 @@ enum mono_colors {
     COLOR_WHITE
 };
 
+enum color_modes {
+    COLORS_MONOCHROME,
+    COLORS_440B
+};
+
+extern enum color_modes color_mode;
+
 extern char *font_filename;
 
 extern bool video_enabled;

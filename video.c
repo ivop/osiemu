@@ -85,6 +85,15 @@ static int monochrome[][3] = {
 
 enum mono_colors mono_color = COLOR_WHITE;
 
+static int colors_440b[][4] = {
+    { 0xff, 0xff, 0xff },           // white
+    { 0xff, 0x00, 0x00 },           // red
+    { 0x00, 0xff, 0x00 },           // green
+    { 0xff, 0xff, 0x00 }            // yellow
+};
+
+enum color_modes color_mode = COLORS_MONOCHROME;
+
 // ----------------------------------------------------------------------------
 
 static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
@@ -98,17 +107,31 @@ static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
 static void blit_screenmem(SDL_Texture *font) {
     if (!video_enabled) return;
 
-    SDL_SetTextureColorMod(font, monochrome[mono_color][0],
-                                 monochrome[mono_color][1],
-                                 monochrome[mono_color][2]);
 
-    for (int y = 0; y < osi_height; y++) {
-        for (int x = 0; x < osi_width; x++) {
-            blit_char(font, x, y, SCREEN[x+y*osi_stride]);
+    switch (color_mode) {
+    case COLORS_MONOCHROME:
+        SDL_SetTextureColorMod(font, monochrome[mono_color][0],
+                                     monochrome[mono_color][1],
+                                     monochrome[mono_color][2]);
+        for (int y = 0; y < osi_height; y++) {
+            for (int x = 0; x < osi_width; x++) {
+                blit_char(font, x, y, SCREEN[x+y*osi_stride]);
+            }
+        }
+        break;
+    case COLORS_440B:
+        for (int y = 0; y < osi_height; y++) {
+            for (int x = 0; x < osi_width; x++) {
 
-// OSI440B DEC 6-bit ASCII
-// blit_char(font, x, y, ((SCREEN[x+y*osi_width]-0x20)&0x3f)+0x20);
-
+                // Assume SixBit ASCII
+                uint8_t k = SCREEN[x+y*osi_stride] & 0x3f;   // 6-bits
+                k = ((k - 0x20) & 0x3f) + 0x20;              // adjust in font
+                uint8_t color = SCREEN[x+y*osi_stride] >> 6; // upper 2 bits
+                SDL_SetTextureColorMod(font, colors_440b[color][0],
+                                             colors_440b[color][1],
+                                             colors_440b[color][2]);
+                blit_char(font, x, y, k);
+            }
         }
     }
 }

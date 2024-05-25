@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:c:C:df:F:g:G:hik:m:M:rt:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hik:m:M:rt:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:

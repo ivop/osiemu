@@ -20,7 +20,7 @@
 
 bool keyboard_inverted = true;
 bool keyboard_cooked = true;
-bool keyboard_ascii_enable = true;
+bool keyboard_ascii_enable = false;
 
 static double keyboard_ticks;
 static double interval;
@@ -69,6 +69,17 @@ void keyboard_init(double cpu_clock) {
 
 // ----------------------------------------------------------------------------
 
+static void raw_keyboard_modifiers(SDL_Keysym *key) {
+    if (key->mod & KMOD_CAPS)
+        keyboard_osi_matrix[0] ^= 1 << 0;
+    if (key->mod & KMOD_LSHIFT)
+        keyboard_osi_matrix[0] ^= 1 << 2;
+    if (key->mod & KMOD_RSHIFT)
+        keyboard_osi_matrix[0] ^= 1 << 1;
+    if (key->mod & KMOD_LCTRL || key->mod & KMOD_RCTRL)
+        keyboard_osi_matrix[0] ^= 1 << 6;
+}
+
 void keyboard_press_key(SDL_Keysym *key) {
     int i, row, col;
 
@@ -95,9 +106,10 @@ void keyboard_press_key(SDL_Keysym *key) {
 
     // RAW keyboard
 
+    clear_matrix();
+
     if (key->sym > 127 || !key->sym) {
-        clear_matrix();
-        goto mod_only;
+        raw_keyboard_modifiers(key);
     }
 
     for (i = 0; i < 64; i++) {
@@ -107,25 +119,16 @@ void keyboard_press_key(SDL_Keysym *key) {
     }
     if (i == 64) return;    // not found
 
-    clear_matrix();
-
     keyboard_osi_matrix[row] ^= 1 << col;
 
-mod_only:
-    if (key->mod & KMOD_CAPS)
-        keyboard_osi_matrix[0] ^= 1 << 0;
-    if (key->mod & KMOD_LSHIFT)
-        keyboard_osi_matrix[0] ^= 1 << 2;
-    if (key->mod & KMOD_RSHIFT)
-        keyboard_osi_matrix[0] ^= 1 << 1;
-    if (key->mod & KMOD_LCTRL || key->mod & KMOD_RCTRL)
-        keyboard_osi_matrix[0] ^= 1 << 6;
+    raw_keyboard_modifiers(key);
 }
 
 // ----------------------------------------------------------------------------
 
 void keyboard_release_key(SDL_Keysym *key UNUSED) {
     clear_matrix();
+    raw_keyboard_modifiers(key);
 }
 
 // ----------------------------------------------------------------------------

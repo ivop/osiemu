@@ -98,11 +98,11 @@ uint8_t read6502(uint16_t address) {
             }
         }
     }
-    if (address == 0xdf00) {
-        return keyboard_read();
-    }
     if (keyboard_ascii_enable && address == 0xdf01) {
         return keyboard_ascii_read();
+    }
+    if ((address & 0xff00) == 0xdf00) {
+        return keyboard_read();
     }
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
@@ -137,7 +137,7 @@ void write6502(uint16_t address, uint8_t value) {
             return;
         }
     }
-    if (address == 0xdf00) {
+    if ((address & 0xff00) == 0xdf00) {
         keyboard_write(value);
         return;
     }

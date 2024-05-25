@@ -67,6 +67,7 @@ static void usage(void) {
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
 "\n"
+"    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals\n"
 "\n"
@@ -88,6 +89,7 @@ static void usage(void) {
 
 static struct option long_options[] = {
     { "aspect",         required_argument,  0, 'a' },
+    { "ascii-keyboard", no_argument,        0, 'A' },
     { "basic",          required_argument,  0, 'b' },
     { "tape-baseclock", required_argument,  0, 'B' },
     { "font",           required_argument,  0, 'c' },
@@ -116,7 +118,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:b:c:C:df:F:g:G:hik:m:M:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:c:C:df:F:g:G:hik:m:M:rt:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -209,6 +211,9 @@ int main(int argc, char **argv) {
         case 'r':
             keyboard_cooked = false;
             keyboard_ascii_enable = false;
+            break;
+        case 'A':
+            keyboard_ascii_enable = true;
             break;
         case 'f':
             drive0_filename = strdup(optarg);

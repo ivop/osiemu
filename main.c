@@ -69,7 +69,7 @@ static void usage(void) {
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
-"    -i/--invert-keyboard       invert keyboard matrix signals\n"
+"    -i/--invert-keyboard       invert keyboard matrix signals (model 542)\n"
 "\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
@@ -257,7 +257,7 @@ int main(int argc, char **argv) {
     printf("ticks per frame: %.2lf\n", ticks_per_frame);
 
     printf("matrix keyboard mode: %s\n", keyboard_cooked ? "cooked" : "raw");
-    printf("matrix signals: %s\n", keyboard_inverted ? "model 600" : "model 540");
+    printf("matrix signals: %s\n", keyboard_inverted ? "model 600" : "model 542");
     printf("ascii keyboard: %s\n", keyboard_ascii_enable ? "enabled" : "disabled");
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {

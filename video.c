@@ -27,7 +27,7 @@ uint8_t SCREEN[0x0800];      // 2kB Video RAM
 uint8_t COLOR[0x0800];       // 2kB Color RAM
 
 bool video_enabled = true;
-bool color_enabled = false;
+bool color_ram_enabled = false;
 bool video_smooth = false;
 bool fullscreen = false;
 
@@ -104,6 +104,10 @@ static void blit_screenmem(SDL_Texture *font) {
     for (int y = 0; y < osi_height; y++) {
         for (int x = 0; x < osi_width; x++) {
             blit_char(font, x, y, SCREEN[x+y*osi_width]);
+
+// OSI440B DEC 6-bit ASCII
+// blit_char(font, x, y, ((SCREEN[x+y*osi_width]-0x20)&0x3f)+0x20);
+
         }
     }
 }
@@ -264,3 +268,17 @@ void screen_toggle_fullscreen(void) {
         SDL_SetWindowFullscreen(window, 0);
     }
 }
+
+// ----------------------------------------------------------------------------
+
+uint8_t screen_color_ram_read(uint16_t address) {
+    return COLOR[address & 0x07ff];
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_color_ram_write(uint16_t address, uint8_t value) {
+    COLOR[address & 0x07ff] = value;
+}
+
+// ----------------------------------------------------------------------------

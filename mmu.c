@@ -45,8 +45,8 @@ static uint16_t kernel_bottom;
 // cf00-cf1f    Up to 16 ACIA's (Model 550 serial port board)
 //              used by multishare system and C3s
 //
-// d000-d7ff    Screen RAM  (32x32 or 64x32, stride is always 64)
-// de00         video mode:
+// d000-d7ff    Screen RAM 1kB or 2kB
+// de00         video mode: model 540B
 //              write:
 //                  bit 0, 1=32, 0=64
 //                  bit 1, 1=tone on (642 keyboard)
@@ -56,6 +56,7 @@ static uint16_t kernel_bottom;
 //                  bit 7 toggles at 1/120th of a second (duty cycle is 60Hz)
 //
 // df00         Polled Keyboard (Model 542/542B or Model 600/600D (inverted))
+// df01         ASCII keyboard
 // df01         R2R DAC output, or tone generator at 49152/value Hz
 //
 // e000-e7ff    Color RAM
@@ -92,9 +93,9 @@ uint8_t read6502(uint16_t address) {
         if (address >= 0xd000 && address <= 0xd7ff) {
             return screen_read(address);
         }
-        if (color_enabled) {
+        if (color_ram_enabled) {
             if (address >= 0xe000 && address <= 0xe7ff) {
-                return COLOR[address - 0xe000];
+                return screen_color_ram_read(address);
             }
         }
     }
@@ -132,9 +133,11 @@ void write6502(uint16_t address, uint8_t value) {
             screen_write(address, value);
             return;
         }
-        if (address >= 0xe000 && address <= 0xe7ff) {
-            COLOR[address - 0xe000] = value;
-            return;
+        if (color_ram_enabled) {
+            if (address >= 0xe000 && address <= 0xe7ff) {
+                screen_color_ram_write(address, value);
+                return;
+            }
         }
     }
     if ((address & 0xff00) == 0xdf00) {

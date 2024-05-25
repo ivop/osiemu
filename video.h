@@ -10,11 +10,8 @@ enum mono_colors {
 
 extern char *font_filename;
 
-extern uint8_t SCREEN[0x0800];
-extern uint8_t COLOR[0x0800];
-
 extern bool video_enabled;
-extern bool color_enabled;
+extern bool color_ram_enabled;
 extern bool video_smooth;
 extern enum mono_colors mono_color;
 extern bool fullscreen;
@@ -39,3 +36,5 @@ void screen_unhide(void);
 void screen_toggle_fullscreen(void);
 uint8_t screen_read(uint16_t address);
 void screen_write(uint16_t address, uint8_t value);
+uint8_t screen_color_ram_read(uint16_t address);
+void screen_color_ram_write(uint16_t address, uint8_t value);

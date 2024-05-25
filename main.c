@@ -257,6 +257,7 @@ int main(int argc, char **argv) {
     printf("ticks per frame: %.2lf\n", ticks_per_frame);
 
     printf("matrix keyboard mode: %s\n", keyboard_cooked ? "cooked" : "raw");
+    printf("matrix signals: %s\n", keyboard_inverted ? "model 600" : "model 540");
     printf("ascii keyboard: %s\n", keyboard_ascii_enable ? "enabled" : "disabled");
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {

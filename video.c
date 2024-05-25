@@ -41,6 +41,7 @@ int screen_height = 256;
 
 int osi_width = 64;
 int osi_height = 32;
+int osi_stride = 64;
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -103,7 +104,7 @@ static void blit_screenmem(SDL_Texture *font) {
 
     for (int y = 0; y < osi_height; y++) {
         for (int x = 0; x < osi_width; x++) {
-            blit_char(font, x, y, SCREEN[x+y*osi_width]);
+            blit_char(font, x, y, SCREEN[x+y*osi_stride]);
 
 // OSI440B DEC 6-bit ASCII
 // blit_char(font, x, y, ((SCREEN[x+y*osi_width]-0x20)&0x3f)+0x20);

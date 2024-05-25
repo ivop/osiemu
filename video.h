@@ -28,6 +28,7 @@ extern int screen_height;
 
 extern int osi_width;
 extern int osi_height;
+extern int osi_stride;
 
 bool screen_init(void);
 void screen_update(void);

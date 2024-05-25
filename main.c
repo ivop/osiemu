@@ -61,8 +61,8 @@ static void usage(void) {
 "    -d/--disable-basic         disable BASIC (default: enabled)\n"
 "\n"
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
-"    -m/--video-mode mode       select mode: 64x32 (default), 64x16, or 32x32\n"
-"    -M/--mono-color color      select monochrome color green, amber or white\n"
+"    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64\n"
+"    -M/--mono-color color      monochrome color green, amber or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
@@ -165,13 +165,21 @@ int main(int argc, char **argv) {
             if (!strcmp(optarg, "64x32")) {
                 osi_width = 64;
                 osi_height = 32;
+                osi_stride = 64;
             } else if (!strcmp(optarg, "32x32")) {
                 osi_width = 32;
                 osi_height = 32;
+                osi_stride = 32;
+                stretchx = 2;
+            } else if (!strcmp(optarg, "32x32s64")) {
+                osi_width = 32;
+                osi_height = 32;
+                osi_stride = 64;    // Model 440B
                 stretchx = 2;
             } else if (!strcmp(optarg, "64x16")) {
                 osi_width = 64;
                 osi_height = 16;
+                osi_stride = 64;
                 stretchy = 2;
             } else {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);

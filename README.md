@@ -13,7 +13,7 @@ Ohio Scientific Instruments, Inc. Emulator
 * ASCII keyboard, Model 440B
 * 64x32, 64x16, and 32x32 monochrome character based display
 * Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
-* Bit-level floppy emulation, Model 470, up to four single sided 5" or 8" drives
+* Bit-level floppy emulation, Model 470, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display
 
 ## TODO

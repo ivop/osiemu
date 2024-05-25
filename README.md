@@ -1,2 +1,27 @@
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator
+
+## Features
+
+* NMOS 6502 CPU
+* 40kB RAM
+* 8kB BASIC ROM
+* Up to 4kB OS/Monitor ROM
+* Polled keyboard, Model 542 or Model 600 mode, raw or cooked
+* ASCII keyboard, Model 440B
+* 64x32, 64x16, and 32x32 monochrome character based display
+* Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
+* Bit-level floppy emulation, Model 470, up to four single sided 5" or 8" drives
+* Hardware accelerated display
+
+## TODO
+
+* Video: Model 440B color output (6-bit characters, upper two bits select color)
+* Video: Model 540A video 32x32 with stride of 64
+* Video: Model 540B video 64x32 and 32x32 with stride of 64, color RAM at 0xE000, mode register at 0xDE00
+* Video: Model 541 Hi Resolution Graphics Expander
+* Video: Model 630 Superboard color video expander
+* RAM: Model 522 48kB RAM (no BASIC)
+* Serial: Serial I/O without keyboard and display (named sockets)
+* Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
+* Misc: Model 505 joysticks, and real-time clock

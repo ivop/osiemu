@@ -110,6 +110,7 @@ void keyboard_press_key(SDL_Keysym *key) {
 
     if (key->sym > 127 || !key->sym) {
         raw_keyboard_modifiers(key);
+        return;
     }
 
     for (i = 0; i < 64; i++) {

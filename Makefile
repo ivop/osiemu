@@ -4,7 +4,7 @@ DEBUG ?= -g3
 WARN ?= -W -Wall -Wextra
 CFLAGS = -flto=auto -O3 $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)
 LFLAGS = -flto=auto
-LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lSDL2_gfx
+LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image
 
 SRC_FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
 			cooked.c floppy.c monitor.c

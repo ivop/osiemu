@@ -308,9 +308,14 @@ int main(int argc, char **argv) {
                     tape_rewind();
                     break;
                 case SDLK_F8:
+                    {
                     screen_hide();
+                    double remember = SDL_GetTicks();
                     if (!monitor()) goto exit_out;
+                    double elapsed = SDL_GetTicks() - remember;
+                    target += elapsed;
                     screen_unhide();
+                    }
                     break;
                 case SDLK_F9:
                     goto exit_out;
@@ -330,12 +335,19 @@ int main(int argc, char **argv) {
         }
 
         while (cpu_ticks < cpu_target) {
+            if (monitor_checkbp()) {
+                screen_hide();
+                double remember = SDL_GetTicks();
+                if (!monitor()) goto exit_out;
+                double elapsed = SDL_GetTicks() - remember;
+                target += elapsed;
+                screen_unhide();
+            }
             double ticks = step6502();
             cpu_ticks += ticks;
             tape_tick(ticks);
             keyboard_tick(ticks);
             floppy_tick(ticks);
-            if (!monitor_checkbp()) goto exit_out;
         }
 
         cpu_target += ticks_per_frame;

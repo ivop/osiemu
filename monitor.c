@@ -197,14 +197,11 @@ static void clrbp(void) {
 // ----------------------------------------------------------------------------
 
 bool monitor_checkbp(void) {
-    bool ret = true;
     if (bp_enable && PC == bp) {
-        screen_hide();
         puts("BREAKPOINT ENCOUNTERED");
-        ret = monitor();
-        screen_unhide();
+        return true;
     }
-    return ret;
+    return false;
 }
 
 // ----------------------------------------------------------------------------

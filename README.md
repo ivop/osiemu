@@ -18,6 +18,7 @@ Ohio Scientific Instruments, Inc. Emulator
   * full resolution 512x256
   * optional 2x zoom
   * optional TV aspect ratio 16:9 or 4:3 with optional anti-aliasing
+* On-Screen Display during peripheral access
 
 ## TODO
 

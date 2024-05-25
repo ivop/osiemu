@@ -1,6 +1,8 @@
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator
 
+![screenshot]( screenshots/osiemu.png )  
+
 ## Features
 
 * NMOS 6502 CPU

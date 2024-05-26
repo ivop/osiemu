@@ -164,8 +164,8 @@ static void blit_screenmem(SDL_Texture *font) {
 
                 SDL_RenderCopy(renderer, hires_bytes, &src_bits, &dst_bits);
 
-                SDL_Rect src_bits2 = { 4, bits & 15, 4, 1 };
-                SDL_Rect dst_bits2 = { x*8+4, y , 4, 1 };
+                src_bits.x = 4;
+                dst_bits.x += 4;
 
                 if (color_mode == COLORS_440B) {
                     uint8_t color = SCREEN[(y/4)*osi_stride + x*2 + 1] >> 6;
@@ -174,7 +174,7 @@ static void blit_screenmem(SDL_Texture *font) {
                                                         colors_440b[color][2]);
                 }
 
-                SDL_RenderCopy(renderer, hires_bytes, &src_bits2, &dst_bits2);
+                SDL_RenderCopy(renderer, hires_bytes, &src_bits, &dst_bits);
             }
         }
         break;

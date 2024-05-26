@@ -28,7 +28,6 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
-* Video: Model 540A video 32x32 with stride of 64
 * Video: Model 540B video 64x32 and 32x32 with stride of 64, color RAM at 0xE000, mode register at 0xDE00
 * Video: Model 541 High Resolution Graphics Expander
 * Video: Model 630 Superboard color video expander

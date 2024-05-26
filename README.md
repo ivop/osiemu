@@ -14,10 +14,10 @@ Ohio Scientific Instruments, Inc. Emulator
 * 64x32, 64x16, and 32x32 character based display
 * Color modes:
   * Monochrome white, green, or amber
-  * Model 440B 6-bit ASCII, 4 colors
+  * Model 440B, 6-bit ASCII, 4 colors
 * High resolution overlays:
-  * Model 440B 128x128
-  * Model 541 256x256 High Resolution Graphics Expander
+  * Model 440B, 128x128
+  * Model 541, 256x256, High Resolution Graphics Expander
 * Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
 * Bit-level floppy emulation, Model 470, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display

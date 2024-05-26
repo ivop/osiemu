@@ -34,7 +34,9 @@ static uint16_t kernel_bottom;
 
 // Memory Map:
 //
-// 0000-9fff    RAM
+// 0000-7fff    RAM
+//
+// 8000-9fff    RAM or 256x256 hires 541 (set ram_top to 7ffe)
 //
 // a000-bfff    BASIC ROM or RAM
 //
@@ -59,7 +61,7 @@ static uint16_t kernel_bottom;
 // df01         ASCII keyboard
 // df01         R2R DAC output, or tone generator at 49152/value Hz
 //
-// e000-e7ff    Color RAM
+// e000-e7ff    Color RAM / 2kB 128x128 hires 440B
 //
 // f000-f0ff    ACIA for tape input
 //
@@ -96,6 +98,11 @@ uint8_t read6502(uint16_t address) {
         if (color_ram_enabled) {
             if (address >= 0xe000 && address <= 0xe7ff) {
                 return screen_color_ram_read(address);
+            }
+        }
+        if (hires_mode == HIRES_440B) {
+            if (address >= 0xe000 && address <= 0xe7ff) {
+                return screen_hires_ram_read(address);
             }
         }
     }
@@ -137,6 +144,11 @@ void write6502(uint16_t address, uint8_t value) {
             if (address >= 0xe000 && address <= 0xe7ff) {
                 screen_color_ram_write(address, value);
                 return;
+            }
+        }
+        if (hires_mode == HIRES_440B) {
+            if (address >= 0xe000 && address <= 0xe7ff) {
+                return screen_hires_ram_write(address, value);
             }
         }
     }

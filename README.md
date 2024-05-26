@@ -15,6 +15,8 @@ Ohio Scientific Instruments, Inc. Emulator
 * Color modes:
   * Monochrome white, green, or amber
   * Model 440B 6-bit ASCII, 4 colors
+* High resultion modes:
+  * Model 440B 128x128
 * Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
 * Bit-level floppy emulation, Model 470, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display
@@ -26,7 +28,6 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
-* Video: Model 440B 128x128 graphics
 * Video: Model 540A video 32x32 with stride of 64
 * Video: Model 540B video 64x32 and 32x32 with stride of 64, color RAM at 0xE000, mode register at 0xDE00
 * Video: Model 541 High Resolution Graphics Expander

@@ -13,7 +13,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL2_rotozoom.h>
+#include <SDL_render.h>
 
 #include "video.h"
 #include "tape.h"
@@ -25,7 +25,7 @@ char *font_filename = "chargen/type1.pbm";
 
 uint8_t SCREEN[0x0800];      // 2kB Video RAM
 uint8_t COLOR[0x0800];       // 2kB Color RAM
-
+uint8_t HIRES[0x2000];       // 2kB for 44B, 8kB for 541
 bool video_enabled = true;
 bool color_ram_enabled = false;
 bool video_smooth = false;
@@ -94,6 +94,11 @@ static int colors_440b[][4] = {
 
 enum color_modes color_mode = COLORS_MONOCHROME;
 
+enum hires_modes hires_mode = HIRES_NONE;
+
+SDL_Texture *hires_bytes;
+SDL_Texture *hires_screen;
+
 // ----------------------------------------------------------------------------
 
 static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
@@ -134,6 +139,48 @@ static void blit_screenmem(SDL_Texture *font) {
             }
         }
     }
+
+    switch (hires_mode) {
+    case HIRES_NONE:
+        break;
+    case HIRES_440B:
+        SDL_SetRenderTarget(renderer, hires_screen);
+        SDL_SetTextureBlendMode(hires_screen, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+        SDL_RenderClear(renderer);
+        for (int y=0; y<128; y++) {
+            for (int x=0; x<16; x++) {
+                uint8_t bits = HIRES[y*16+x];
+
+                SDL_Rect src_bits = { 0, bits, 4, 1 };
+                SDL_Rect dst_bits = { x*8, y , 4, 1 };
+
+                if (color_mode == COLORS_440B) {
+                    uint8_t color = SCREEN[(y/4)*osi_stride + x*2] >> 6;
+                    SDL_SetTextureColorMod(hires_bytes, colors_440b[color][0],
+                                                        colors_440b[color][1],
+                                                        colors_440b[color][2]);
+                }
+
+                SDL_RenderCopy(renderer, hires_bytes, &src_bits, &dst_bits);
+
+                SDL_Rect src_bits2 = { 4, bits & 15, 4, 1 };
+                SDL_Rect dst_bits2 = { x*8+4, y , 4, 1 };
+
+                if (color_mode == COLORS_440B) {
+                    uint8_t color = SCREEN[(y/4)*osi_stride + x*2 + 1] >> 6;
+                    SDL_SetTextureColorMod(hires_bytes, colors_440b[color][0],
+                                                        colors_440b[color][1],
+                                                        colors_440b[color][2]);
+                }
+
+                SDL_RenderCopy(renderer, hires_bytes, &src_bits2, &dst_bits2);
+            }
+        }
+        break;
+    case HIRES_541:
+        break;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -152,8 +199,13 @@ void screen_update(void) {
     blit_screenmem(font);
 
     SDL_SetRenderTarget(renderer, NULL);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, screen, NULL, NULL );
+
+    if (hires_mode) {
+        SDL_RenderCopy(renderer, hires_screen, NULL, NULL);
+    }
 
     // On-Screen-Display
 
@@ -185,6 +237,25 @@ void screen_update(void) {
     }
 
     SDL_RenderPresent(renderer);
+}
+
+// ----------------------------------------------------------------------------
+
+static void init_hires_bytes(void) {
+    SDL_SetRenderTarget(renderer, hires_bytes);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+    SDL_SetTextureBlendMode(hires_bytes, SDL_BLENDMODE_BLEND);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    for (int y=0; y<256; y++) {
+        int mask = 0x80;
+        for (int x=0; x<8; x++) {
+            if (y & mask) {
+                SDL_RenderDrawPoint(renderer, x, y);
+            }
+            mask >>= 1;
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -250,8 +321,40 @@ bool screen_init(void) {
                                          screen_width, screen_height);
 
     if (!screen) {
-        fprintf(stderr, "error: unable to create blank texture\n");
+        fprintf(stderr, "error: unable to create screen texture\n");
         return false;
+    }
+
+    if (hires_mode > HIRES_NONE) {
+        hires_bytes = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                                  SDL_TEXTUREACCESS_TARGET,
+                                                  8, 256);
+
+        if (!hires_bytes) {
+            fprintf(stderr, "error: unable to create hires texture\n");
+            return false;
+        }
+
+        unsigned int hires_screen_width;
+        unsigned int hires_screen_height;
+
+        if (hires_mode == HIRES_440B) {
+            hires_screen_width = hires_screen_height = 128;
+        } else {
+            hires_screen_width = hires_screen_height = 256;
+        }
+
+        hires_screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                                   SDL_TEXTUREACCESS_TARGET,
+                                                   hires_screen_width,
+                                                   hires_screen_height);
+
+        if (!hires_screen) {
+            fprintf(stderr, "error: unable to create hires screen texture\n");
+            return false;
+        }
+
+        init_hires_bytes();
     }
 
     return true;
@@ -303,6 +406,26 @@ uint8_t screen_color_ram_read(uint16_t address) {
 
 void screen_color_ram_write(uint16_t address, uint8_t value) {
     COLOR[address & 0x07ff] = value;
+}
+
+// ----------------------------------------------------------------------------
+
+uint8_t screen_hires_ram_read(uint16_t address) {
+    if (hires_mode == HIRES_440B) {
+        return HIRES[address & 0x07ff];
+    } else {
+        return HIRES[address & 0x1fff];
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_hires_ram_write(uint16_t address, uint8_t value) {
+    if (hires_mode == HIRES_440B) {
+        HIRES[address & 0x07ff] = value;
+    } else {
+        HIRES[address & 0x1fff] = value;
+    }
 }
 
 // ----------------------------------------------------------------------------

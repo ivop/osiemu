@@ -13,14 +13,21 @@ enum color_modes {
     COLORS_440B
 };
 
+enum hires_modes {
+    HIRES_NONE,
+    HIRES_440B,
+    HIRES_541
+};
+
+extern enum mono_colors mono_color;
 extern enum color_modes color_mode;
+extern enum hires_modes hires_mode;
 
 extern char *font_filename;
 
 extern bool video_enabled;
 extern bool color_ram_enabled;
 extern bool video_smooth;
-extern enum mono_colors mono_color;
 extern bool fullscreen;
 
 extern double aspectx;
@@ -39,10 +46,16 @@ extern int osi_stride;
 
 bool screen_init(void);
 void screen_update(void);
+
 void screen_hide(void);
 void screen_unhide(void);
 void screen_toggle_fullscreen(void);
+
 uint8_t screen_read(uint16_t address);
 void screen_write(uint16_t address, uint8_t value);
+
 uint8_t screen_color_ram_read(uint16_t address);
 void screen_color_ram_write(uint16_t address, uint8_t value);
+
+uint8_t screen_hires_ram_read(uint16_t address);
+void screen_hires_ram_write(uint16_t address, uint8_t value);

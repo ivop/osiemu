@@ -67,6 +67,7 @@ static void usage(void) {
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b\n"
+"    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
@@ -101,6 +102,7 @@ static struct option long_options[] = {
     { "floppy2",        required_argument,  0, 'g' },
     { "floppy3",        required_argument,  0, 'G' },
     { "help",           no_argument,        0, 'h' },
+    { "hires-mode",     required_argument,  0, 'H' },
     { "invert-keyboard",no_argument,        0, 'i' },
     { "kernel",         required_argument,  0, 'k' },
     { "tape-location",  required_argument,  0, 'L' },
@@ -120,7 +122,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hik:L:m:M:rt:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ik:L:m:M:rt:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -204,6 +206,18 @@ int main(int argc, char **argv) {
                 color_mode = COLORS_440B;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
+                return 1;
+            }
+            break;
+        case 'H':
+            if (!strcmp(optarg, "none")) {
+                hires_mode = HIRES_NONE;
+            } else if (!strcmp(optarg, "440b")) {
+                hires_mode = HIRES_440B;
+            } else if (!strcmp(optarg, "541")) {
+                hires_mode = HIRES_541;
+            } else {
+                fprintf(stderr, "error: unknown hires mode: %s\n", optarg);
                 return 1;
             }
             break;

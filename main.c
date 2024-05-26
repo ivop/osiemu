@@ -66,7 +66,7 @@ static void usage(void) {
 "    -M/--mono-color color      monochrome color green, amber or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
-"    -V/--smooth-video          enable anti-aliased scaling, requires --zoom\n"
+"    -V/--smooth-video          enable anti-aliased scaling\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b\n"
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
 "\n"

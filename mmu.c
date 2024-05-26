@@ -105,6 +105,11 @@ uint8_t read6502(uint16_t address) {
                 return screen_hires_ram_read(address);
             }
         }
+        if (hires_mode == HIRES_541) {
+            if (address >= 0x8000 && address <= 0x9fff) {
+                return screen_hires_ram_read(address);
+            }
+        }
     }
     if (keyboard_ascii_enable && address == 0xdf01) {
         return keyboard_ascii_read();
@@ -129,10 +134,12 @@ void write6502(uint16_t address, uint8_t value) {
     }
     if (floppy_enable) {
         if (address >= 0xc000 && address <= 0xc003) {
-            return floppy_pia_write(address, value);
+            floppy_pia_write(address, value);
+            return;
         }
         if (address >= 0xc010 && address <= 0xc011) {
-            return floppy_acia_write(address, value);
+            floppy_acia_write(address, value);
+            return;
         }
     }
     if (video_enabled) {
@@ -148,7 +155,14 @@ void write6502(uint16_t address, uint8_t value) {
         }
         if (hires_mode == HIRES_440B) {
             if (address >= 0xe000 && address <= 0xe7ff) {
-                return screen_hires_ram_write(address, value);
+                screen_hires_ram_write(address, value);
+                return;
+            }
+        }
+        if (hires_mode == HIRES_541) {
+            if (address >= 0x8000 && address <= 0x9fff) {
+                screen_hires_ram_write(address, value);
+                return;
             }
         }
     }

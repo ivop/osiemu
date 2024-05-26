@@ -179,6 +179,20 @@ static void blit_screenmem(SDL_Texture *font) {
         }
         break;
     case HIRES_541:
+        SDL_SetRenderTarget(renderer, hires_screen);
+        SDL_SetTextureBlendMode(hires_screen, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+        SDL_RenderClear(renderer);
+        for (int y=0; y<256; y++) {
+            for (int x=0; x<32; x++) {
+                uint8_t bits = HIRES[y*32+x];
+
+                SDL_Rect src_bits = { 0, bits, 8, 1 };
+                SDL_Rect dst_bits = { x*8, y , 8, 1 };
+
+                SDL_RenderCopy(renderer, hires_bytes, &src_bits, &dst_bits);
+            }
+        }
         break;
     }
 }

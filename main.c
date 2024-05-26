@@ -217,6 +217,7 @@ int main(int argc, char **argv) {
                 hires_mode = HIRES_440B;
             } else if (!strcmp(optarg, "541")) {
                 hires_mode = HIRES_541;
+                mmu_ram_top = 0x7ffe;
             } else {
                 fprintf(stderr, "error: unknown hires mode: %s\n", optarg);
                 return 1;

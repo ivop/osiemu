@@ -39,12 +39,13 @@ static char *drive1_filename = NULL;
 static char *drive2_filename = NULL;
 static char *drive3_filename = NULL;
 
-// How fast does our 6502 run?
+#define CPU_CLOCK_C1P       (3932160/4)     // 1P / Superboard II Service Manual
+#define CPU_CLOCK_510C_SLOW (8000000/8)     // 510C Schematics
+#define CPU_CLOCK_510C_FAST (8000000/4)     // 510C Schematics
+#define CPU_CLOCK_UK101     (8000000/8)     // ???
+#define CPU_CLOCK C2P        2000000
 
-#define CPU_CLOCK_C1P   (3932160/4)     // 1P / Superboard II Service Manual
-#define CPU_CLOCK_UK101 (8000000/8)     // WinOSI, source???
-
-static int cpu_clock = CPU_CLOCK_UK101;
+static int cpu_clock = CPU_CLOCK_510C_SLOW;
 static double fps = 60.0;
 static double ticks_per_frame;
 

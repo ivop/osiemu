@@ -21,7 +21,7 @@
 
 // ----------------------------------------------------------------------------
 
-char *font_filename = "chargen/type1.pbm";
+char *font_filename = "chargen/type1.png";
 
 uint8_t SCREEN[0x0800];      // 2kB Video RAM
 uint8_t COLOR[0x0800];       // 2kB Color RAM
@@ -105,13 +105,15 @@ static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
     SDL_Rect srcrect = { 0, c*8, 8, 8 };
     SDL_Rect dstrect = { x*8, y*8, 8, 8, };
 
-    SDL_SetRenderTarget(renderer, screen);
 	SDL_RenderCopy(renderer, font, &srcrect, &dstrect);
 }
 
 static void blit_screenmem(SDL_Texture *font) {
     if (!video_enabled) return;
 
+    SDL_SetRenderTarget(renderer, screen);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
 
     switch (color_mode) {
     case COLORS_MONOCHROME:

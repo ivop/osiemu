@@ -67,7 +67,7 @@ static void usage(void) {
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling\n"
-"    -C/--color-mode mode       mode: monochrome (default), 440b\n"
+"    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
@@ -201,6 +201,8 @@ int main(int argc, char **argv) {
                 mono_color = COLOR_GREEN;
             } else if (!strcmp(optarg, "amber")) {
                 mono_color = COLOR_AMBER;
+            } else if (!strcmp(optarg, "bluish")) {
+                mono_color = COLOR_BLUISH;
             } else {
                 mono_color = COLOR_WHITE;
             }
@@ -210,6 +212,10 @@ int main(int argc, char **argv) {
                 color_mode = COLORS_MONOCHROME;
             } else if (!strcmp(optarg, "440b")) {
                 color_mode = COLORS_440B;
+            } else if (!strcmp(optarg, "540b")) {
+                color_mode = COLORS_540B;
+            } else if (!strcmp(optarg, "630")) {
+                color_mode = COLORS_630;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
                 return 1;

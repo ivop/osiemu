@@ -5,12 +5,15 @@
 enum mono_colors {
     COLOR_GREEN = 0,
     COLOR_AMBER,
-    COLOR_WHITE
+    COLOR_WHITE,
+    COLOR_BLUISH
 };
 
 enum color_modes {
     COLORS_MONOCHROME,
-    COLORS_440B
+    COLORS_440B,
+    COLORS_540B,
+    COLORS_630
 };
 
 enum hires_modes {

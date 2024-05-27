@@ -62,25 +62,12 @@ static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
 static SDL_Rect src_rect_digits = {  0,  0, 32, 64 };
 static SDL_Rect dst_rect_digits = { 96, 16, 32, 64 };
 
-#if 0
-static int colors [][3] = {
-    // 540B colors, 600D colors??? Not sure yet how the colors work
-    [0] = { 0xff, 0xff, 0xff },     // yellow
-    [1] = { 0xff, 0x00, 0x00 },     // red
-    [2] = { 0x00, 0xff, 0x00 },     // green
-    [3] = { 0x70, 0x82, 0x38 },     // olive
-    [4] = { 0x00, 0x00, 0xff },     // blue
-    [5] = { 0x80, 0x00, 0x80 },     // purple
-    [6] = { 0x87, 0xce, 0xeb },     // sky blue
-    [7] = { 0x00, 0x00, 0x00 },     // black
-};
-#endif
-
 static int monochrome[][3] = {
     // mono colors
-    [COLOR_GREEN] = { 0x00, 0xff, 0x00 },
-    [COLOR_AMBER] = { 0xff, 191, 0 },
-    [COLOR_WHITE] = { 0xff, 0xff, 0xff }
+    [COLOR_GREEN]  = { 0x00, 0xff, 0x00 },
+    [COLOR_AMBER]  = { 0xff, 0xbf, 0x00 },
+    [COLOR_WHITE]  = { 0xff, 0xff, 0xff },
+    [COLOR_BLUISH] = { 0x8a, 0xc2, 0xff }
 };
 
 enum mono_colors mono_color = COLOR_WHITE;
@@ -140,6 +127,11 @@ static void blit_screenmem(SDL_Texture *font) {
                 blit_char(font, x, y, k);
             }
         }
+    case COLORS_540B:
+        // See doc/osi540-colors.txt for explanation
+        break;
+    case COLORS_630:
+        break;
     }
 
     switch (hires_mode) {

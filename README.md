@@ -19,7 +19,7 @@ Ohio Scientific Instruments, Inc. Emulator
   * Model 440B, 128x128
   * Model 541, 256x256, High Resolution Graphics Expander
 * Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
-* Bit-level floppy emulation, Model 470, up to four single sided 5¼" or 8" drives
+* Bit-level floppy emulation, Model 470/505, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display
   * full resolution 512x256
   * optional 2x zoom

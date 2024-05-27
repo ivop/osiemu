@@ -14,7 +14,7 @@ KEYB = $df00
 ROW7 = 0x80
 ROW4 = 0x10
 
-    org $2000
+    org $0300
 
 start:
 

@@ -74,6 +74,9 @@ static void usage(void) {
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals (model 542)\n"
 "\n"
+"    -j/--joystick1 index       specify joystick 1\n"
+"    -J/--joystick2 index       specify joystick 2\n"
+"\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
 "    -L/--tape-location         ACIA location: f000 (default), fc00\n"
@@ -105,6 +108,8 @@ static struct option long_options[] = {
     { "help",           no_argument,        0, 'h' },
     { "hires-mode",     required_argument,  0, 'H' },
     { "invert-keyboard",no_argument,        0, 'i' },
+    { "joystick1",      required_argument,  0, 'j' },
+    { "joystick2",      required_argument,  0, 'J' },
     { "kernel",         required_argument,  0, 'k' },
     { "tape-location",  required_argument,  0, 'L' },
     { "video-mode",     required_argument,  0, 'm' },
@@ -123,7 +128,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ik:L:m:M:rt:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rt:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -252,6 +257,12 @@ int main(int argc, char **argv) {
         case 'A':
             keyboard_ascii_enable = true;
             break;
+        case 'j':
+            keyboard_joysticks[0] = atoi(optarg);
+            break;
+        case 'J':
+            keyboard_joysticks[1] = atoi(optarg);
+            break;
         case 'f':
             drive0_filename = strdup(optarg);
             break;
@@ -305,7 +316,9 @@ int main(int argc, char **argv) {
     if (!screen_init()) return 1;
 
     reset6502();
-    keyboard_init(cpu_clock);
+    if (!keyboard_init(cpu_clock)) {
+        return 1;
+    }
     if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
         return 1;
     }
@@ -368,6 +381,15 @@ int main(int argc, char **argv) {
             case SDL_TEXTINPUT:
                 keyboard_text_input(e.text.text);
                 break;
+            case SDL_JOYAXISMOTION:
+            case SDL_JOYBUTTONDOWN:
+            case SDL_JOYBUTTONUP:
+            case SDL_JOYHATMOTION:
+                keyboard_joystick_event(&e);
+                break;
+//            default:
+//                printf("main: sdl event %d\n", e.type);
+//                break;
             }
         }
 

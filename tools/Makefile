@@ -3,10 +3,10 @@ MADS ?= mads
 
 all: xex2lod test.lod hfe2osi
 
-test.lod: test.xex xex2lod
+%.lod: %.xex xex2lod
 	./xex2lod < $< > $@
 
-test.xex: test.s
+%.xex: %.s
 	$(MADS) -o:$@ $<
 
 %: %.c

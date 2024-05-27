@@ -1,0 +1,85 @@
+
+From OSI 540B Schematics
+------------------------
+
+Color Delays (CD0-CD6)
+
+74LS151:
+
+Data inputs:
+
+CD0 --> D7 (yellow)
+CD1 --> D1 (sky blue)
+CD2 --> D6 (red)
+CD3 --> D5 (green)
+CD4 --> D2 (purple)
+CD5 --> D4 (olive)
+CD6 --> D3 (blue)
+GND --> D0
+
+Select inputs:
+
+A = !R
+B = !G
+C = !B
+
+    ($E000-)
+    (memory)
+     (bits) (74151)
+     (3-1)   (CBA)   (74151)
+      BGR    !BGR     Y
+0 --> 000 --> 111 --> D7  CD0 (yellow)
+1 --> 001 --> 110 --> D6  CD2 (red)
+2 --> 010 --> 101 --> D5  CD3 (green)
+3 --> 011 --> 100 --> D4  CD5 (olive)
+4 --> 100 --> 011 --> D3  CD6 (blue)
+5 --> 101 --> 010 --> D2  CD4 (purple)
+6 --> 110 --> 001 --> D1  CD1 (sky blue)
+7 --> 111 --> 000 --> D0  GND (b/w)
+
+CD delay line is made of inverters, +180° +propagation delay
+
+CD0 (yellow)    x
+CD1 (sky blue)      o
+CD2 (red)       x
+CD3 (green)         o
+CD4 (purple)    x
+CD5 (olive)         o
+CD6 (blue)      x
+
+n = propagation delay of a single 74LS inverter
+
+CD0     -2n -->     CD2     -2n -->     CD4     -2n -->     CD6
+yellow              red                 purple              blue
+
+ |
+ |
++180°-n
+ |
+ V
+
+CD1     -2n -->     CD3     -2n -->     CD5
+sky blue            green               olive
+
+
+            Hue     Sat     Lum
+Yellow       60°    100%    50%     = rgb(255,255,  0)
+Red           0°    100%    50%     = rgb(255,  0,  0)
+Purple      300°    100%    50%     = rgb(255,  0,255)
+Blue        240°    100%    50%     = rgb(  0,  0,255)
+
+2n = 60°
+
+60+180-30=210
+
+Sky blue    210°    100%    50%     = rgb(  0,128,255)
+Green       150°    100%    50%     = rgb(  0,255,128)
+Olive        90°    100%    50%     = rgb(128,255,  0)
+
+
+OSI colors.
+
+Saturation          50%  (experiment)
+Luminance bright    50%
+Luminance dim       25%
+

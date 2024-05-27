@@ -25,6 +25,7 @@ bool keyboard_ascii_enable = false;
 int keyboard_joysticks[2] = { -1, -1 };
 static uint8_t joystick_values[2];
 static uint8_t joystick_triggers[2];
+static int joystick_axes[2][2];
 
 static double keyboard_ticks;
 static double interval;
@@ -254,11 +255,6 @@ uint8_t keyboard_ascii_read(void) {
 
 // ----------------------------------------------------------------------------
 
-// Keyboard matrix joystick directions:
-//
-// Joy1: row 7: bits 4:up,   3:down, 2:right, 1:left,  0:fire
-// Joy2: row 4: bits 7:fire, 6:down, 5:up,    4:right, 3:left
-
 #define HAT_UP      0x01
 #define HAT_RIGHT   0x02
 #define HAT_DOWN    0x04
@@ -299,25 +295,38 @@ static int hat_to_joy[2][16] = {
     }
 };
 
+#define DEADZONE 8000
+
 void keyboard_joystick_event(SDL_Event *e) {
     uint8_t mask = keyboard_inverted ? 0xff : 0x00;
     int which = -1;
 
+    if (keyboard_joysticks[0] == e->jhat.which) {
+        which = 0;
+    } else if (keyboard_joysticks[1] == e->jhat.which) {
+        which = 1;
+    }
+    if (which < 0) return;
+
     switch (e->type) {
     case SDL_JOYAXISMOTION:
-//        printf("joystick: which %d, axis %d, value %d\n", e->jaxis.which, e->jaxis.axis, e->jaxis.value);
-        break;
-    case SDL_JOYHATMOTION:
-//        printf("joystick: hat: which %d, index %d, value %d\n", e->jhat.which, e->jhat.hat, e->jhat.value);
-        if (keyboard_joysticks[0] == e->jhat.which) {
-            which = 0;
-        } else if (keyboard_joysticks[1] == e->jhat.which) {
-            which = 1;
-        }
-        if (which < 0 || e->jhat.hat > 0) return;
+        int fakehat = 0;
 
+        if (e->jaxis.axis > 1) return;
+
+        joystick_axes[which][e->jaxis.axis] = e->jaxis.value; // buffer values
+
+        if (joystick_axes[which][1] < -DEADZONE) fakehat |= HAT_UP;
+        if (joystick_axes[which][1] >  DEADZONE) fakehat |= HAT_DOWN;
+        if (joystick_axes[which][0] < -DEADZONE) fakehat |= HAT_LEFT;
+        if (joystick_axes[which][0] >  DEADZONE) fakehat |= HAT_RIGHT;
+
+        joystick_values[which] = hat_to_joy[which][fakehat];
+        break;
+
+    case SDL_JOYHATMOTION:
+        if (e->jhat.hat > 0) return;
         joystick_values[which] = hat_to_joy[which][e->jhat.value];
-//        printf("joystick: which %d --> %d\n", which, joystick_values[which]);
         break;
 
     case SDL_JOYBUTTONDOWN:
@@ -329,7 +338,6 @@ void keyboard_joystick_event(SDL_Event *e) {
         if (which < 0) return;
 
         joystick_triggers[which] = which ? JOY2_FIRE : JOY1_FIRE;
-//        printf("joystick: trigger: which: %d --> %d\n", which, joystick_triggers[which]);
         break;
 
     case SDL_JOYBUTTONUP:
@@ -341,7 +349,6 @@ void keyboard_joystick_event(SDL_Event *e) {
         if (which < 0) return;
 
         joystick_triggers[which] = 0;
-//        printf("joystick: trigger: which: %d --> %d\n", which, joystick_triggers[which]);
         break;
     }
     keyboard_osi_matrix[7] = (joystick_values[0] | joystick_triggers[0]) ^ mask;

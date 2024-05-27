@@ -11,6 +11,7 @@ Ohio Scientific Instruments, Inc. Emulator
 * Up to 4kB OS/Monitor ROM
 * Polled keyboard, Model 542 or Model 600 mode, raw or cooked
 * ASCII keyboard, Model 440B
+* Two joysticks (d-pad or analog)
 * 64x32, 64x16, and 32x32 character based display
 * Color modes:
   * Monochrome white, green, or amber
@@ -25,7 +26,7 @@ Ohio Scientific Instruments, Inc. Emulator
   * optional 2x zoom
   * optional TV aspect ratio 16:9 or 4:3 with optional anti-aliasing
 * On-Screen Display during peripheral access
-* Built-in monitor, dump memory contents, set breakpoints, disassembler
+* Built-in monitor, dump/change memory contents, registers, set breakpoints, disassembler
 
 ## TODO
 
@@ -35,4 +36,3 @@ Ohio Scientific Instruments, Inc. Emulator
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
 * Sound: SN76489AN and/or AY-3-8910
 * Sound: ACIA RTS DAC
-* Misc: Model 505 joysticks, and real-time clock

@@ -4,7 +4,6 @@ fake6502/*.o
 osiemu
 .depend
 tools/xex2lod
-tools/*.xex
 tools/*.lod
 tools/hfe2osi
 tapeout.dat

@@ -86,7 +86,7 @@ static bool write_enable;
 static bool erase_enable;
 static bool step_to_3976;
 static bool drive_01_23;
-static bool low_current;
+static bool low_current UNUSED;
        bool head_on_disk;
 
 // ACIA

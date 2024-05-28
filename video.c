@@ -19,6 +19,7 @@
 #include "tape.h"
 #include "floppy.h"
 #include "hslrgb.h"
+#include "portability.h"
 
 // ----------------------------------------------------------------------------
 
@@ -96,6 +97,13 @@ static double saturation   = 0.75;
 
 static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 
+#define CONTROL_540B_32X32      0x01    // leave up to command line for now
+#define CONTROL_540B_TONE_ON    0x02    // 542 keyboard tone
+#define CONTROL_540B_COLOR_ON   0x04    // 1=color on
+#define CONTROL_540B_ACHOME     0x08    // 38-40kHz AC Home Control output
+
+static uint8_t control_540b;
+
 enum hires_modes hires_mode = HIRES_NONE;
 
 SDL_Texture *hires_bytes;
@@ -118,6 +126,7 @@ static void blit_screenmem(SDL_Texture *font) {
 
     switch (color_mode) {
     case COLORS_MONOCHROME:
+do_monochrome:
         SDL_RenderClear(renderer);
         SDL_SetTextureColorMod(font, monochrome[mono_color][0],
                                      monochrome[mono_color][1],
@@ -145,6 +154,8 @@ static void blit_screenmem(SDL_Texture *font) {
         }
         break;
     case COLORS_540B:
+        if (!(control_540b & CONTROL_540B_COLOR_ON))
+            goto do_monochrome;
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {
                 int v = COLOR[x+y*osi_stride];
@@ -518,6 +529,18 @@ void screen_hires_ram_write(uint16_t address, uint8_t value) {
     } else {
         HIRES[address & 0x1fff] = value;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+uint8_t screen_control_540b_read(uint16_t address UNUSED) {
+    return 0x00;    // fix: bit 7 60Hz 50/50 duty cycle
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_control_540b_write(uint16_t address UNUSED, uint8_t value) {
+    control_540b = value;
 }
 
 // ----------------------------------------------------------------------------

@@ -99,6 +99,9 @@ uint8_t read6502(uint16_t address) {
             if (address >= 0xe000 && address <= 0xe7ff) {
                 return screen_color_ram_read(address);
             }
+            if (color_mode == COLORS_540B && address == 0xde00) {
+                return screen_control_540b_read(address);
+            }
         }
         if (hires_mode == HIRES_440B) {
             if (address >= 0xe000 && address <= 0xe7ff) {
@@ -151,6 +154,9 @@ void write6502(uint16_t address, uint8_t value) {
             if (address >= 0xe000 && address <= 0xe7ff) {
                 screen_color_ram_write(address, value);
                 return;
+            }
+            if (color_mode == COLORS_540B && address == 0xde00) {
+                screen_control_540b_write(address, value);
             }
         }
         if (hires_mode == HIRES_440B) {

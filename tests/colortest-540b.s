@@ -1,6 +1,7 @@
 
 SCREEN = $d000
 COLORS = $e000
+CONTROL_540B = $de00
 
     org $0300
 
@@ -30,6 +31,9 @@ start:
     sta COLORS,y
     dey
     bpl @-
+
+    lda #$04
+    sta CONTROL_540B
 
     jmp *
 

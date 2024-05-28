@@ -62,3 +62,6 @@ void screen_color_ram_write(uint16_t address, uint8_t value);
 
 uint8_t screen_hires_ram_read(uint16_t address);
 void screen_hires_ram_write(uint16_t address, uint8_t value);
+
+uint8_t screen_control_540b_read(uint16_t address);
+void screen_control_540b_write(uint16_t address, uint8_t value);

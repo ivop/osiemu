@@ -58,6 +58,7 @@ static SDL_Texture *drive2_icon;
 static SDL_Texture *drive3_icon;
 static SDL_Texture *drive4_icon;
 static SDL_Texture *digits;
+static SDL_Texture *background;         // single character "font"
 
 static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
 static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
@@ -150,13 +151,10 @@ static void blit_screenmem(SDL_Texture *font) {
                 int c = (v >> 1) & 7;
                 bool i = v & 1;
 
-                SDL_SetRenderDrawColor(renderer, colors_540b[i][c][0],
-                                                 colors_540b[i][c][1],
-                                                 colors_540b[i][c][2],
-                                                 255);
-
-                SDL_Rect rect = { x*8, y*8, 8, 8 };
-                SDL_RenderFillRect(renderer, &rect);
+                SDL_SetTextureColorMod(background, colors_540b[i][c][0],
+                                                   colors_540b[i][c][1],
+                                                   colors_540b[i][c][2]);
+                blit_char(background, x, y, 0);
 
                 i ^= 1;
                 SDL_SetTextureColorMod(font, colors_540b[i][c][0],
@@ -437,6 +435,19 @@ bool screen_init(void) {
     if (color_mode == COLORS_540B) {
         init_colors_540b();
     }
+
+    background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                             SDL_TEXTUREACCESS_TARGET,
+                                             8, 8);
+
+    if (!background) {
+        fprintf(stderr, "error: unable to create background texture\n");
+        return false;
+    }
+
+    SDL_SetRenderTarget(renderer, background);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
 
     return true;
 }

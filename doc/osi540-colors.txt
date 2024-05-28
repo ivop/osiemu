@@ -1,9 +1,14 @@
 Reverse engineer colors from OSI 540B Schematics
 ------------------------------------------------
+by Ivo van Poorten, May 2024
+
 
 Color Delays (CD0-CD6)
 
-74LS151:
+Color clock passes through a train of inverters. In between CD0-CD6 are
+tapped.
+
+74LS151 is used to select the required color.
 
 Data inputs:
 

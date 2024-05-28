@@ -91,7 +91,7 @@ static double propagation_delay = 30.0;
 
 static int mapping_74ls151[7] = { 0, 2, 3, 5, 6, 4, 1 };
 
-static double lightness[2] = { 0.05, 0.60 };
+static double lightness[2] = { 0.10, 0.60 };
 static double saturation   = 0.75;
 
 static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
@@ -328,7 +328,7 @@ static void init_colors_540b(void) {
     }
 
     for (int i=0; i<=1; i++) {
-        hsl_to_rgb(0.0, 0.0, lightness[0] + i*0.90, &R, &G, &B);
+        hsl_to_rgb(0.0, 0.0, lightness[0] + i*0.85, &R, &G, &B);
         colors_540b[i][7][0] = R;       // dark grey / light grey
         colors_540b[i][7][1] = G;
         colors_540b[i][7][2] = B;

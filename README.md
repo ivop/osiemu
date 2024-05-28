@@ -14,7 +14,7 @@ Ohio Scientific Instruments, Inc. Emulator
 * Two joysticks (d-pad or analog)
 * 64x32, 64x16, and 32x32 character based display
 * Color modes:
-  * Monochrome white, green, or amber
+  * Monochrome white, green, amber, or bluish
   * Model 440B, 6-bit ASCII, 4 colors
   * Model 540B, 8 colors, inverse video
 * High resolution overlays:

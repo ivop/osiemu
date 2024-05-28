@@ -63,7 +63,7 @@ static void usage(void) {
 "\n"
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
 "    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64\n"
-"    -M/--mono-color color      monochrome color green, amber or white\n"
+"    -M/--mono-color color      monochrome color green, amber, bluish or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling\n"

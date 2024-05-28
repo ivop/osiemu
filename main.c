@@ -68,6 +68,7 @@ static void usage(void) {
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
+"    -s/--saturation            color saturation [0.0-1.0], default: %.2lf\n"
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
@@ -88,6 +89,7 @@ static void usage(void) {
 "    -G/--floppy3 file          specify floppy3 file (default: none)\n"
 "\n"
 "    -h/--help                  show usage information\n"
+    , saturation
 );
 }
 
@@ -115,6 +117,7 @@ static struct option long_options[] = {
     { "video-mode",     required_argument,  0, 'm' },
     { "mono-color",     required_argument,  0, 'M' },
     { "raw-keyboard",   no_argument,        0, 'r' },
+    { "saturation",     required_argument,  0, 's' },
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
@@ -176,25 +179,25 @@ int main(int argc, char **argv) {
                 osi_width = 64;
                 osi_height = 32;
                 osi_stride = 64;
-                screen_top = 0xd7ff;
+                screen_ram_top = 0xd7ff;
             } else if (!strcmp(optarg, "32x32")) {
                 osi_width = 32;
                 osi_height = 32;
                 osi_stride = 32;
                 stretchx = 2;
-                screen_top = 0xd3ff;
+                screen_ram_top = 0xd3ff;
             } else if (!strcmp(optarg, "32x32s64")) {
                 osi_width = 32;
                 osi_height = 32;
                 osi_stride = 64;    // Model 440B
                 stretchx = 2;
-                screen_top = 0xd7ff;
+                screen_ram_top = 0xd7ff;
             } else if (!strcmp(optarg, "64x16")) {
                 osi_width = 64;
                 osi_height = 16;
                 osi_stride = 64;
                 stretchy = 2;
-                screen_top = 0xd3ff;
+                screen_ram_top = 0xd3ff;
             } else {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;
@@ -219,11 +222,22 @@ int main(int argc, char **argv) {
             } else if (!strcmp(optarg, "540b")) {
                 color_mode = COLORS_540B;
                 color_ram_enabled = true;
+                color_ram_bottom = 0xe000;
+                color_ram_top    = 0xe7ff;
             } else if (!strcmp(optarg, "630")) {
                 color_mode = COLORS_630;
                 color_ram_enabled = true;
+                color_ram_bottom  = 0xd400;
+                color_ram_top     = 0xd7ff;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
+                return 1;
+            }
+            break;
+        case 's':
+            saturation = strtod(optarg, NULL);
+            if (saturation < 0.0 || saturation > 1.0) {
+                fprintf(stderr, "error: saturation out of range [0.0-1.0]\n");
                 return 1;
             }
             break;
@@ -306,6 +320,11 @@ int main(int argc, char **argv) {
 
     if (optind != argc) {
         fprintf(stderr, "error: wrong command line arguments\n");
+        return 1;
+    }
+
+    if (color_mode == COLORS_630 && screen_ram_top >= 0xd400) {
+        fprintf(stderr, "error: screen memory overlaps color RAM\n");
         return 1;
     }
 

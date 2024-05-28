@@ -1,0 +1,27 @@
+600/630 Schematics:
+
+select mode     0x01    0 = 32x32, 1=64x16
+enable colors   0x02    0 = disabled, 1=enabled
+
+color ram bits, map directly to CD0-CD3
+
+bit 0   0=dim   1=bright    CD0
+bit 1   red                 CD1
+bit 2   green               CD2
+bit 3   blue                CD3
+
+Three color delays CD1-CD3 are mixed as follows:
+
+                                        BGR
+0/1     = black, grey                   000     saturation 0
+2/3     = dark red, light red           001
+4,5     = dark green, light green       010
+6,7     = dark yellow, light yellow     011
+8,9     = dark blue, light blue         100
+10,11   = dark magenta, light magenta   101
+12,13   = dark cyan, light cyan         110
+14,15   = grey, white                   111     saturation 0
+
+32x32 or 64x16 @ $d000
+color ram      @ $d400
+control        @ $d800

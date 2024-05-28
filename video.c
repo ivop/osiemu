@@ -40,8 +40,10 @@ int zoom = 1, stretchx = 1, stretchy = 1;
 double aspectx = 1.0;
 double aspecty = 1.0;
 
-uint16_t screen_bottom = 0xd000;
-uint16_t screen_top    = 0xd7ff;
+uint16_t screen_ram_bottom = 0xd000;
+uint16_t screen_ram_top    = 0xd7ff;
+uint16_t color_ram_bottom  = 0xe000;
+uint16_t color_ram_top     = 0xe7ff;
 
 int screen_width = 512;
 int screen_height = 256;
@@ -96,7 +98,7 @@ static double propagation_delay = 30.0;
 static int mapping_74ls151[7] = { 0, 2, 3, 5, 6, 4, 1 };
 
 static double lightness[2] = { 0.10, 0.60 };
-static double saturation   = 0.75;
+double saturation = 0.75;
 
 static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 
@@ -106,6 +108,24 @@ static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 #define CONTROL_540B_ACHOME     0x08    // 38-40kHz AC Home Control output
 
 static uint8_t control_540b;
+
+static double angles_630[8] = {
+      0.0,  // dummy
+      0.0,  // red      (360)
+    120.0,  // green
+     60.0,  // yellow   (0+120)/2
+    240.0,  // blue
+    300.0,  // magenta  (240+360)/2
+    180.0,  // cyan     (240+120)/2
+      0.0   // dummy
+};
+
+static int colors_630[16][3];  // 8 dim/bright pairs, maps directly to bits 3-0
+
+#define CONTROL_630_64x16       0x01    // leave up to command line for now
+#define CONTROL_630_COLOR_ON    0x02    // 1=color on
+
+static uint8_t control_630;
 
 enum hires_modes hires_mode = HIRES_NONE;
 
@@ -179,6 +199,20 @@ do_monochrome:
         }
         break;
     case COLORS_630:
+        if (!(control_630 & CONTROL_630_COLOR_ON))
+            goto do_monochrome;
+        SDL_RenderClear(renderer);
+        for (int y = 0; y < osi_height; y++) {
+            for (int x = 0; x < osi_width; x++) {
+                int c = COLOR[x+y*osi_stride] & 0x0f;
+
+                SDL_SetTextureColorMod(font, colors_630[c][0],
+                                             colors_630[c][1],
+                                             colors_630[c][2]);
+
+                blit_char(font, x, y, SCREEN[x+y*osi_stride]);
+            }
+        }
         break;
     }
 
@@ -350,6 +384,31 @@ static void init_colors_540b(void) {
 
 // ----------------------------------------------------------------------------
 
+// See doc/osi630-colors.txt for details
+
+static void init_colors_630(void) {
+    int R, G, B;
+
+    for (int i=0; i<16; i++) {
+        int j = i >> 1;
+        int k = i & 1;
+
+        if (j == 0) {           // black/grey
+            hsl_to_rgb(0.0, 0.0, k ? 0.5 : 0.0, &R, &G, &B);
+        } else if (j == 7) {    // grey/white
+            hsl_to_rgb(0.0, 0.0, k ? 1.0 : 0.5, &R, &G, &B);
+        } else {                // colors
+            hsl_to_rgb(angles_630[j], saturation, k ? 0.50 : 0.25, &R, &G, &B);
+        }
+
+        colors_630[i][0] = R;
+        colors_630[i][1] = G;
+        colors_630[i][2] = B;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 bool screen_init(void) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
@@ -447,20 +506,20 @@ bool screen_init(void) {
 
     if (color_mode == COLORS_540B) {
         init_colors_540b();
+        background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                                 SDL_TEXTUREACCESS_TARGET,
+                                                 8, 8);
+        if (!background) {
+            fprintf(stderr, "error: unable to create background texture\n");
+            return false;
+        }
+
+        SDL_SetRenderTarget(renderer, background);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+    } else if (color_mode == COLORS_630) {
+        init_colors_630();
     }
-
-    background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-                                             SDL_TEXTUREACCESS_TARGET,
-                                             8, 8);
-
-    if (!background) {
-        fprintf(stderr, "error: unable to create background texture\n");
-        return false;
-    }
-
-    SDL_SetRenderTarget(renderer, background);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
 
     return true;
 }
@@ -504,13 +563,13 @@ void screen_toggle_fullscreen(void) {
 // ----------------------------------------------------------------------------
 
 uint8_t screen_color_ram_read(uint16_t address) {
-    return COLOR[address & 0x07ff];
+    return COLOR[(address - color_ram_bottom) & 0x07ff];
 }
 
 // ----------------------------------------------------------------------------
 
 void screen_color_ram_write(uint16_t address, uint8_t value) {
-    COLOR[address & 0x07ff] = value;
+    COLOR[(address - color_ram_bottom) & 0x07ff] = value;
 }
 
 // ----------------------------------------------------------------------------
@@ -543,6 +602,12 @@ uint8_t screen_control_540b_read(uint16_t address UNUSED) {
 
 void screen_control_540b_write(uint16_t address UNUSED, uint8_t value) {
     control_540b = value;
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_control_630_write(uint16_t address UNUSED, uint8_t value) {
+    control_630 = value;
 }
 
 // ----------------------------------------------------------------------------

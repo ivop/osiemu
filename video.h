@@ -40,8 +40,11 @@ extern int zoom;
 extern int stretchx;
 extern int stretchy;
 
-extern uint16_t screen_bottom;
-extern uint16_t screen_top;
+extern uint16_t screen_ram_bottom;
+extern uint16_t screen_ram_top;
+extern uint16_t color_ram_bottom;
+extern uint16_t color_ram_top;
+extern double saturation;
 
 extern int screen_width;
 extern int screen_height;
@@ -68,3 +71,5 @@ void screen_hires_ram_write(uint16_t address, uint8_t value);
 
 uint8_t screen_control_540b_read(uint16_t address);
 void screen_control_540b_write(uint16_t address, uint8_t value);
+
+void screen_control_630_write(uint16_t address, uint8_t value);

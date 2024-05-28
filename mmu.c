@@ -92,11 +92,11 @@ uint8_t read6502(uint16_t address) {
         }
     }
     if (video_enabled) {
-        if (address >= screen_bottom && address <= screen_top) {
+        if (address >= screen_ram_bottom && address <= screen_ram_top) {
             return screen_read(address);
         }
         if (color_ram_enabled) {
-            if (address >= 0xe000 && address <= 0xe7ff) {
+            if (address >= color_ram_bottom && address <= color_ram_top) {
                 return screen_color_ram_read(address);
             }
             if (color_mode == COLORS_540B && address == 0xde00) {
@@ -146,14 +146,17 @@ void write6502(uint16_t address, uint8_t value) {
         }
     }
     if (video_enabled) {
-        if (address >= screen_bottom && address <= screen_top) {
+        if (address >= screen_ram_bottom && address <= screen_ram_top) {
             screen_write(address, value);
             return;
         }
         if (color_ram_enabled) {
-            if (address >= 0xe000 && address <= 0xe7ff) {
+            if (address >= color_ram_bottom && address <= color_ram_top) {
                 screen_color_ram_write(address, value);
                 return;
+            }
+            if (color_mode == COLORS_630 && address == 0xd800) {
+                screen_control_630_write(address, value);
             }
             if (color_mode == COLORS_540B && address == 0xde00) {
                 screen_control_540b_write(address, value);

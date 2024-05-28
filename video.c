@@ -84,11 +84,11 @@ static int colors_440b[4][3] = {
 
 static double angles_540b[7] = {                // hues
      60.0,   // CD0 yellow
-    210.0,   // CD1 sky blue
       0.0,   // CD2 red
     150.0,   // CD3 green
-    300.0,   // CD4 purple
      90.0,   // CD5 olive
+    300.0,   // CD4 purple
+    210.0,   // CD1 sky blue
     240.0,   // CD6 blue
 };
 static double dimbright[2] = { 0.25, 0.50 };    // lightness

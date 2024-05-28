@@ -330,7 +330,6 @@ static void init_colors_540b(void) {
     for (int i=0; i<=1; i++) {          // dim, bright
         for (int j=0; j<=6; j++) {      // angles
             double angle = clock_delay_angles[mapping_74ls151[j]];
-            printf("debug: angle: %.2lf\n", angle);
             hsl_to_rgb(angle, saturation, lightness[i], &R, &G, &B);
             colors_540b[i][j][0] = R;
             colors_540b[i][j][1] = G;

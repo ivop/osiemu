@@ -16,6 +16,7 @@ Ohio Scientific Instruments, Inc. Emulator
 * Color modes:
   * Monochrome white, green, or amber
   * Model 440B, 6-bit ASCII, 4 colors
+  * Model 540B, 8 colors, inverse video
 * High resolution overlays:
   * Model 440B, 128x128
   * Model 541, 256x256, High Resolution Graphics Expander
@@ -31,9 +32,8 @@ Ohio Scientific Instruments, Inc. Emulator
 ## TODO
 
 * Video: add graph font support, and keybinding to toggle
-* Floppy: write support
-* Video: Model 540B video 64x32 and 32x32 with stride of 64, color RAM at 0xE000, mode register at 0xDE00
 * Video: Model 630 Superboard color video expander
+* Floppy: write support
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
 * Sound: SN76489AN and/or AY-3-8910

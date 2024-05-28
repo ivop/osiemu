@@ -18,8 +18,11 @@
 #include "video.h"
 #include "tape.h"
 #include "floppy.h"
+#include "hslrgb.h"
 
 // ----------------------------------------------------------------------------
+
+#define OSD_COLOR 0xff, 0x00, 0x00
 
 char *font_filename = "chargen/type1.png";
 
@@ -72,12 +75,26 @@ static int monochrome[][3] = {
 
 enum mono_colors mono_color = COLOR_WHITE;
 
-static int colors_440b[][4] = {
+static int colors_440b[4][3] = {
     { 0xff, 0xff, 0xff },           // white
     { 0xff, 0x00, 0x00 },           // red
     { 0x00, 0xff, 0x00 },           // green
     { 0xff, 0xff, 0x00 }            // yellow
 };
+
+static double angles_540b[7] = {                // hues
+     60.0,   // CD0 yellow
+    210.0,   // CD1 sky blue
+      0.0,   // CD2 red
+    150.0,   // CD3 green
+    300.0,   // CD4 purple
+     90.0,   // CD5 olive
+    240.0,   // CD6 blue
+};
+static double dimbright[2] = { 0.25, 0.50 };    // lightness
+static double saturation   = 0.5;
+
+static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 
 enum color_modes color_mode = COLORS_MONOCHROME;
 
@@ -268,6 +285,28 @@ static void init_hires_bytes(void) {
 
 // ----------------------------------------------------------------------------
 
+// See doc/osi540-colors.txt for details
+
+static void init_colors_540b(void) {
+    int R, G, B;
+    for (int i=0; i<=1; i++) {          // dim, bright
+        for (int j=0; j<=6; j++) {      // angles
+            hsl_to_rgb(angles_540b[j], saturation, dimbright[i], &R, &G, &B);
+            colors_540b[i][j][0] = R;
+            colors_540b[i][j][1] = G;
+            colors_540b[i][j][2] = B;
+        }
+    }
+    for (int i=0; i<=1; i++) {
+        hsl_to_rgb(0.0, 0.0, 0.25 + i*0.5, &R, &G, &B);
+        colors_540b[i][7][0] = R;       // dark grey / light grey
+        colors_540b[i][7][1] = G;
+        colors_540b[i][7][2] = B;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 bool screen_init(void) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
@@ -315,8 +354,6 @@ bool screen_init(void) {
         return false;
     }
 
-#define OSD_COLOR 0xff, 0x00, 0x00
-
     SDL_SetTextureColorMod(tape_icon,   OSD_COLOR);
     SDL_SetTextureColorMod(drive1_icon, OSD_COLOR);
     SDL_SetTextureColorMod(drive2_icon, OSD_COLOR);
@@ -363,6 +400,10 @@ bool screen_init(void) {
         }
 
         init_hires_bytes();
+    }
+
+    if (color_mode == COLORS_540B) {
+        init_colors_540b();
     }
 
     return true;

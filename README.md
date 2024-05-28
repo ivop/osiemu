@@ -30,6 +30,7 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
+* Video: add graph font support, and keybinding to toggle
 * Floppy: write support
 * Video: Model 540B video 64x32 and 32x32 with stride of 64, color RAM at 0xE000, mode register at 0xDE00
 * Video: Model 630 Superboard color video expander

@@ -40,6 +40,9 @@ extern int zoom;
 extern int stretchx;
 extern int stretchy;
 
+extern uint16_t screen_bottom;
+extern uint16_t screen_top;
+
 extern int screen_width;
 extern int screen_height;
 

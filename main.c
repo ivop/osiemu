@@ -176,21 +176,25 @@ int main(int argc, char **argv) {
                 osi_width = 64;
                 osi_height = 32;
                 osi_stride = 64;
+                screen_top = 0xd7ff;
             } else if (!strcmp(optarg, "32x32")) {
                 osi_width = 32;
                 osi_height = 32;
                 osi_stride = 32;
                 stretchx = 2;
+                screen_top = 0xd3ff;
             } else if (!strcmp(optarg, "32x32s64")) {
                 osi_width = 32;
                 osi_height = 32;
                 osi_stride = 64;    // Model 440B
                 stretchx = 2;
+                screen_top = 0xd7ff;
             } else if (!strcmp(optarg, "64x16")) {
                 osi_width = 64;
                 osi_height = 16;
                 osi_stride = 64;
                 stretchy = 2;
+                screen_top = 0xd3ff;
             } else {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;

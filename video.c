@@ -40,6 +40,9 @@ int zoom = 1, stretchx = 1, stretchy = 1;
 double aspectx = 1.0;
 double aspecty = 1.0;
 
+uint16_t screen_bottom = 0xd000;
+uint16_t screen_top    = 0xd7ff;
+
 int screen_width = 512;
 int screen_height = 256;
 

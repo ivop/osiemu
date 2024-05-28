@@ -74,6 +74,7 @@ static int monochrome[][3] = {
 };
 
 enum mono_colors mono_color = COLOR_WHITE;
+enum color_modes color_mode = COLORS_MONOCHROME;
 
 static int colors_440b[4][3] = {
     { 0xff, 0xff, 0xff },           // white
@@ -82,21 +83,17 @@ static int colors_440b[4][3] = {
     { 0xff, 0xff, 0x00 }            // yellow
 };
 
-static double angles_540b[7] = {                // hues
-     60.0,   // CD0 yellow
-      0.0,   // CD2 red
-    150.0,   // CD3 green
-     90.0,   // CD5 olive
-    300.0,   // CD4 purple
-    210.0,   // CD1 sky blue
-    240.0,   // CD6 blue
-};
-static double dimbright[2] = { 0.25, 0.50 };    // lightness
+// 540B
+static double clock_delay_angles[7];
+static double first_angle = 60.0;           // yellow
+static double propagation_delay = 30.0;
+
+static int mapping_74ls151[7] = { 0, 2, 3, 5, 6, 4, 1 };
+
+static double lightness[2] = { 0.10, 0.60 };
 static double saturation   = 0.5;
 
 static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
-
-enum color_modes color_mode = COLORS_MONOCHROME;
 
 enum hires_modes hires_mode = HIRES_NONE;
 
@@ -117,10 +114,10 @@ static void blit_screenmem(SDL_Texture *font) {
 
     SDL_SetRenderTarget(renderer, screen);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
 
     switch (color_mode) {
     case COLORS_MONOCHROME:
+        SDL_RenderClear(renderer);
         SDL_SetTextureColorMod(font, monochrome[mono_color][0],
                                      monochrome[mono_color][1],
                                      monochrome[mono_color][2]);
@@ -131,6 +128,7 @@ static void blit_screenmem(SDL_Texture *font) {
         }
         break;
     case COLORS_440B:
+        SDL_RenderClear(renderer);
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {
 
@@ -144,8 +142,29 @@ static void blit_screenmem(SDL_Texture *font) {
                 blit_char(font, x, y, k);
             }
         }
+        break;
     case COLORS_540B:
-        // See doc/osi540-colors.txt for explanation
+        for (int y = 0; y < osi_height; y++) {
+            for (int x = 0; x < osi_width; x++) {
+                int v = COLOR[x+y*osi_stride];
+                int c = (v >> 1) & 7;
+                bool i = v & 1;
+
+                SDL_SetRenderDrawColor(renderer, colors_540b[i][c][0],
+                                                 colors_540b[i][c][1],
+                                                 colors_540b[i][c][2],
+                                                 255);
+
+                SDL_Rect rect = { x*8, y*8, 8, 8 };
+                SDL_RenderFillRect(renderer, &rect);
+
+                i ^= 1;
+                SDL_SetTextureColorMod(font, colors_540b[i][c][0],
+                                             colors_540b[i][c][1],
+                                             colors_540b[i][c][2]);
+                blit_char(font, x, y, SCREEN[x+y*osi_stride]);
+            }
+        }
         break;
     case COLORS_630:
         break;
@@ -288,17 +307,31 @@ static void init_hires_bytes(void) {
 // See doc/osi540-colors.txt for details
 
 static void init_colors_540b(void) {
+    double n = propagation_delay;
+
+    clock_delay_angles[0] = first_angle;
+
+    for (int i=1; i<=6; i++) {
+        clock_delay_angles[i] = clock_delay_angles[i-1] + 180.0 - n;
+        if (clock_delay_angles[i] < 0.0) clock_delay_angles[i] += 360.0;
+        clock_delay_angles[i] = fmod(clock_delay_angles[i], 360.0);
+    }
+
     int R, G, B;
     for (int i=0; i<=1; i++) {          // dim, bright
         for (int j=0; j<=6; j++) {      // angles
-            hsl_to_rgb(angles_540b[j], saturation, dimbright[i], &R, &G, &B);
+            double angle = clock_delay_angles[mapping_74ls151[j]];
+            printf("debug: angle: %.2lf\n", angle);
+            hsl_to_rgb(angle, saturation, lightness[i], &R, &G, &B);
             colors_540b[i][j][0] = R;
             colors_540b[i][j][1] = G;
             colors_540b[i][j][2] = B;
+            printf("debug: %02x %02x %02x\n", R, G, B);
         }
     }
+
     for (int i=0; i<=1; i++) {
-        hsl_to_rgb(0.0, 0.0, 0.25 + i*0.5, &R, &G, &B);
+        hsl_to_rgb(0.0, 0.0, 0.10 + i*0.85, &R, &G, &B);
         colors_540b[i][7][0] = R;       // dark grey / light grey
         colors_540b[i][7][1] = G;
         colors_540b[i][7][2] = B;

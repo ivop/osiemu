@@ -214,8 +214,10 @@ int main(int argc, char **argv) {
                 color_mode = COLORS_440B;
             } else if (!strcmp(optarg, "540b")) {
                 color_mode = COLORS_540B;
+                color_ram_enabled = true;
             } else if (!strcmp(optarg, "630")) {
                 color_mode = COLORS_630;
+                color_ram_enabled = true;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
                 return 1;

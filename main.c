@@ -89,6 +89,7 @@ static void usage(void) {
 "    -g/--floppy2 file          specify floppy2 file (default: none)\n"
 "    -G/--floppy3 file          specify floppy3 file (default: none)\n"
 "\n"
+"    -R/--force-ramtop hex      force RAM top to location hex\n"
 "    -h/--help                  show usage information\n"
     , saturation
 );
@@ -119,6 +120,7 @@ static struct option long_options[] = {
     { "mono-color",     required_argument,  0, 'M' },
     { "graph-font",     required_argument,  0, 'q' },
     { "raw-keyboard",   no_argument,        0, 'r' },
+    { "force-ramtop",   required_argument,  0, 'R' },
     { "saturation",     required_argument,  0, 's' },
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
@@ -133,7 +135,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rt:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rR:t:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -284,6 +286,9 @@ int main(int argc, char **argv) {
         case 'r':
             keyboard_cooked = false;
             keyboard_ascii_enable = false;
+            break;
+        case 'R':
+            mmu_ram_top = strtol(optarg, NULL, 16);
             break;
         case 'A':
             keyboard_ascii_enable = true;

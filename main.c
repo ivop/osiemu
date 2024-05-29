@@ -394,6 +394,9 @@ int main(int argc, char **argv) {
                 break;
             case SDL_KEYUP:
                 switch (e.key.keysym.sym) {
+                case SDLK_F3:
+                    screen_toggle_hires();
+                    break;
                 case SDLK_F4:
                     screen_swap_fonts();
                     break;

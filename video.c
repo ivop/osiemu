@@ -136,6 +136,8 @@ enum hires_modes hires_mode = HIRES_NONE;
 static SDL_Texture *hires_bytes;
 static SDL_Texture *hires_screen;
 
+static bool hires_visible;
+
 static double interval;
 static double counter;
 
@@ -223,6 +225,8 @@ do_monochrome:
         break;
     }
 
+    if (!hires_visible) return;
+
     switch (hires_mode) {
     case HIRES_NONE:
         break;
@@ -300,7 +304,7 @@ void screen_update(void) {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, screen, NULL, NULL );
 
-    if (hires_mode) {
+    if (hires_mode && hires_visible) {
         SDL_RenderCopy(renderer, hires_screen, NULL, NULL);
     }
 
@@ -645,6 +649,12 @@ void screen_tick(double ticks) {
         counter -= interval;
         Hz_tick_540b ^= 0x80;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_toggle_hires(void) {
+    hires_visible ^= 1;
 }
 
 // ----------------------------------------------------------------------------

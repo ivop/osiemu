@@ -78,3 +78,5 @@ void screen_control_630_write(uint16_t address, uint8_t value);
 void screen_swap_fonts(void);
 
 void screen_tick(double ticks);
+
+void screen_toggle_hires(void);

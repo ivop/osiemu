@@ -345,12 +345,17 @@ static void init_hires_bytes(void) {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (int y=0; y<256; y++) {
-        int mask = 0x80;
+        uint8_t mask = 0x80;
+        if (hires_mode == HIRES_541) mask = 0x01;
         for (int x=0; x<8; x++) {
             if (y & mask) {
                 SDL_RenderDrawPoint(renderer, x, y);
             }
-            mask >>= 1;
+            if (hires_mode == HIRES_541) {
+                mask <<= 1;
+            } else {
+                mask >>= 1;
+            }
         }
     }
 }

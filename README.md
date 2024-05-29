@@ -13,6 +13,7 @@ Ohio Scientific Instruments, Inc. Emulator
 * ASCII keyboard, Model 440B
 * Two joysticks (d-pad or analog)
 * 64x32, 64x16, and 32x32 character based display
+* Switchable ASCII font and graphics font
 * Color modes:
   * Monochrome white, green, amber, or bluish
   * Model 440B, 6-bit ASCII, 4 colors
@@ -21,21 +22,22 @@ Ohio Scientific Instruments, Inc. Emulator
 * High resolution overlays:
   * Model 440B, 128x128
   * Model 541, 256x256, High Resolution Graphics Expander
-* Serial tape ACIA with selectable baudrate and location (0xF000 or 0xFC00)
+* Serial tape ACIA with selectable baudrate and memory location
 * Bit-level floppy emulation, Model 470/505, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display
   * full resolution 512x256
   * optional 2x zoom
-  * optional TV aspect ratio 16:9 or 4:3 with optional anti-aliasing
+  * optional TV aspect ratio 16:9 or 4:3
+  * optional anti-aliasing
 * On-Screen Display during peripheral access
 * Built-in monitor, dump/change memory contents, registers, set breakpoints, disassembler
 
 ## TODO
 
 * Video: implement Model 630 60Hz bit
-* Video: add graph font support, and keybinding to toggle
 * Floppy: write support
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
 * Sound: SN76489AN and/or AY-3-8910
 * Sound: ACIA RTS DAC
+* Monitor: repeat last command if d or u by pressing enter

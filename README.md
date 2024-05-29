@@ -32,6 +32,7 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
+* Video: implement Model 630 60Hz bit
 * Video: add graph font support, and keybinding to toggle
 * Floppy: write support
 * Serial: Serial I/O without keyboard and display (named sockets)

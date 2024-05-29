@@ -349,7 +349,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (!screen_init()) return 1;
+    if (!screen_init(cpu_clock, fps)) return 1;
 
     reset6502();
     if (!keyboard_init(cpu_clock)) {
@@ -446,6 +446,7 @@ int main(int argc, char **argv) {
             tape_tick(ticks);
             keyboard_tick(ticks);
             floppy_tick(ticks);
+            screen_tick(ticks);
         }
 
         cpu_target += ticks_per_frame;

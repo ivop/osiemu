@@ -111,6 +111,7 @@ static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 #define CONTROL_540B_ACHOME     0x08    // 38-40kHz AC Home Control output
 
 static uint8_t control_540b;
+static uint8_t Hz_tick_540b;
 
 static double angles_630[8] = {
       0.0,  // dummy
@@ -132,8 +133,11 @@ static uint8_t control_630;
 
 enum hires_modes hires_mode = HIRES_NONE;
 
-SDL_Texture *hires_bytes;
-SDL_Texture *hires_screen;
+static SDL_Texture *hires_bytes;
+static SDL_Texture *hires_screen;
+
+static double interval;
+static double counter;
 
 // ----------------------------------------------------------------------------
 
@@ -412,7 +416,7 @@ static void init_colors_630(void) {
 
 // ----------------------------------------------------------------------------
 
-bool screen_init(void) {
+bool screen_init(double cpu_clock, double fps) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
 
@@ -527,6 +531,8 @@ bool screen_init(void) {
         init_colors_630();
     }
 
+    interval = cpu_clock / fps / 2.0;
+
     return true;
 }
 
@@ -601,7 +607,7 @@ void screen_hires_ram_write(uint16_t address, uint8_t value) {
 // ----------------------------------------------------------------------------
 
 uint8_t screen_control_540b_read(uint16_t address UNUSED) {
-    return 0x00;    // fix: bit 7 60Hz 50/50 duty cycle
+    return Hz_tick_540b;
 }
 
 // ----------------------------------------------------------------------------
@@ -622,6 +628,18 @@ void screen_swap_fonts(void) {
     void *t = font;
     font = graph_font;
     graph_font = t;
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_tick(double ticks) {
+    if (color_mode != COLORS_540B) return;
+
+    counter += ticks;
+    if (counter >= interval) {
+        counter -= interval;
+        Hz_tick_540b ^= 0x80;
+    }
 }
 
 // ----------------------------------------------------------------------------

@@ -54,7 +54,7 @@ extern int osi_width;
 extern int osi_height;
 extern int osi_stride;
 
-bool screen_init(void);
+bool screen_init(double cpu_clock, double fps);
 void screen_update(void);
 
 void screen_hide(void);
@@ -76,3 +76,5 @@ void screen_control_540b_write(uint16_t address, uint8_t value);
 void screen_control_630_write(uint16_t address, uint8_t value);
 
 void screen_swap_fonts(void);
+
+void screen_tick(double ticks);

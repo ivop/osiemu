@@ -397,6 +397,7 @@ bool monitor(void) {
     int i;
     char *lineptr = NULL;
     size_t size = 0;
+    char prev = ' ';
 
     signal(SIGINT, SIG_IGN);
 
@@ -413,7 +414,14 @@ bool monitor(void) {
     
         char *p = strtok(lineptr, " \t\n\r");
 
-        if (!p) continue;
+        if (!p) {
+            if (prev == 'd') {
+                dump();
+            } else if (prev == 'u') {
+                unasm();
+            }
+            continue;
+        }
 
         if (!strcmp(p, "quit") || !strcmp(p, "q")) {
             return false;
@@ -424,6 +432,13 @@ bool monitor(void) {
             if (!strcmp(p, commands[i].name)) break;
         }
         if (commands[i].func) {
+            if (strlen(p) == 1) {
+                if (p[0] == 'd' || p[0] == 'u') {
+                    prev = p[0];
+                };
+            } else {
+                prev = ' ';
+            }
             commands[i].func();
         } else {
             puts("huh?");

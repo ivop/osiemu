@@ -27,6 +27,7 @@ extern enum color_modes color_mode;
 extern enum hires_modes hires_mode;
 
 extern char *font_filename;
+extern char *graph_font_filename;
 
 extern bool video_enabled;
 extern bool color_ram_enabled;
@@ -73,3 +74,5 @@ uint8_t screen_control_540b_read(uint16_t address);
 void screen_control_540b_write(uint16_t address, uint8_t value);
 
 void screen_control_630_write(uint16_t address, uint8_t value);
+
+void screen_swap_fonts(void);

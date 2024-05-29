@@ -26,10 +26,12 @@
 #define OSD_COLOR 0xff, 0x00, 0x00
 
 char *font_filename = "chargen/type1.png";
+char *graph_font_filename = "chargen/graph.png";
 
 uint8_t SCREEN[0x0800];      // 2kB Video RAM
 uint8_t COLOR[0x0800];       // 2kB Color RAM
-uint8_t HIRES[0x2000];       // 2kB for 44B, 8kB for 541
+uint8_t HIRES[0x2000];       // 2kB for 440B, 8kB for 541
+
 bool video_enabled = true;
 bool color_ram_enabled = false;
 bool video_smooth = false;
@@ -58,6 +60,7 @@ static SDL_Renderer *renderer;
 static SDL_Texture *screen;
 
 static SDL_Texture *font;
+static SDL_Texture *graph_font;
 static SDL_Texture *tape_icon;
 static SDL_Texture *drive1_icon;
 static SDL_Texture *drive2_icon;
@@ -437,6 +440,9 @@ bool screen_init(void) {
     if (!(font = load_texture(font_filename))) {
         return false;
     }
+    if (!(graph_font = load_texture(graph_font_filename))) {
+        return false;
+    }
     if (!(tape_icon = load_texture("icons/tape.png"))) {
         return false;
     }
@@ -608,6 +614,14 @@ void screen_control_540b_write(uint16_t address UNUSED, uint8_t value) {
 
 void screen_control_630_write(uint16_t address UNUSED, uint8_t value) {
     control_630 = value;
+}
+
+// ----------------------------------------------------------------------------
+
+void screen_swap_fonts(void) {
+    void *t = font;
+    font = graph_font;
+    graph_font = t;
 }
 
 // ----------------------------------------------------------------------------

@@ -57,7 +57,8 @@ static void usage(void) {
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"
 "    -k/--kernel filename.rom   specify kernel ROM\n"
-"    -c/--font filename.rom     specify character set font (8x2048 image)\n"
+"    -c/--font filename         specify character set font (8x2048 image)\n"
+"    -q/--graph-font filename   specify graphics font (8x2048 image)\n"
 "\n"
 "    -d/--disable-basic         disable BASIC (default: enabled)\n"
 "\n"
@@ -116,6 +117,7 @@ static struct option long_options[] = {
     { "tape-location",  required_argument,  0, 'L' },
     { "video-mode",     required_argument,  0, 'm' },
     { "mono-color",     required_argument,  0, 'M' },
+    { "graph-font",     required_argument,  0, 'q' },
     { "raw-keyboard",   no_argument,        0, 'r' },
     { "saturation",     required_argument,  0, 's' },
     { "tape-input",     required_argument,  0, 't' },
@@ -157,6 +159,9 @@ int main(int argc, char **argv) {
             break;
         case 'c':
             font_filename = strdup(optarg);
+            break;
+        case 'q':
+            graph_font_filename = strdup(optarg);
             break;
         case 'k':
             kernel_filename = strdup(optarg);
@@ -384,6 +389,9 @@ int main(int argc, char **argv) {
                 break;
             case SDL_KEYUP:
                 switch (e.key.keysym.sym) {
+                case SDLK_F4:
+                    screen_swap_fonts();
+                    break;
                 case SDLK_F5:
                     reset6502();
                     tape_rewind();

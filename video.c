@@ -68,6 +68,7 @@ static SDL_Texture *drive3_icon;
 static SDL_Texture *drive4_icon;
 static SDL_Texture *digits;
 static SDL_Texture *background;         // single character "font"
+static SDL_Texture *scanlines;
 
 static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
 static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
@@ -139,6 +140,8 @@ static SDL_Texture *hires_bytes;
 static SDL_Texture *hires_screen;
 
 static bool hires_visible;
+
+bool scanlines_enable;
 
 static double interval;
 static double counter;
@@ -310,6 +313,10 @@ void screen_update(void) {
         SDL_RenderCopy(renderer, hires_screen, NULL, NULL);
     }
 
+    if (scanlines_enable) {
+        SDL_RenderCopy(renderer, scanlines, NULL, NULL);
+    }
+
     // On-Screen-Display
 
     if (tape_running) {
@@ -441,15 +448,19 @@ static void init_colors_440b(void) {
 // ----------------------------------------------------------------------------
 
 bool screen_init(double cpu_clock, double fps) {
+    int window_width, window_height;
+
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
+
+    window_width = aspectx * stretchx * zoom * screen_width;
+    window_height = aspecty * stretchy * zoom * screen_height;
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, video_smooth ? "linear" : "");
 
     window = SDL_CreateWindow("OSIEMU",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                              aspectx * stretchx * zoom * screen_width,
-                              aspecty * stretchy * zoom * screen_height,
+                              window_width, window_height,
                               SDL_WINDOW_SHOWN );
     if( window == NULL ) {
         fprintf(stderr,  "error: cannot create window: %s\n", SDL_GetError() );
@@ -558,6 +569,25 @@ bool screen_init(double cpu_clock, double fps) {
     }
 
     interval = cpu_clock / fps / 2.0;
+
+    if (zoom > 1 && scanlines_enable) {
+        scanlines = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                               SDL_TEXTUREACCESS_TARGET,
+                                               window_width, window_height);
+        if (!scanlines) {
+            fprintf(stderr, "error: unable to create scanlines texture\n");
+            return false;
+        }
+
+        SDL_SetRenderTarget(renderer, scanlines);
+        SDL_SetTextureBlendMode(scanlines, SDL_BLENDMODE_BLEND);
+        for (int y=0; y<window_height; y+=2) {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+            SDL_RenderDrawLine(renderer, 0, y, window_width-1, y);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
+            SDL_RenderDrawLine(renderer, 0, y+1, window_width-1, y+1);
+        }
+    }
 
     return true;
 }

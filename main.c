@@ -122,6 +122,7 @@ static struct option long_options[] = {
     { "raw-keyboard",   no_argument,        0, 'r' },
     { "force-ramtop",   required_argument,  0, 'R' },
     { "saturation",     required_argument,  0, 's' },
+    { "scanlines",      no_argument,        0, 'S' },
     { "tape-input",     required_argument,  0, 't' },
     { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
@@ -135,7 +136,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rR:t:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rR:s:St:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -247,6 +248,9 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "error: saturation out of range [0.0-1.0]\n");
                 return 1;
             }
+            break;
+        case 'S':
+            scanlines_enable = true;
             break;
         case 'H':
             if (!strcmp(optarg, "none")) {

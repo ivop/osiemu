@@ -6,4 +6,5 @@ osiemu
 tools/xex2lod
 tools/*.lod
 tools/hfe2osi
+tools/mirrorbytes
 tapeout.dat

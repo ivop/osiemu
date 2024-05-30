@@ -1,6 +1,10 @@
 
 SCREEN = $d000
 
+    org $e000
+
+    ins 'logo-128x128.dat'
+
     org $0300
 
 start:

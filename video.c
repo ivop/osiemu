@@ -131,6 +131,8 @@ static int colors_630[16][3];  // 8 dim/bright pairs, maps directly to bits 3-0
 
 static uint8_t control_630;
 
+static double *angles_440b = angles_630; // white + three identical colors
+
 enum hires_modes hires_mode = HIRES_NONE;
 
 static SDL_Texture *hires_bytes;
@@ -420,6 +422,24 @@ static void init_colors_630(void) {
 
 // ----------------------------------------------------------------------------
 
+static void init_colors_440b(void) {
+    int R, G, B;
+
+    for (int i=0; i<4; i++) {
+        if (i == 0) {           // white
+            hsl_to_rgb(0.0, 0.0, 0.9, &R, &G, &B);
+        } else {                // colors
+            hsl_to_rgb(angles_440b[i], saturation, 0.50, &R, &G, &B);
+        }
+
+        colors_440b[i][0] = R;
+        colors_440b[i][1] = G;
+        colors_440b[i][2] = B;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 bool screen_init(double cpu_clock, double fps) {
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
@@ -533,6 +553,8 @@ bool screen_init(double cpu_clock, double fps) {
         SDL_RenderClear(renderer);
     } else if (color_mode == COLORS_630) {
         init_colors_630();
+    } else if (color_mode == COLORS_440B) {
+        init_colors_440b();
     }
 
     interval = cpu_clock / fps / 2.0;

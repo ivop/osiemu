@@ -1,4 +1,9 @@
-    Disk Driver Routines
+BIG WARNING: THIS TEXT SEEMS THE RESULT OF OCR AND THE DISASSEMBLY CONTAINS
+SEVERAL ERRORS!!! Stil helpful though because of the comments that are mostly
+correct.
+
+
+	Disk Driver Routines
 	        for 
 	OSI's Disk Basic
 	        in RAM

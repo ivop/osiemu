@@ -55,7 +55,6 @@ struct drive {
 
     unsigned int pos;
     uint8_t bit;
-    uint8_t curbyte;
 
     unsigned int curtrk;
     bool ready;
@@ -156,7 +155,7 @@ static bool two_stopbits;
 
 // Framing state-machine
 
-enum acia_state_e {
+enum acia_rx_state_e {
     STATE_WAIT_FOR_STARTBIT,
     STATE_COLLECT_DATABITS,
     STATE_READ_PARITY,
@@ -164,7 +163,18 @@ enum acia_state_e {
     STATE_READ_STOPBIT2
 };
 
-enum acia_state_e acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+enum acia_rx_state_e acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+
+enum acia_tx_state_e {
+    STATE_IDLE,
+    STATE_WRITE_STARTBIT,
+    STATE_WRITE_DATABITS,
+    STATE_WRITE_PARITY,
+    STATE_WRITE_STOPBIT1,
+    STATE_WRITE_STOPBIT2
+};
+
+enum acia_tx_state_e acia_transmit_state = STATE_IDLE;
 
 // ----------------------------------------------------------------------------
 
@@ -485,6 +495,9 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
             puts("floppy: master reset");
             status = 0;
             setbit(status, STATUS_TDRE_MASK);   // empty
+            acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+            acia_transmit_state = STATE_IDLE;
+            return;
             break;
         }
         ws = (control & CONTROL_WS_MASK) >> 2;
@@ -504,12 +517,11 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
 
 static bool get_bit(struct drive *d) {
     if (!d->bit) {
-        d->curbyte = d->map[d->offset + d->curtrk*trksize + d->pos];
         d->bit = 0x80;
         d->pos++;
     }
 
-    bool x = d->curbyte & d->bit;
+    bool x = d->map[d->offset + d->curtrk*trksize + d->pos] & d->bit;
     d->bit >>= 1;
     return x;
 }

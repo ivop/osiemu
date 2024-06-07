@@ -71,6 +71,7 @@ static void usage(void) {
 "    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
 "    -s/--saturation            color saturation [0.0-1.0], default: %.2lf\n"
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
+"    -S/--scanlines             emulate visual scanlines\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"

@@ -39,11 +39,11 @@ static char *drive1_filename = NULL;
 static char *drive2_filename = NULL;
 static char *drive3_filename = NULL;
 
-#define CPU_CLOCK_C1P       (3932160/4)     // 1P / Superboard II Service Manual
-#define CPU_CLOCK_510C_SLOW (8000000/8)     // 510C Schematics
-#define CPU_CLOCK_510C_FAST (8000000/4)     // 510C Schematics
-#define CPU_CLOCK_UK101     (8000000/8)     // ???
-#define CPU_CLOCK C2P        2000000
+#define CPU_CLOCK_C1P       (3932160/4.0)   // 1P / Superboard II Service Manual
+#define CPU_CLOCK_510C_SLOW (8000000/8.0)   // 510C Schematics
+#define CPU_CLOCK_510C_FAST (8000000/4.0)   // 510C Schematics
+#define CPU_CLOCK_UK101     (8000000/8.0)   // ???
+#define CPU_CLOCK_C2P        2000000/1.0
 
 static int cpu_clock = CPU_CLOCK_510C_SLOW;
 static double fps = 60.0;
@@ -52,15 +52,28 @@ static double ticks_per_frame;
 // ----------------------------------------------------------------------------
 
 static void usage(void) {
-    fprintf(stderr, "usage: ./osiemu [options]\n\n"
+    fprintf(stderr,
+
+"usage: ./osiemu [options]\n\n"
 "options:\n"
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"
+"    -d/--disable-basic         disable BASIC (default: enabled)\n"
+"\n"
 "    -k/--kernel filename.rom   specify kernel ROM\n"
+"\n"
 "    -c/--font filename         specify character set font (8x2048 image)\n"
 "    -q/--graph-font filename   specify graphics font (8x2048 image)\n"
 "\n"
-"    -d/--disable-basic         disable BASIC (default: enabled)\n"
+"    -K/--cpu-speed speed       select speed: c1p        %.1lf Hz\n"
+"                                             510c-slow  %.1lf Hz (default)\n"
+"                                             510c-fast  %.1lf Hz\n"
+"                                             uk101      %.1lf Hz\n"
+"                                             c2p        %.1lf Hz\n",
+    CPU_CLOCK_C1P, CPU_CLOCK_510C_SLOW, CPU_CLOCK_510C_FAST, CPU_CLOCK_UK101,
+    CPU_CLOCK_C2P);
+
+    fprintf(stderr, 
 "\n"
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
 "    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64\n"
@@ -69,7 +82,13 @@ static void usage(void) {
 "    -z/--zoom                  increase display size by 2\n"
 "    -V/--smooth-video          enable anti-aliased scaling\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
-"    -s/--saturation            color saturation [0.0-1.0], default: %.2lf\n"
+);
+
+    fprintf(stderr,
+"    -s/--saturation            color saturation [0.0-1.0], default: %.2lf\n",
+    saturation);
+
+    fprintf(stderr,
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
 "    -S/--scanlines             emulate visual scanlines\n"
 "\n"
@@ -91,8 +110,8 @@ static void usage(void) {
 "    -G/--floppy3 file          specify floppy3 file (default: none)\n"
 "\n"
 "    -R/--force-ramtop hex      force RAM top to location hex\n"
+"\n"
 "    -h/--help                  show usage information\n"
-    , saturation
 );
 }
 
@@ -116,6 +135,7 @@ static struct option long_options[] = {
     { "joystick1",      required_argument,  0, 'j' },
     { "joystick2",      required_argument,  0, 'J' },
     { "kernel",         required_argument,  0, 'k' },
+    { "cpu-speed",      required_argument,  0, 'K' },
     { "tape-location",  required_argument,  0, 'L' },
     { "video-mode",     required_argument,  0, 'm' },
     { "mono-color",     required_argument,  0, 'M' },
@@ -137,7 +157,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:L:m:M:rR:s:St:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -169,6 +189,21 @@ int main(int argc, char **argv) {
             break;
         case 'k':
             kernel_filename = strdup(optarg);
+            break;
+        case 'K':
+            if (!strcmp(optarg, "c1p")) {
+                cpu_clock = CPU_CLOCK_C1P;
+            } else if (!strcmp(optarg, "510c-slow")) {
+                cpu_clock = CPU_CLOCK_510C_SLOW;
+            } else if (!strcmp(optarg, "510c-fast")) {
+                cpu_clock = CPU_CLOCK_510C_FAST;
+            } else if (!strcmp(optarg, "uk101")) {
+                cpu_clock = CPU_CLOCK_UK101;
+            } else if (!strcmp(optarg, "c2p")) {
+                cpu_clock = CPU_CLOCK_C2P;
+            } else {
+                cpu_clock = strtol(optarg, NULL, 10);
+            }
             break;
         case 'd':
             mmu_basic_enabled = false;
@@ -294,6 +329,9 @@ int main(int argc, char **argv) {
             break;
         case 'R':
             mmu_ram_top = strtol(optarg, NULL, 16);
+            if (mmu_ram_top > 0xbfff) {
+                puts("warning: ramtop > 0xbfff, are you sure?");
+            }
             break;
         case 'A':
             keyboard_ascii_enable = true;

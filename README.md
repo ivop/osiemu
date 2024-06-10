@@ -6,6 +6,7 @@ Ohio Scientific Instruments, Inc. Emulator
 ## Features
 
 * NMOS 6502 CPU
+* Selectable CPU speed
 * 40kB RAM, or 48kB RAM without BASIC (Model 522)
 * 8kB BASIC ROM
 * Up to 4kB OS/Monitor ROM
@@ -38,4 +39,5 @@ Ohio Scientific Instruments, Inc. Emulator
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
 * Sound: SN76489AN and/or AY-3-8910
-* Sound: ACIA RTS DAC
+* Sound: 1-bit ACIA RTS DAC
+* Sound: 4-bit keyboard DAC

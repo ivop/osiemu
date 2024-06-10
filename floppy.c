@@ -525,6 +525,18 @@ static bool get_bit(struct drive *d) {
     return x;
 }
 
+static void put_bit(struct drive *d, bool bit) {
+    if (!d->bit) {
+        d->bit = 0x80;
+        d->pos++;
+    }
+    d->map[d->offset + d->curtrk*trksize + d->pos] &= ~d->bit;
+    if (bit) {
+        d->map[d->offset + d->curtrk*trksize + d->pos] |=  d->bit;
+    }
+    d->bit >>= 1;
+}
+
 // ----------------------------------------------------------------------------
 
 void floppy_tick(double ticks) {
@@ -627,6 +639,7 @@ void floppy_tick(double ticks) {
             acia_receive_state = STATE_WAIT_FOR_STARTBIT;
 
 copy_byte_to_rdr:   // copy byte to RDR and set RDRF
+//            printf("%02x ", databyte);
             RDR = databyte;
             if (status & STATUS_RDRF_MASK) {
                 setbit(status, STATUS_OVRN_MASK);
@@ -637,8 +650,54 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             break;
         }
 
-    } else {
-                // WRITE TO DISK
+    } else { // WRITE TO DISK
+
+//        printf("floppy: writing, state = %d\n", acia_transmit_state);
+
+        switch (acia_transmit_state) {
+        case STATE_IDLE_OR_WRITE_STARTBIT:
+            if (status & STATUS_TDRE_MASK) {    // empty
+                put_bit(&drives[curdrive], 1);
+            } else {
+                curdatabit = parity_calc = 0;
+                databyte = TDR;                                 // consume byte
+                setbit(status, STATUS_TDRE_MASK);               // empty again
+                acia_transmit_state = STATE_WRITE_DATABITS;
+                put_bit(&drives[curdrive], 0);                  // startbit
+            }
+            break;
+        case STATE_WRITE_DATABITS:
+            put_bit(&drives[curdrive], databyte & (1 << curdatabit));
+            curdatabit++;
+            if (curdatabit >= ndatabits) {
+                if (parity_type > NO_PARITY) {
+                    acia_transmit_state = STATE_WRITE_PARITY;
+                } else {
+                    acia_transmit_state = STATE_WRITE_STOPBIT1;
+                }
+            }
+            break;
+        case STATE_WRITE_PARITY:
+            if (parity_type == EVEN_PARITY) {
+                put_bit(&drives[curdrive], parity_calc);
+            } else if (parity_type == ODD_PARITY) {
+                put_bit(&drives[curdrive], !parity_calc);
+            }
+            acia_transmit_state = STATE_WRITE_STOPBIT1;
+            break;
+        case STATE_WRITE_STOPBIT1:
+            put_bit(&drives[curdrive], 1);
+            if (two_stopbits) {
+                acia_transmit_state = STATE_WRITE_STOPBIT2;
+            } else {
+                acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
+            }
+            break;
+        case STATE_WRITE_STOPBIT2:
+            put_bit(&drives[curdrive], 1);
+            acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
+            break;
+        }
     }
 }
 

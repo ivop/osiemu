@@ -652,6 +652,8 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
 
     } else { // WRITE TO DISK
 
+        bool bit;
+
 //        printf("floppy: writing, state = %d\n", acia_transmit_state);
 
         switch (acia_transmit_state) {
@@ -667,7 +669,9 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             }
             break;
         case STATE_WRITE_DATABITS:
-            put_bit(&drives[curdrive], databyte & (1 << curdatabit));
+            bit = databyte & (1 << curdatabit);
+            put_bit(&drives[curdrive], bit);
+            parity_calc ^= bit;
             curdatabit++;
             if (curdatabit >= ndatabits) {
                 if (parity_type > NO_PARITY) {

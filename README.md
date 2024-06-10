@@ -35,9 +35,8 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
-* Floppy: write support
-* Serial: Serial I/O without keyboard and display (named sockets)
-* Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.
-* Sound: SN76489AN and/or AY-3-8910
 * Sound: 1-bit ACIA RTS DAC
 * Sound: 4-bit keyboard DAC
+* Sound: SN76489AN and/or AY-3-8910
+* Serial: Serial I/O without keyboard and display (named sockets)
+* Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

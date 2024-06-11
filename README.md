@@ -35,6 +35,7 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
+* Emulation: "Warp speed", run emulation as fast as possible
 * Sound: Model 542B/C keyboard 0xdf01 tone generator / 8-bit DAC
 * Sound: Model 600/Super board II keyboard 0xdf00 8-bit DAC
 * Sound: 1-bit ACIA RTS DAC (Model?)

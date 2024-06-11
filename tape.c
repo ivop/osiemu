@@ -14,7 +14,7 @@
 #include "tape.h"
 #include "acia.h"
 
-double tape_baseclock = 19200.0;
+double tape_baseclock = 4800.0;
 
 static FILE *inputf;
 static FILE *outputf;

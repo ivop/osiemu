@@ -35,8 +35,9 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
-* Sound: 1-bit ACIA RTS DAC
-* Sound: 4-bit keyboard DAC
+* Sound: Model 542B/C keyboard 0xdf01 tone generator / 8-bit DAC
+* Sound: Model 600/Super board II keyboard 0xdf00 8-bit DAC
+* Sound: 1-bit ACIA RTS DAC (Model?)
 * Sound: SN76489AN and/or AY-3-8910
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

@@ -7,4 +7,6 @@ tools/xex2lod
 tools/*.lod
 tools/hfe2osi
 tools/mirrorbytes
+tools/*.bas
+tools/txt2bas
 tapeout.dat

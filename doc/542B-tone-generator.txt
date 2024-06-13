@@ -20,4 +20,26 @@ V is value written to $df01
 Highest frequency = 983040 / 5 / 2 / (  0+1) / 2 = 49152 Hz
 Lowest frequency  = 983040 / 5 / 2 / (255+1) / 2 =   192 Hz
 
-Pass filter frequency response and attenuation, see LTSpice simulation.
+Pass filter frequency response and attenuation from LTSpice simulation.
+
+Polynomial approximation with fityk of decades:
+
+1-100 (combined 1-10 and 10-100)
+-----
+
+-1.511750E+01 + -1.958976E-14*x + -1.165709E-06*x^2 + -1.754988E-16*x^3 + 1.564514E-13*x^4 + -6.738307E-20*x^5 + -2.760927E-20*x^6
+
+100-1k
+------
+
+-1.511747E+01 + -5.057542E-07*x + -1.161440E-06*x^2 + -1.797632E-11*x^3 + 1.975130E-13*x^4 + -5.047754E-17*x^5 + 2.504592E-22*x^6
+
+1k-10k
+------
+
+-1.473646E+01 + -6.210253E-04*x + -1.052175E-06*x^2 + 3.130030E-10*x^3 + -4.307847E-14*x^4 + 2.948358E-18*x^5 + -8.047391E-23*x^6
+
+10k-100k
+--------
+
+-1.865841E+01 + -1.495209E-03*x + 4.912716E-08*x^2 + -1.049522E-12*x^3 + 1.308050E-17*x^4 + -8.637777E-23*x^5 + 2.328160E-28*x^6

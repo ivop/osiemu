@@ -1,0 +1,32 @@
+542B 8-bit DAC reverse engineered.
+
+Assume 1N914 has resistance close to zero
+
+Simple 2^x resistor ladder.
+
+Values
+
+bit 0   68K
+bit 1   33K
+bit 2   16K
+bit 3   8.2K
+bit 4   3.9K
+bit 5   2K
+bit 6   1K
+bit 7   510R
+
+Ladder forms voltage divider with resistor or 510R
+
+Signal passes through 33u capacitor, removes DC offset
+
+In sound.c, generate 256 byte lookup table.
+
+Note that the resistors are not exactly twice the value of the next one,
+hence the bit[0..7] --> volume mapping is not linear and not even continuous!
+This especially noticable around the transition of 0x7f to 0x80.
+
+Bits    Normalized volume [0.0-1.0]
+...     ...
+127     0.251589
+128     0.246832
+...     ...

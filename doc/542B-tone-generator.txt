@@ -1,0 +1,22 @@
+Reverse engineer 542B/C polled keyboard tone generator
+
+Value written to $df01 is latched by two 74LS75s.
+
+Two 74LS193 counters are cascaded and counting down. When borrow occurs the
+counters are reloaded with the latched value.
+
+Count down pulse is 1QA output of 74LS390, which is in a bi-quinary
+configuration (1QD is connected to 1A). Output frequency is 1B/5/2.
+
+When the 74LS193s are reloaded, a _short_ pulse is sent to 2A of the 74LS390.
+
+Second counter of the 74LS390 is in BCD mode, so frequency of 2QA is 2A/2
+
+Tone frequency = SI / 5 / 2 / (V+1) / 2
+
+SI is CPU Clock (983040 Hz on C1)
+V is value written to $df01
+
+Highest frequency = 983040 / 5 / 2 / (  0+1) / 2 = 49152 Hz
+Lowest frequency  = 983040 / 5 / 2 / (255+1) / 2 =   192 Hz
+

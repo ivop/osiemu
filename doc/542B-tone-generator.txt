@@ -20,3 +20,4 @@ V is value written to $df01
 Highest frequency = 983040 / 5 / 2 / (  0+1) / 2 = 49152 Hz
 Lowest frequency  = 983040 / 5 / 2 / (255+1) / 2 =   192 Hz
 
+Pass filter frequency response and attenuation, see LTSpice simulation.

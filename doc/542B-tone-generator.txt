@@ -17,6 +17,8 @@ Tone frequency = SI / 5 / 2 / (V+1) / 2
 SI is CPU Clock (983040 Hz on C1)
 V is value written to $df01
 
+Tone generator can be turned on and off by bit 1 of the register at $de00.
+
 Highest frequency = 983040 / 5 / 2 / (  0+1) / 2 = 49152 Hz
 Lowest frequency  = 983040 / 5 / 2 / (255+1) / 2 =   192 Hz
 

@@ -16,6 +16,8 @@
 static double dac_542b_volumes[256];    // maps 8-bit DAC to volume [0.0-1.0]
 static double tone_542b_volumes[256];   // volume for freq div V [0.0-1.0]
 
+static double *dac_600_volumes = dac_542b_volumes;      // identical
+
 static double poly6[4][7] = {
 /*  1-100 Hz */ { -1.511750E+01, -1.958976E-14, -1.165709E-06, -1.754988E-16,
                    1.564514E-13, -6.738307E-20, -2.760927E-20 },

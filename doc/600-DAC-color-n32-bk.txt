@@ -34,5 +34,5 @@ I suppose bit 1 (D1) controls the 630 color enable. Need to check.
 BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
 further.
 
-/32 probably switches between 32x32 and 64x32. Need to investigate if the 630
-has that as an input.
+/32 probably switches between 32x32 and 64x16. Both take 1kB of screen
+memory located at $d000-$d3ff. Color RAM is located at $d400-$d7ff.

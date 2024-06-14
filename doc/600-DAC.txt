@@ -26,7 +26,10 @@ Location of this register seems to be $d800 (ref. Third Book Of OSI, page 89)
     lda #$00        ; turn DAC off
     sta $d800
 
-I suppose bit 1 (D1) controls the 630 color enable.
+The actual DAC has the same resistor values as the 542B/C DAC, hence the
+output is identical.
+
+I suppose bit 1 (D1) controls the 630 color enable. Need to check.
 
 BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
 further.

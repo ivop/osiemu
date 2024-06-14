@@ -29,10 +29,12 @@ Location of this register seems to be $d800 (ref. Third Book Of OSI, page 89)
 The actual DAC has the same resistor values as the 542B/C DAC, hence the
 output is identical.
 
-I suppose bit 1 (D1) controls the 630 color enable. Need to check.
-
-BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
-further.
+Bit 1 (D1) controls the 630 color enable.
 
 /32 probably switches between 32x32 and 64x16. Both take 1kB of screen
 memory located at $d000-$d3ff. Color RAM is located at $d400-$d7ff.
+
+Todo:
+
+BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
+further.

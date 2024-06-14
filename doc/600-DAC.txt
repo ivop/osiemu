@@ -1,0 +1,35 @@
+The OSI600 Superboard II also has an optional 8-bit DAC output, similar to
+the 542B/C. But instead of writing the values to $df01, the values are to
+be written to $df00 that's also the row select register. Hence it has a
+DAC Disable bit to avoid unwanted noise during keyboard reads.
+
+The implementation of the bit is at 5B4 (OSI 600 schematic), the actual
+bit comes from U72, located at 2C1 (OSI 600 schematic).
+
+U72 is wired confusingly, like:
+
+databus     LS174 inputs    function
+D0      --> 3D              /32                 (32x32 mode (?))
+D1      --> 2D              COLOR EN
+D2      --> 1D              BK0
+D3      --> 5D              BK1
+D4      --> 6D              DAC DISABLE
+D5      --> 4D              N.C.
+
+Documentation is scarce.
+
+Location of this register seems to be $d800 (ref. Third Book Of OSI, page 89)
+
+    lda #$10        ; turn DAC on, output of LS74 is inverted(!)
+    sta $d800
+    ...
+    lda #$00        ; turn DAC off
+    sta $d800
+
+I suppose bit 1 (D1) controls the 630 color enable.
+
+BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
+further.
+
+/32 probably switches between 32x32 and 64x32. Need to investigate if the 630
+has that as an input.

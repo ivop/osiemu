@@ -50,6 +50,8 @@ static int cpu_clock = CPU_CLOCK_510C_SLOW;
 static double fps = 60.0;
 static double ticks_per_frame;
 
+static bool warp_speed;
+
 // ----------------------------------------------------------------------------
 
 static void usage(void) {
@@ -149,6 +151,7 @@ static struct option long_options[] = {
     { "tape-output",    required_argument,  0, 'T' },
     { "disable-video",  no_argument,        0, 'v' },
     { "smooth-video",   no_argument,        0, 'V' },
+    { "warp-speed",     no_argument,        0, 'w' },
     { "zoom",           no_argument,        0, 'z' },
 };
 
@@ -158,7 +161,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwz",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -355,6 +358,9 @@ int main(int argc, char **argv) {
         case 'G':
             drive3_filename = strdup(optarg);
             break;
+        case 'w':
+            warp_speed = true;
+            break;
         case 'h':
             usage();
             return 1;
@@ -386,6 +392,7 @@ int main(int argc, char **argv) {
 
     printf("screen width: %d\nscreen height: %d\n", osi_width, osi_height);
     printf("cpu clock: %d Hz\n", cpu_clock);
+    printf("warp speed: %s\n", warp_speed ? "on" : "off");
     printf("frame rate: %.2lf fps\n", fps);
     printf("ticks per frame: %.2lf\n", ticks_per_frame);
 
@@ -505,13 +512,15 @@ int main(int argc, char **argv) {
 
         cpu_target += ticks_per_frame;
 
-        while (SDL_GetTicks() < target) {
+        if (!warp_speed) {
+            while (SDL_GetTicks() < target) {
 #ifndef DONT_USE_NANOSLEEP
-            struct timespec wait = { 0, 100000 };   // 0.1ms
-            nanosleep(&wait,NULL);
+                struct timespec wait = { 0, 100000 };   // 0.1ms
+                nanosleep(&wait,NULL);
 #else
-            SDL_Delay(1);                           // 1ms, less accurate
+                SDL_Delay(1);                           // 1ms, less accurate
 #endif
+            }
         }
     }
 

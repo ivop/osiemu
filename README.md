@@ -6,7 +6,7 @@ Ohio Scientific Instruments, Inc. Emulator
 ## Features
 
 * NMOS 6502 CPU
-* Selectable CPU speed
+* Selectable CPU speed, including "warp speed"
 * 40kB RAM, or 48kB RAM without BASIC (Model 522)
 * 8kB BASIC ROM
 * Up to 4kB OS/Monitor ROM
@@ -35,7 +35,6 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ## TODO
 
-* Emulation: "Warp speed", run emulation as fast as possible
 * Sound: Model 542B/C keyboard 0xdf01 tone generator / 8-bit DAC
 * Sound: Model 600/Super board II keyboard 0xdf00 8-bit DAC
 * Sound: 1-bit ACIA RTS DAC (Model?)

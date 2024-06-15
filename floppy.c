@@ -551,12 +551,6 @@ void floppy_tick(double ticks) {
 
     floppy_ticks -= interval;
 
-    if (bits_counter < bits_per_hole) {
-        hole = true;
-    } else {
-        hole = false;
-    }
-
     bits_counter++;
     if (bits_counter >= bits_per_revolution) {
         bits_counter = 0;

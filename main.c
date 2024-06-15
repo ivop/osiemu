@@ -421,6 +421,7 @@ int main(int argc, char **argv) {
     if (!sound_init(cpu_clock)) {
         return 1;
     }
+
     // doubles to avoid drift when cpu_clock/fps or 1000/fps is not an integer
 
     double sdl_ticks_per_frame = 1000.0 / fps;

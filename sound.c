@@ -13,10 +13,16 @@
 
 #include "sound.h"
 
+bool sound_enabled;
+
 static double dac_542b_volumes[256];    // maps 8-bit DAC to volume [0.0-1.0]
 static double tone_542b_volumes[256];   // volume for freq div V [0.0-1.0]
 
 static double *dac_600_volumes = dac_542b_volumes;      // identical
+
+// ----------------------------------------------------------------------------
+
+// See doc/542B-DAC.txt for details
 
 static double poly6[4][7] = {
 /*  1-100 Hz */ { -1.511750E+01, -1.958976E-14, -1.165709E-06, -1.754988E-16,
@@ -28,8 +34,6 @@ static double poly6[4][7] = {
 /* 10-100kHz */ { -1.865841E+01, -1.495209E-03,  4.912716E-08, -1.049522E-12,
                    1.308050E-17, -8.637777E-23,  2.328160E-28 }
 };
-
-// See doc/542B-DAC.txt for details
 
 static void calculate_542b_dac_volumes(void) {
     static double Rtop = 510;
@@ -57,6 +61,8 @@ static void calculate_542b_dac_volumes(void) {
     }
 }
 
+// ----------------------------------------------------------------------------
+
 // See doc/542B-tone-generator.txt for details
 
 static double attenuation(double x) {
@@ -78,6 +84,8 @@ static void calculate_542b_tonegen_volumes(double cpu_clock) {
         tone_542b_volumes[V] = pow(10, a / 20.0);
     }
 }
+
+// ----------------------------------------------------------------------------
 
 bool sound_init(double cpu_clock) {
     calculate_542b_dac_volumes();

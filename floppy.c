@@ -539,18 +539,7 @@ static void put_bit(struct drive *d, bool bit) {
 
 // ----------------------------------------------------------------------------
 
-void floppy_tick(double ticks) {
-    if (!floppy_enable) {
-        return;
-    }
-
-    floppy_ticks += ticks;
-    if (floppy_ticks < interval) {
-        return;
-    }
-
-    floppy_ticks -= interval;
-
+static void floppy_one_emulation_cycle(void) {
     bits_counter++;
     if (bits_counter >= bits_per_revolution) {
         bits_counter = 0;
@@ -696,6 +685,18 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
             break;
         }
+    }
+}
+
+void floppy_tick(double ticks) {
+    if (!floppy_enable) {
+        return;
+    }
+
+    floppy_ticks += ticks;
+    while (floppy_ticks >= interval) {      // beware of long 6502 instructions
+        floppy_ticks -= interval;
+        floppy_one_emulation_cycle();
     }
 }
 

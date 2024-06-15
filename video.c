@@ -129,6 +129,9 @@ static int colors_630[16][3];  // 8 dim/bright pairs, maps directly to bits 3-0
 
 #define CONTROL_630_64x16       0x01    // leave up to command line for now
 #define CONTROL_630_COLOR_ON    0x02    // 1=color on
+#define CONTROL_630_BK0         0x04
+#define CONTROL_630_BK1         0x08
+#define CONTROL_630_DAC_DISABLE 0x10    // disable 600 DAC
 
 static uint8_t control_630;
 

@@ -45,3 +45,5 @@ Polynomial approximation with fityk of decades:
 --------
 
 -1.865841E+01 + -1.495209E-03*x + 4.912716E-08*x^2 + -1.049522E-12*x^3 + 1.308050E-17*x^4 + -8.637777E-23*x^5 + 2.328160E-28*x^6
+
+The phase shift of the filter is not modelled.

@@ -17,6 +17,7 @@
 #include "video.h"
 #include "tape.h"
 #include "floppy.h"
+#include "control.h"
 
 // ----------------------------------------------------------------------------
 
@@ -48,11 +49,12 @@ static uint16_t kernel_bottom;
 //              used by multishare system and C3s
 //
 // d000-d7ff    Screen RAM 1kB or 2kB
-// de00         video mode: model 540B
+// d800         Superboard II/Model 600 control register
+// de00         Model 54x control register
 //              write:
 //                  bit 0, 1=32, 0=64
-//                  bit 1, 1=tone on (642 keyboard)
-//                  bit 2, 1=color on
+//                  bit 1, 1=tone on (542 keyboard)
+//                  bit 2, 1=color on (540 graphics)
 //                  bit 3, 1=enable 38-40kHz AC Home control output
 //              read:
 //                  bit 7 toggles at 1/120th of a second (duty cycle is 60Hz)
@@ -155,12 +157,6 @@ void write6502(uint16_t address, uint8_t value) {
                 screen_color_ram_write(address, value);
                 return;
             }
-            if (color_mode == COLORS_630 && address == 0xd800) {
-                screen_control_630_write(address, value);
-            }
-            if (color_mode == COLORS_540B && address == 0xde00) {
-                screen_control_540b_write(address, value);
-            }
         }
         if (hires_mode == HIRES_440B) {
             if (address >= 0xe000 && address <= 0xe7ff) {
@@ -174,6 +170,14 @@ void write6502(uint16_t address, uint8_t value) {
                 return;
             }
         }
+    }
+    if (control_6xx_enable && address == 0xd800) {
+        control_6xx_write(address, value);
+        return;
+    }
+    if (control_5xx_enable && address == 0xde00) {
+        control_5xx_write(address, value);
+        return;
     }
     if ((address & 0xff00) == 0xdf00) {
         keyboard_write(value);

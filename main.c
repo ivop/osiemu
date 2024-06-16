@@ -28,6 +28,7 @@
 #include "tape.h"
 #include "floppy.h"
 #include "sound.h"
+#include "control.h"
 
 // ----------------------------------------------------------------------------
 
@@ -272,11 +273,13 @@ int main(int argc, char **argv) {
                 color_ram_enabled = true;
                 color_ram_bottom = 0xe000;
                 color_ram_top    = 0xe7ff;
+                control_5xx_enable = true;
             } else if (!strcmp(optarg, "630")) {
                 color_mode = COLORS_630;
                 color_ram_enabled = true;
                 color_ram_bottom  = 0xd400;
                 color_ram_top     = 0xd7ff;
+                control_6xx_enable = true;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
                 return 1;

@@ -20,6 +20,7 @@
 #include "floppy.h"
 #include "hslrgb.h"
 #include "portability.h"
+#include "control.h"
 
 // ----------------------------------------------------------------------------
 
@@ -106,12 +107,6 @@ double saturation = 0.75;
 
 static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 
-#define CONTROL_540B_32X32      0x01    // leave up to command line for now
-#define CONTROL_540B_TONE_ON    0x02    // 542 keyboard tone
-#define CONTROL_540B_COLOR_ON   0x04    // 1=color on
-#define CONTROL_540B_ACHOME     0x08    // 38-40kHz AC Home Control output
-
-static uint8_t control_540b;
 static uint8_t Hz_tick_540b;
 
 static double angles_630[8] = {
@@ -126,14 +121,6 @@ static double angles_630[8] = {
 };
 
 static int colors_630[16][3];  // 8 dim/bright pairs, maps directly to bits 3-0
-
-#define CONTROL_630_64x16       0x01    // leave up to command line for now
-#define CONTROL_630_COLOR_ON    0x02    // 1=color on
-#define CONTROL_630_BK0         0x04
-#define CONTROL_630_BK1         0x08
-#define CONTROL_630_DAC_DISABLE 0x10    // disable 600 DAC
-
-static uint8_t control_630;
 
 static double *angles_440b = angles_630; // white + three identical colors
 
@@ -194,7 +181,7 @@ do_monochrome:
         }
         break;
     case COLORS_540B:
-        if (!(control_540b & CONTROL_540B_COLOR_ON))
+        if (!(control_5xx & CONTROL_540B_COLOR_ON))
             goto do_monochrome;
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {
@@ -216,7 +203,7 @@ do_monochrome:
         }
         break;
     case COLORS_630:
-        if (!(control_630 & CONTROL_630_COLOR_ON))
+        if (!(control_6xx & CONTROL_630_COLOR_ON))
             goto do_monochrome;
         SDL_RenderClear(renderer);
         for (int y = 0; y < osi_height; y++) {
@@ -667,18 +654,6 @@ void screen_hires_ram_write(uint16_t address, uint8_t value) {
 
 uint8_t screen_control_540b_read(uint16_t address UNUSED) {
     return Hz_tick_540b;
-}
-
-// ----------------------------------------------------------------------------
-
-void screen_control_540b_write(uint16_t address UNUSED, uint8_t value) {
-    control_540b = value;
-}
-
-// ----------------------------------------------------------------------------
-
-void screen_control_630_write(uint16_t address UNUSED, uint8_t value) {
-    control_630 = value;
 }
 
 // ----------------------------------------------------------------------------

@@ -2,16 +2,27 @@
     org $0300
 
 start:
-    lda #2
+    lda #2          ; enable tone
     sta $de00
     ldx #255
 @:
     stx $df01
     jsr wait
-    dex
+    dex             ; slide up
     bne @-
 
-    jmp *
+    lda #0          ; disable tone
+    sta $de00
+
+@:
+    stx $df01
+    .rept 8
+        nop
+    .endr
+    dex             ; saw tooth
+    bne @-
+
+    jmp @-
 
 wait:
     ldy #0

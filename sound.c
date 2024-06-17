@@ -118,7 +118,7 @@ static uint16_t mixer(void) {
         if (control_5xx & CONTROL_542B_TONE_ON) {
             sample += tone_level * tone_542b_volumes[dac_or_tone] * 32767;
         }
-        sample += dac_542b_volumes[dac_or_tone] * 32768;
+        sample += dac_542b_volumes[dac_or_tone] * 32767;
     } else if (sound_mode == SOUND_MODE_600) {
         sample = dac_600_volumes[dac_or_tone] * 65535;
     }

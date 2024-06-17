@@ -412,6 +412,11 @@ int main(int argc, char **argv) {
 
     ticks_per_frame = cpu_clock / fps;
 
+    printf("color mode: %s\n", color_modes_name[color_mode]);
+    if (color_mode == COLORS_MONOCHROME) {
+        printf("monochrome color: %s\n", mono_colors_name[mono_color]);
+    }
+    printf("hires mode: %s\n", hires_modes_name[hires_mode]);
     printf("screen width: %d\nscreen height: %d\n", osi_width, osi_height);
     printf("cpu clock: %d Hz\n", cpu_clock);
     printf("warp speed: %s\n", warp_speed ? "on" : "off");

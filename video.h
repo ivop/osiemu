@@ -22,6 +22,10 @@ enum hires_modes {
     HIRES_541
 };
 
+extern const char * const mono_colors_name[];
+extern const char * const color_modes_name[];
+extern const char * const hires_modes_name[];
+
 extern enum mono_colors mono_color;
 extern enum color_modes color_mode;
 extern enum hires_modes hires_mode;

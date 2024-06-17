@@ -78,7 +78,6 @@ static SDL_Rect src_rect_digits = {  0,  0, 32, 64 };
 static SDL_Rect dst_rect_digits = { 96, 16, 32, 64 };
 
 static int monochrome[][3] = {
-    // mono colors
     [COLOR_GREEN]  = { 0x00, 0xff, 0x00 },
     [COLOR_AMBER]  = { 0xff, 0xbf, 0x00 },
     [COLOR_WHITE]  = { 0xff, 0xff, 0xff },
@@ -135,6 +134,26 @@ bool scanlines_enable;
 
 static double interval;
 static double counter;
+
+const char * const mono_colors_name[] = {
+    [COLOR_GREEN]  = "green",
+    [COLOR_AMBER]  = "amber",
+    [COLOR_WHITE]  = "white",
+    [COLOR_BLUISH] = "bluish"
+};
+
+const char * const color_modes_name[] = {
+    [COLORS_MONOCHROME] = "monochrome",
+    [COLORS_440B]       = "440b",
+    [COLORS_540B]       = "540b",
+    [COLORS_630]        = "630"
+};
+
+const char * const hires_modes_name[] = {
+    [HIRES_NONE] = "none",
+    [HIRES_440B] = "440b",
+    [HIRES_541]  = "541"
+};
 
 // ----------------------------------------------------------------------------
 

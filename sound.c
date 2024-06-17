@@ -13,9 +13,13 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 
+#include "portability.h"
 #include "sound.h"
+#include "control.h"
 
 bool sound_enabled = true;
+
+enum sound_mode_e sound_mode = SOUND_MODE_542B;
 
 static SDL_AudioDeviceID audio_device;
 
@@ -30,8 +34,10 @@ static uint16_t ring_buffer[RINGBUF_SIZE];
 static uint16_t *readp = ring_buffer;
 static uint16_t *writep = ring_buffer;
 
+static uint8_t dac_or_tone = 0;
+
 static double tone_counter;
-static double tone_interval = 5*2*223;
+static double tone_interval = 5*2*(0+1);
 static bool   tone_level;
 
 static double sample_counter;
@@ -98,19 +104,36 @@ static void calculate_542b_tonegen_volumes(double cpu_clock) {
     for (int V=0; V<256; V++) {
         double f = cpu_clock / 5.0 / 2.0 / (V+1) / 2.0;
         double a = attenuation(f) + 15.16;           // normalize to 0dB
+        if (f > 16000) a = -96.0;
         tone_542b_volumes[V] = pow(10, a / 20.0);
     }
 }
 
 // ----------------------------------------------------------------------------
 
+static uint16_t mixer(void) {
+    uint16_t sample = 0;
+    if (sound_mode == SOUND_MODE_542B) {
+        // we mix the DAC and tone generator (or silence) 50:50
+        if (control_5xx & CONTROL_542B_TONE_ON) {
+            sample += tone_level * tone_542b_volumes[dac_or_tone] * 32767;
+        }
+        sample += dac_542b_volumes[dac_or_tone] * 32768;
+    } else if (sound_mode == SOUND_MODE_600) {
+        sample = dac_600_volumes[dac_or_tone] * 65535;
+    }
+    return sample;
+}
+
 void sound_tick(double ticks) {
     if (!sound_enabled) return;
 
-    tone_counter += ticks;
-    if (tone_counter >= tone_interval) {
-        tone_counter -= tone_interval;
-        tone_level ^= 1;
+    if (sound_mode == SOUND_MODE_542B) {
+        tone_counter += ticks;
+        if (tone_counter >= tone_interval) {
+            tone_counter -= tone_interval;
+            tone_level ^= 1;
+        }
     }
 
     sample_counter += ticks;
@@ -120,13 +143,13 @@ void sound_tick(double ticks) {
         // is repeated
         writep++;
         if (writep == &ring_buffer[RINGBUF_SIZE]) writep = ring_buffer;
-        *writep = tone_level * 65535;
+        *writep = mixer();
     }
 }
 
 // ----------------------------------------------------------------------------
 
-static void callback(void *udata, uint8_t *stream, int len) {
+static void callback(void *udata UNUSED, uint8_t *stream, int len) {
     uint16_t *s = (uint16_t *) stream;
 
     for (int i=0; i<len; i+=sizeof(int16_t)) {
@@ -141,11 +164,11 @@ static void callback(void *udata, uint8_t *stream, int len) {
 // ----------------------------------------------------------------------------
 
 void sound_start(void) {
-    SDL_PauseAudioDevice(audio_device, false);
+    if (sound_enabled) SDL_PauseAudioDevice(audio_device, false);
 }
 
 void sound_stop(void) {
-    SDL_PauseAudioDevice(audio_device, true);
+    if (sound_enabled) SDL_PauseAudioDevice(audio_device, true);
 }
 
 // ----------------------------------------------------------------------------
@@ -176,4 +199,15 @@ bool sound_init(double cpu_clock) {
     sample_interval = cpu_clock / 44100.0;
 
     return true;
+}
+
+// ----------------------------------------------------------------------------
+
+void sound_5xx_write_dac_or_tone(uint8_t value) {
+    dac_or_tone = value;
+    tone_interval = 5*2*(value+1);
+}
+
+void sound_6xx_write_dac(uint8_t value) {
+    dac_or_tone = value;
 }

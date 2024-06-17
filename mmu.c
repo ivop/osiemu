@@ -18,6 +18,7 @@
 #include "tape.h"
 #include "floppy.h"
 #include "control.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------
 
@@ -61,7 +62,7 @@ static uint16_t kernel_bottom;
 //
 // df00         Polled Keyboard (Model 542/542B or Model 600/600D (inverted))
 // df01         ASCII keyboard
-// df01         R2R DAC output, or tone generator at 49152/value Hz
+// df01         8R DAC output, or tone generator at 49152/(value+1) Hz
 //
 // e000-e7ff    Color RAM / 2kB 128x128 hires 440B
 //
@@ -179,8 +180,14 @@ void write6502(uint16_t address, uint8_t value) {
         control_5xx_write(address, value);
         return;
     }
+    if (address == 0xdf01 && sound_mode == SOUND_MODE_542B) {
+        sound_5xx_write_dac_or_tone(value);
+    }
     if ((address & 0xff00) == 0xdf00) {
         keyboard_write(value);
+        if (sound_mode == SOUND_MODE_600) {
+            sound_6xx_write_dac(value);
+        }
         return;
     }
     if (address >= tape_location && address <= tape_location+3) {

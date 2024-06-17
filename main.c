@@ -115,6 +115,8 @@ static void usage(void) {
 "\n"
 "    -R/--force-ramtop hex      force RAM top to location hex\n"
 "\n"
+"    -y/--sound-mode mode       mode: none, 542b (DAC+tone), 600 (DAC)\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -153,6 +155,7 @@ static struct option long_options[] = {
     { "disable-video",  no_argument,        0, 'v' },
     { "smooth-video",   no_argument,        0, 'V' },
     { "warp-speed",     no_argument,        0, 'w' },
+    { "sound-mode",     required_argument,  0, 'y' },
     { "zoom",           no_argument,        0, 'z' },
 };
 
@@ -162,7 +165,7 @@ int main(int argc, char **argv) {
 
     printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwz",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwy:z",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -363,6 +366,22 @@ int main(int argc, char **argv) {
             break;
         case 'w':
             warp_speed = true;
+            break;
+        case 'y':
+            if (!strcmp(optarg, "none")) {
+                sound_enabled = false;
+            } else if (!strcmp(optarg, "542b")) {
+                sound_enabled = true;
+                sound_mode = SOUND_MODE_542B;
+                control_5xx_enable = true;
+            } else if (!strcmp(optarg, "600")) {
+                sound_enabled = true;
+                sound_mode = SOUND_MODE_600;
+                control_6xx_enable = true;
+            } else {
+                fprintf(stderr, "sound: unknown mode %s\n", optarg);
+                return 1;
+            }
             break;
         case 'h':
             usage();

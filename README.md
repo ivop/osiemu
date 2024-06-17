@@ -36,6 +36,42 @@ Ohio Scientific Instruments, Inc. Emulator
 * On-Screen Display during peripheral access
 * Built-in monitor, dump/change memory contents, registers, set breakpoints, disassembler
 
+## Keybindings
+
+| Key | Function |
+| --- | --- |
+| F3 | Hardware switch, hi-res overlay |
+| F4 | Hardware switch, normal font / graphics font |
+| F5 | Hardware reset |
+| F8 | Enter monitor |
+| F9 | Exit emulator |
+| F11 | Toggle fullscreen |
+
+## Monitor
+
+| Command | Arguments | Function |
+| --- | --- | --- |
+| q,quit |              | exit emulator |
+| cont |                | continue emulation |
+| help |                | print this help |
+| show |                | show emulation window |
+| hide |                | hide emulation window |
+| d | [mem]             | dump memory contents |
+| c | mem val ...       | change memory to value(s) |
+| regs |                | display CPU registers |
+| setcpu | type         | set CPU type to nmos\|undef\|cmos |
+| u | [mem]             | unassemble memory |
+| setbp | mem           | set breakpoint |
+| clrbp |               | clear breakpoint |
+| l | mem file          | load raw data from file to mem |
+| s | beg end file      | save raw data to file |
+| setpc | val           | set PC to value |
+| seta | val            | set A to value |
+| setx | val            | set X to value |
+| sety | val            | set Y to value |
+| setsp | val           | set SP to value |
+| setp | val            | set P to value |
+
 ## Future additions?
 
 * Serial: Serial I/O without keyboard and display (named sockets)

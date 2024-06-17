@@ -30,14 +30,15 @@ Ohio Scientific Instruments, Inc. Emulator
   * optional 2x zoom
   * optional TV aspect ratio 16:9 or 4:3
   * optional anti-aliasing
+* Sound modes:
+  * Model 542B/C keyboard tone generator and 8-bit DAC
+  * Superboard II/Model 600/C1P keyboard 8-bit DAC
 * On-Screen Display during peripheral access
 * Built-in monitor, dump/change memory contents, registers, set breakpoints, disassembler
 
-## TODO
+## Future additions?
 
-* Sound: Model 542B/C keyboard 0xdf01 tone generator / 8-bit DAC
-* Sound: Model 600/Super board II keyboard 0xdf00 8-bit DAC
-* Sound: 1-bit ACIA RTS DAC (Model?)
-* Sound: SN76489AN and/or AY-3-8910
 * Serial: Serial I/O without keyboard and display (named sockets)
+* Sound: 1-bit ACIA RTS DAC (which model?)
+* Sound: SN76489AN and/or AY-3-8910 daughterboard
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

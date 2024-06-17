@@ -84,3 +84,8 @@ Datastream is stored, starting at MSB of byte, so:
              |                       |
  lead-in     start  data bits        stop bit
                     in ACIA order
+
+This is inverse compared to how the HFE files store a bitstream, but my way
+makes it easier to be read by a human (i.e. reading and decoding the hexdump
+visually). Computationally there's no difference.
+

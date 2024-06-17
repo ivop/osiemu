@@ -72,6 +72,13 @@ Ohio Scientific Instruments, Inc. Emulator
 | setsp | val           | set SP to value |
 | setp | val            | set P to value |
 
+## Statistics
+
+Non-blank non-comment lines of code, including submodules:
+
+.c: 3080  
+.h: 1052  
+
 ## Future additions?
 
 * Serial: Serial I/O without keyboard and display (named sockets)

@@ -10,15 +10,32 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <SDL.h>
+#include <SDL_audio.h>
 
 #include "sound.h"
 
-bool sound_enabled;
+bool sound_enabled = true;
+
+static SDL_AudioDeviceID audio_device;
 
 static double dac_542b_volumes[256];    // maps 8-bit DAC to volume [0.0-1.0]
 static double tone_542b_volumes[256];   // volume for freq div V [0.0-1.0]
 
 static double *dac_600_volumes = dac_542b_volumes;      // identical
+
+#define RINGBUF_SIZE 4096
+
+static uint16_t ring_buffer[RINGBUF_SIZE];
+static uint16_t *readp = ring_buffer;
+static uint16_t *writep = ring_buffer;
+
+static double tone_counter;
+static double tone_interval = 5*2*223;
+static bool   tone_level;
+
+static double sample_counter;
+static double sample_interval;
 
 // ----------------------------------------------------------------------------
 
@@ -87,8 +104,76 @@ static void calculate_542b_tonegen_volumes(double cpu_clock) {
 
 // ----------------------------------------------------------------------------
 
+void sound_tick(double ticks) {
+    if (!sound_enabled) return;
+
+    tone_counter += ticks;
+    if (tone_counter >= tone_interval) {
+        tone_counter -= tone_interval;
+        tone_level ^= 1;
+    }
+
+    sample_counter += ticks;
+    if (sample_counter >= sample_interval) {
+        sample_counter -= sample_interval;
+        // increase first, then write; in case readp catches up, last sample
+        // is repeated
+        writep++;
+        if (writep == &ring_buffer[RINGBUF_SIZE]) writep = ring_buffer;
+        *writep = tone_level * 65535;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+static void callback(void *udata, uint8_t *stream, int len) {
+    uint16_t *s = (uint16_t *) stream;
+
+    for (int i=0; i<len; i+=sizeof(int16_t)) {
+        *s++ = *readp;
+        if (readp != writep) {
+            readp++;
+            if (readp == &ring_buffer[RINGBUF_SIZE]) readp = ring_buffer;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void sound_start(void) {
+    SDL_PauseAudioDevice(audio_device, false);
+}
+
+void sound_stop(void) {
+    SDL_PauseAudioDevice(audio_device, true);
+}
+
+// ----------------------------------------------------------------------------
+
 bool sound_init(double cpu_clock) {
+    if (!sound_enabled) return true;
+
+    SDL_AudioSpec audio_spec;
+    SDL_zero(audio_spec);
+    audio_spec.freq = 44100;
+    audio_spec.format = AUDIO_U16SYS;
+    audio_spec.channels = 1;
+    audio_spec.samples = 32;
+    audio_spec.callback = callback;
+
+    audio_device = SDL_OpenAudioDevice(NULL, false, &audio_spec, NULL, false);
+
+    if (!audio_device) {
+        fprintf(stderr, "sound: unable to open default audio device\n");
+        return false;
+    }
+
+    puts("sound: opened default audio device");
+
     calculate_542b_dac_volumes();
     calculate_542b_tonegen_volumes(cpu_clock);
+
+    sample_interval = cpu_clock / 44100.0;
+
     return true;
 }

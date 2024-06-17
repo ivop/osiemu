@@ -431,6 +431,8 @@ int main(int argc, char **argv) {
     double target = SDL_GetTicks();
     double cpu_target = cpu_ticks + ticks_per_frame;
 
+    sound_start();
+
     while (1) {
         target += sdl_ticks_per_frame;
 
@@ -512,6 +514,7 @@ int main(int argc, char **argv) {
             keyboard_tick(ticks);
             floppy_tick(ticks);
             screen_tick(ticks);
+            sound_tick(ticks);
         }
 
         cpu_target += ticks_per_frame;

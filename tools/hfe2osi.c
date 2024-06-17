@@ -2,7 +2,7 @@
  * hfe2osi
  *
  * Convert HFE to OSI Bitstream
- * Includes all the 8E1 and 8N1 framing and zeroes for timing.
+ * Includes all the 8E1 and 8N1 framing and zeroes and ones for timing.
  * This stream will be sent directly to the ACIA at the selected bitrate
  */
 
@@ -11,43 +11,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "hfe.h"
+#include "osi.h"
 
-static struct picfileformatheader {
-    uint8_t  id[8];
-    uint8_t  version;
-    uint8_t  ntracks;
-    uint8_t  nsides;
-    uint8_t  encoding;
-    uint16_t bitrate;
-    uint16_t rpm;
-    uint8_t  interface;
-    uint8_t  dnu;
-    uint16_t offset;
-    uint8_t  r_w;
-    // v1.1 additions
-    uint8_t single_step;
-    uint8_t track0s0_altencoding;
-    uint8_t track0s0_encoding;
-    uint8_t track0s1_altencoding;
-    uint8_t track0s1_encoding;
-} ph;
+static struct picfileformatheader ph;
 
-static struct pictracklut {
-    uint16_t offset;
-    uint16_t length;
-} phlut[256];
+static struct pictracklut phlut[256];
 
-static struct osibitstream {
-    uint8_t id[16];
-    uint8_t version;
-    uint8_t type;
-    uint8_t offset;
-} oh;
-
-enum osi_disk_type {
-    TYPE_525_SS,
-    TYPE_8_SS
-};
+static struct osibitstream oh;
 
 static FILE *inp, *outp;
 static uint8_t *trkbuf;

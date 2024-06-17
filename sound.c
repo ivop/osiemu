@@ -120,7 +120,9 @@ static uint16_t mixer(void) {
         }
         sample += dac_542b_volumes[dac_or_tone] * 32767;
     } else if (sound_mode == SOUND_MODE_600) {
-        sample = dac_600_volumes[dac_or_tone] * 65535;
+        if (control_6xx & CONTROL_600_DAC_ENABLE) {
+            sample = dac_600_volumes[dac_or_tone] * 65535;
+        }
     }
     return sample;
 }

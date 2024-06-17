@@ -15,7 +15,7 @@ extern uint8_t control_5xx;
 #define CONTROL_630_COLOR_ON    0x02    // 1=color on
 #define CONTROL_600_BK0         0x04
 #define CONTROL_600_BK1         0x08
-#define CONTROL_600_DAC_DISABLE 0x10    // disable 600 DAC
+#define CONTROL_600_DAC_ENABLE  0x10    // enable 600 DAC
 
 extern uint8_t control_6xx;
 

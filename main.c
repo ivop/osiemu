@@ -379,7 +379,7 @@ int main(int argc, char **argv) {
                 sound_mode = SOUND_MODE_600;
                 control_6xx_enable = true;
             } else {
-                fprintf(stderr, "sound: unknown mode %s\n", optarg);
+                fprintf(stderr, "error: unknown mode %s\n", optarg);
                 return 1;
             }
             break;

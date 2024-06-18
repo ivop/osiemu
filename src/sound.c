@@ -183,7 +183,7 @@ bool sound_init(double cpu_clock) {
     audio_spec.freq = 44100;
     audio_spec.format = AUDIO_U16SYS;
     audio_spec.channels = 1;
-    audio_spec.samples = 32;
+    audio_spec.samples = 256;
     audio_spec.callback = callback;
 
     audio_device = SDL_OpenAudioDevice(NULL, false, &audio_spec, NULL, false);

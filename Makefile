@@ -7,9 +7,10 @@ CFLAGS = -flto=auto -O3 $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
 LFLAGS = -flto=auto
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lm
 
-SRC_FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
-			cooked.c floppy.c monitor.c hslrgb.c sound.c control.c
+FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
+        cooked.c floppy.c monitor.c hslrgb.c sound.c control.c
 
+SRC_FILES = $(FILES:%.c=src/%.c)
 OBJ_FILES = $(SRC_FILES:%.c=%.o)
 
 all: osiemu
@@ -24,7 +25,7 @@ strip: osiemu
 	strip $<
 
 clean:
-	rm -f *~ osiemu osiemu.exe *.o fake6502/*.o .depend */*~
+	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~
 
 .depend: $(SRC_FILES)
 	rm -f $@

@@ -17,7 +17,7 @@
 #include "sound.h"
 #include "control.h"
 
-bool sound_enabled = true;
+bool sound_enabled;
 
 enum sound_mode_e sound_mode = SOUND_MODE_542B;
 

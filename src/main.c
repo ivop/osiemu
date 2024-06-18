@@ -556,5 +556,6 @@ int main(int argc, char **argv) {
     }
 
 exit_out:
+    floppy_quit();
     SDL_Quit();
 }

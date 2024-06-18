@@ -52,6 +52,7 @@ struct drive {
     char *fname;
     off_t offset;
     char *map;
+    size_t mapsize;
 
     unsigned int pos;
     uint8_t bit;
@@ -224,6 +225,7 @@ static bool init_memory_mapped_io(struct drive *d) {
     fseek(d->f, 0, SEEK_END);
     long filesize = ftell(d->f);
     fseek(d->f, 0, SEEK_SET);
+    d->mapsize = filesize;
 
     int fd = fileno(d->f);
 
@@ -708,3 +710,12 @@ void floppy_get_current_track_and_drive(int *track, int *drive) {
 }
 
 // ----------------------------------------------------------------------------
+
+void floppy_quit(void) {
+    for (int i=0; i<4; i++) {
+        if (drives[i].f) {
+            munmap(drives[i].map, drives[i].mapsize);
+            fclose(drives[i].f);
+        }
+    }
+}

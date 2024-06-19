@@ -1,4 +1,3 @@
-CC ?= gcc
 SDL2CONFIG ?= sdl2-config
 ifeq ($(MAKECMDGOALS),release)
 	DEBUG = -O3
@@ -17,24 +16,12 @@ FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
 SRC_FILES = $(FILES:%.c=src/%.c)
 OBJ_FILES = $(SRC_FILES:%.c=%.o)
 
-V ?= 0
-ACTUAL_CC := $(CC)
-CC_0 = @echo "Compiling $<"; $(ACTUAL_CC)
-CC_1 = $(ACTUAL_CC)
-CC = $(CC_$(V))
-CC_LINK_0 = @echo "Linking $@"; $(ACTUAL_CC)
-CC_LINK_1 = $(ACTUAL_CC)
-CC_LINK = $(CC_LINK_$(V))
-CC_DEPS_0 = @echo "Generating dependencies"; $(ACTUAL_CC)
-CC_DEPS_1 = $(ACTUAL_CC)
-CC_DEPS = $(CC_DEPS_$(V))
-
 all: osiemu
 
 release: strip
 
 osiemu: $(OBJ_FILES)
-	$(CC_LINK) $(LFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(LFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -46,8 +33,8 @@ clean:
 	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~
 
 .depend: $(SRC_FILES)
-	@rm -f $@
-	$(CC_DEPS) $(CFLAGS) -MM $^ >> .depend
+	rm -f $@
+	$(CC) $(CFLAGS) -MM $^ >> .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 include .depend

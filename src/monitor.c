@@ -136,7 +136,7 @@ static void unasm(void) {
         int mode = distab[opcode].mode;
 
         int n = isizes[mode];
-        int operand, operand2 = 0;
+        int operand = 0, operand2 = 0;
         
         if (n > 1) {
             operand = read6502(loc++);

@@ -42,9 +42,9 @@ extern bool scanlines_enable;
 extern double aspectx;
 extern double aspecty;
 
-extern int zoom;
-extern int stretchx;
-extern int stretchy;
+extern unsigned int zoom;
+extern unsigned int stretchx;
+extern unsigned int stretchy;
 
 extern uint16_t screen_ram_bottom;
 extern uint16_t screen_ram_top;

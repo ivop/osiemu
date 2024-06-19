@@ -83,7 +83,7 @@ static void usage(void) {
 "    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64\n"
 "    -M/--mono-color color      monochrome color green, amber, bluish or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
-"    -z/--zoom                  increase display size by 2\n"
+"    -z/--zoom factor           increase display size by factor (2, 3, or 4)\n"
 "    -V/--smooth-video          enable anti-aliased scaling\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
 );
@@ -156,7 +156,7 @@ static struct option long_options[] = {
     { "smooth-video",   no_argument,        0, 'V' },
     { "warp-speed",     no_argument,        0, 'w' },
     { "sound-mode",     required_argument,  0, 'y' },
-    { "zoom",           no_argument,        0, 'z' },
+    { "zoom",           required_argument,  0, 'z' },
 };
 
 int main(int argc, char **argv) {
@@ -224,7 +224,11 @@ int main(int argc, char **argv) {
             video_smooth = true;
             break;
         case 'z':
-            zoom = 2;
+            zoom = strtol(optarg, NULL, 10);
+            if (zoom != 2 && zoom != 3 && zoom != 4) {
+                fprintf(stderr, "error: invalid zoom factor\n");
+                return 1;
+            }
             break;
         case 'm':
             if (!strcmp(optarg, "64x32")) {

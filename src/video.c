@@ -38,7 +38,7 @@ bool color_ram_enabled = false;
 bool video_smooth = false;
 bool fullscreen = false;
 
-int zoom = 1, stretchx = 1, stretchy = 1;
+unsigned int zoom = 1, stretchx = 1, stretchy = 1;
 
 double aspectx = 1.0;
 double aspecty = 1.0;

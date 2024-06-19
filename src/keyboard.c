@@ -299,6 +299,7 @@ static int hat_to_joy[2][16] = {
 
 void keyboard_joystick_event(SDL_Event *e) {
     uint8_t mask = keyboard_inverted ? 0xff : 0x00;
+    int fakehat = 0;
     int which = -1;
 
     if (keyboard_joysticks[0] == e->jhat.which) {
@@ -310,8 +311,6 @@ void keyboard_joystick_event(SDL_Event *e) {
 
     switch (e->type) {
     case SDL_JOYAXISMOTION:
-        int fakehat = 0;
-
         if (e->jaxis.axis > 1) return;
 
         joystick_axes[which][e->jaxis.axis] = e->jaxis.value; // buffer values

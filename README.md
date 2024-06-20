@@ -3,6 +3,12 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ![screenshot]( screenshots/osiemu.png )  
 
+1. [Features](#features)
+2. [Keybindings](#keybindings)
+3. [Monitor](#monitor)
+4. [Command line options](#command-line-options)
+5. [Build instructions](#build-instructions)
+
 ## Features
 
 * NMOS 6502 CPU

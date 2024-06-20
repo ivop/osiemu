@@ -34,7 +34,7 @@ clean:
 
 .depend: $(SRC_FILES)
 	rm -f $@
-	$(CC) $(CFLAGS) -MM $^ >> .depend
+	$(CC) $(CFLAGS) -MM $^ > .depend
 
 ifneq ($(MAKECMDGOALS),clean)
 include .depend

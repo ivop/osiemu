@@ -84,6 +84,8 @@ cd osiemu
 make release
 ```
 
+```make``` without any arguments will build a debug version (no optimizations, and level 3 debug info).
+
 ### Windows
 
 Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.

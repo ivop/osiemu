@@ -72,6 +72,22 @@ Ohio Scientific Instruments, Inc. Emulator
 | setsp | val           | set SP to value |
 | setp | val            | set P to value |
 
+## Command line options
+
+## Build instructions
+
+### Linux
+
+```
+git clone https://github.com/ivop/osiemu
+cd osiemu
+make release
+```
+
+### Windows
+
+Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.
+
 ## Future additions?
 
 * Serial: Serial I/O without keyboard and display (named sockets)

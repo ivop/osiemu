@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 extern bool sound_enabled;
+extern unsigned int sound_bufsize;
 
 enum sound_mode_e {
     SOUND_MODE_NONE,

@@ -8,7 +8,8 @@ Ohio Scientific Instruments, Inc. Emulator
 3. [Monitor](#monitor)
 4. [Command line options](#command-line-options)
 5. [Configuration files](#configuration-files)
-6. [Build instructions](#build-instructions)
+6. [Disk images](#disk-images)
+7. [Build instructions](#build-instructions)
 
 ## Features
 
@@ -173,6 +174,15 @@ make release
 ### Windows
 
 Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.
+
+## Disk images
+
+```osiemu``` uses its own disk image format.
+One file contains for each track the complete bitstream that enters the floppy ACIA,
+including all the framing and prolonged stop bits for timing.
+See [_doc/disk-format.txt_](doc/disk-format.txt) for details.
+The _tools_ directory contains ```hfe2osi``` and ```osi2hfe``` to convert
+from and to HFE flux dumps from real hardware.
 
 ## Future additions?
 

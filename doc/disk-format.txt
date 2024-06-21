@@ -1,25 +1,5 @@
-Emulation (65D files)
-=====================
-
-5.25"
------
-number of tracks:   40          (0-39)
-track size:         0x0900      (less for a real disk)
-sectors per track:  8
-sector size:        256
-OS65D directory:    12          (directory track)
-
-8"
---
-number of tracks:   77          (0-76)
-track size:         0x0f00      (less for a real disk)
-sectors per track:  12
-sector size:        256
-OS65D directory:    8           (directory track)
-
-
-Real numbers:
-=============
+The numbers:
+============
 
 5.25", 40 tracks, 8 sectors/track, 256 bytes/sectors
 -----

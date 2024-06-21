@@ -176,6 +176,8 @@ Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.
 
 ## Future additions?
 
+* floppy: swap disks
+* GUI launcher
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Sound: 1-bit ACIA RTS DAC (which model?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard

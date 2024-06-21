@@ -564,16 +564,11 @@ static void floppy_one_emulation_cycle(void) {
         return;
     }
 
-    if (!head_on_disk) {
-        get_bit(&drives[curdrive]);     // drop bit
-        return;
-    }
-
-        // collect serial framed bits and pass on to ACIA
-
     bool rx_bit = 1;
 
-    if (head_on_disk && !write_enable) rx_bit = get_bit(&drives[curdrive]);
+    if (head_on_disk && !write_enable) {
+        rx_bit = get_bit(&drives[curdrive]);
+    }
 
     switch (acia_receive_state) {
     case STATE_WAIT_FOR_STARTBIT:
@@ -636,7 +631,6 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
         break;
     }   // end of switch rx state
 
-    if (write_enable) {
         bool tx_bit;
 
 //        printf("floppy: writing, state = %d\n", acia_transmit_state);
@@ -686,8 +680,13 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
             break;
         }
+        if (head_on_disk && write_enable) {
         put_bit(&drives[curdrive], tx_bit);
-    }
+        }
+
+        if (!head_on_disk) {
+            get_bit(&drives[curdrive]);     // drop bit, advance pointers
+        }
 }
 
 void floppy_tick(double ticks) {

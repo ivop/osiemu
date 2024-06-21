@@ -178,7 +178,7 @@ Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.
 ## Disk images
 
 ```osiemu``` uses its own disk image format.
-One file contains for each track the complete bitstream that enters the floppy ACIA,
+For each track it contains the complete bitstream that enters the floppy ACIA,
 including all the framing and prolonged stop bits for timing.
 See [_doc/disk-format.txt_](doc/disk-format.txt) for details.
 The _tools_ directory contains ```hfe2osi``` and ```osi2hfe``` to convert

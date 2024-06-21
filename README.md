@@ -82,7 +82,6 @@ Ohio Scientific Instruments, Inc. Emulator
 
 ```
 usage: osiemu <config-file>
-or
        osiemu [options]
 
 options:
@@ -142,7 +141,7 @@ The leading -- is optional.
 If an option requires an argument, the option and the argument can be
 separated by either a space or a '='.
 Everything after the first space or '=' until the end of the line is
-considered the argument. There's no need (and it's not supported to put
+considered the argument. There's no need (and it's not supported) to put
 arguments between single or double quotes. Escaping of characters isn't
 needed either.
 
@@ -153,6 +152,7 @@ zoom 2
 scanlines
 video-mode=32x32
 --cpu-speed=c1p
+kernel=long path with spaces/synmon.rom
 ```
 
 ## Build instructions

@@ -121,8 +121,8 @@ static struct framing word_select[8] = {
 };
 
 static uint8_t ndatabits;
-static uint8_t curdatabit;
-static uint8_t databyte;
+static uint8_t rx_curdatabit, tx_curdatabit;
+static uint8_t rx_databyte, tx_databyte;
 
 static enum parity_e parity_type;
 static bool parity_calc;
@@ -578,13 +578,13 @@ static void floppy_one_emulation_cycle(void) {
         case STATE_WAIT_FOR_STARTBIT:
             if (bit) break;
             acia_receive_state = STATE_COLLECT_DATABITS;
-            curdatabit = databyte = parity_calc = 0;
+            rx_curdatabit = rx_databyte = parity_calc = 0;
             break;
         case STATE_COLLECT_DATABITS:
-            databyte |= bit << curdatabit;
+            rx_databyte |= bit << rx_curdatabit;
             parity_calc ^= bit;     // note: ^= because += does not overflow to 0
-            curdatabit++;
-            if (curdatabit >= ndatabits) {
+            rx_curdatabit++;
+            if (rx_curdatabit >= ndatabits) {
                 if (parity_type > NO_PARITY) {
                     acia_receive_state = STATE_READ_PARITY;
                 } else {
@@ -625,7 +625,7 @@ static void floppy_one_emulation_cycle(void) {
 
 copy_byte_to_rdr:   // copy byte to RDR and set RDRF
 //            printf("%02x ", databyte);
-            RDR = databyte;
+            RDR = rx_databyte;
             if (status & STATUS_RDRF_MASK) {
                 setbit(status, STATUS_OVRN_MASK);
             } else {
@@ -646,19 +646,19 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             if (status & STATUS_TDRE_MASK) {    // empty
                 put_bit(&drives[curdrive], 1);
             } else {
-                curdatabit = parity_calc = 0;
-                databyte = TDR;                                 // consume byte
+                tx_curdatabit = parity_calc = 0;
+                tx_databyte = TDR;                              // consume byte
                 setbit(status, STATUS_TDRE_MASK);               // empty again
                 acia_transmit_state = STATE_WRITE_DATABITS;
                 put_bit(&drives[curdrive], 0);                  // startbit
             }
             break;
         case STATE_WRITE_DATABITS:
-            bit = databyte & (1 << curdatabit);
+            bit = tx_databyte & (1 << tx_curdatabit);
             put_bit(&drives[curdrive], bit);
             parity_calc ^= bit;
-            curdatabit++;
-            if (curdatabit >= ndatabits) {
+            tx_curdatabit++;
+            if (tx_curdatabit >= ndatabits) {
                 if (parity_type > NO_PARITY) {
                     acia_transmit_state = STATE_WRITE_PARITY;
                 } else {

@@ -571,70 +571,70 @@ static void floppy_one_emulation_cycle(void) {
 
         // collect serial framed bits and pass on to ACIA
 
-        bool rx_bit = 1;
+    bool rx_bit = 1;
 
-        if (head_on_disk && !write_enable) rx_bit = get_bit(&drives[curdrive]);
+    if (head_on_disk && !write_enable) rx_bit = get_bit(&drives[curdrive]);
 
-        switch (acia_receive_state) {
-        case STATE_WAIT_FOR_STARTBIT:
-            if (rx_bit) break;
-            acia_receive_state = STATE_COLLECT_DATABITS;
-            rx_curdatabit = rx_databyte = parity_calc = 0;
-            break;
-        case STATE_COLLECT_DATABITS:
-            rx_databyte |= rx_bit << rx_curdatabit;
-            parity_calc ^= rx_bit; // note: ^= because += does not overflow to 0
-            rx_curdatabit++;
-            if (rx_curdatabit >= ndatabits) {
-                if (parity_type > NO_PARITY) {
-                    acia_receive_state = STATE_READ_PARITY;
-                } else {
-                    acia_receive_state = STATE_READ_STOPBIT1;
-                }
-            }
-            break;
-        case STATE_READ_PARITY:
-            if (parity_type == EVEN_PARITY && rx_bit != parity_calc) {
-                setbit(status, STATUS_PE_MASK);     // parity error
-            } else if (parity_type == ODD_PARITY && rx_bit != !parity_calc) {
-                setbit(status, STATUS_PE_MASK);     // parity error
+    switch (acia_receive_state) {
+    case STATE_WAIT_FOR_STARTBIT:
+        if (rx_bit) break;
+        acia_receive_state = STATE_COLLECT_DATABITS;
+        rx_curdatabit = rx_databyte = parity_calc = 0;
+        break;
+    case STATE_COLLECT_DATABITS:
+        rx_databyte |= rx_bit << rx_curdatabit;
+        parity_calc ^= rx_bit; // note: ^= because += does not overflow to 0
+        rx_curdatabit++;
+        if (rx_curdatabit >= ndatabits) {
+            if (parity_type > NO_PARITY) {
+                acia_receive_state = STATE_READ_PARITY;
             } else {
-                clrbit(status, STATUS_PE_MASK);
+                acia_receive_state = STATE_READ_STOPBIT1;
             }
-            acia_receive_state = STATE_READ_STOPBIT1;
+        }
+        break;
+    case STATE_READ_PARITY:
+        if (parity_type == EVEN_PARITY && rx_bit != parity_calc) {
+            setbit(status, STATUS_PE_MASK);     // parity error
+        } else if (parity_type == ODD_PARITY && rx_bit != !parity_calc) {
+            setbit(status, STATUS_PE_MASK);     // parity error
+        } else {
+            clrbit(status, STATUS_PE_MASK);
+        }
+        acia_receive_state = STATE_READ_STOPBIT1;
+        break;
+    case STATE_READ_STOPBIT1:
+        if (!rx_bit) {
+            setbit(status, STATUS_FE_MASK);     // framing error
+        } else {
+            clrbit(status, STATUS_FE_MASK);
+        }
+        if (two_stopbits) {
+            acia_receive_state = STATE_READ_STOPBIT2;
             break;
-        case STATE_READ_STOPBIT1:
-            if (!rx_bit) {
-                setbit(status, STATUS_FE_MASK);     // framing error
-            } else {
-                clrbit(status, STATUS_FE_MASK);
-            }
-            if (two_stopbits) {
-                acia_receive_state = STATE_READ_STOPBIT2;
-                break;
-            }
-            acia_receive_state = STATE_WAIT_FOR_STARTBIT;
-            goto copy_byte_to_rdr;
-            break;
-        case STATE_READ_STOPBIT2:
-            if (!rx_bit) {
-                setbit(status, STATUS_FE_MASK);     // framing error
-            } else {
-                clrbit(status, STATUS_FE_MASK);
-            }
-            acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+        }
+        acia_receive_state = STATE_WAIT_FOR_STARTBIT;
+        goto copy_byte_to_rdr;
+        break;
+    case STATE_READ_STOPBIT2:
+        if (!rx_bit) {
+            setbit(status, STATUS_FE_MASK);     // framing error
+        } else {
+            clrbit(status, STATUS_FE_MASK);
+        }
+        acia_receive_state = STATE_WAIT_FOR_STARTBIT;
 
 copy_byte_to_rdr:   // copy byte to RDR and set RDRF
 //            printf("%02x ", databyte);
-            RDR = rx_databyte;
-            if (status & STATUS_RDRF_MASK) {
-                setbit(status, STATUS_OVRN_MASK);
-            } else {
-                clrbit(status, STATUS_OVRN_MASK);
-            }
-            setbit(status, STATUS_RDRF_MASK);       // new byte available
-            break;
+        RDR = rx_databyte;
+        if (status & STATUS_RDRF_MASK) {
+            setbit(status, STATUS_OVRN_MASK);
+        } else {
+            clrbit(status, STATUS_OVRN_MASK);
         }
+        setbit(status, STATUS_RDRF_MASK);       // new byte available
+        break;
+    }   // end of switch rx state
 
     if (write_enable) {
         bool tx_bit;

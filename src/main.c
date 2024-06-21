@@ -161,7 +161,7 @@ static struct option long_options[] = {
     { "zoom",           required_argument,  0, 'z' },
 };
 
-int main(int argc, char **argv) {
+int main_program(int argc, char **argv) {
     int option, index;
     double cpu_ticks = 0.0;
 
@@ -405,16 +405,16 @@ int main(int argc, char **argv) {
         }
     }
 
+    if (optind != argc) {
+        fprintf(stderr, "error: wrong command line arguments\n");
+        return 1;
+    }
+
     if (mmu_basic_enabled) {
         if (!mmu_load_file(BASIC, 8192, basic_filename, false))
             return 1;
     }
     if (!mmu_load_file(KERNEL, 4096, kernel_filename, true)) {
-        return 1;
-    }
-
-    if (optind != argc) {
-        fprintf(stderr, "error: wrong command line arguments\n");
         return 1;
     }
 
@@ -572,4 +572,47 @@ exit_out:
     floppy_quit();
     SDL_Quit();
     return 0;
+}
+
+#define add_arg(x) \
+    myargc++; \
+    myargv = realloc(myargv, myargc * sizeof(char *)); \
+    myargv[myargc-1] = (x)
+
+int main(int argc, char **argv) {
+    if (argc == 1 || argc > 2 || (argv[1] && argv[1][0] == '-')) {
+        return main_program(argc, argv);
+    }
+    printf("loading configuration from %s\n", argv[1]);
+
+    FILE *f = fopen(argv[1], "rb");
+    if (!f) {
+        fprintf(stderr, "unable to open %s\n", argv[1]);
+        return 1;
+    }
+
+    char *lineptr;
+    size_t n;
+
+    int myargc = 0;
+    char **myargv = NULL;
+
+    add_arg("osiemu");
+
+    while (getline(&lineptr, &n, f) >= 0) {
+        char *p = strtok(lineptr, " =\r\n");
+        if (p[0] == '-') {
+            add_arg(strdup(p));
+        } else {
+            char *q = malloc(strlen(p)+2+1);
+            q[0] = q[1] = '-';
+            memcpy(q+2, p, strlen(p)+1);
+            add_arg(q);
+        }
+        p = strtok(NULL, "\r\n");
+        if (p) {
+            add_arg(strdup(p));
+        }
+    }
+    return main_program(myargc, myargv);
 }

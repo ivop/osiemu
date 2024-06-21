@@ -2,7 +2,7 @@ SDL2CONFIG ?= sdl2-config
 ifeq ($(MAKECMDGOALS),release)
 	DEBUG = -O3
 else
-	DEBUG = -O0 -g3
+	DEBUG = -Og -g3
 endif
 WARN ?= -W -Wall -Wextra
 CFLAGS = -flto=auto $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\

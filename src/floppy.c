@@ -644,18 +644,17 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
         switch (acia_transmit_state) {
         case STATE_IDLE_OR_WRITE_STARTBIT:
             if (status & STATUS_TDRE_MASK) {    // empty
-                put_bit(&drives[curdrive], 1);
+                tx_bit = 1;
             } else {
                 tx_curdatabit = parity_calc = 0;
                 tx_databyte = TDR;                              // consume byte
                 setbit(status, STATUS_TDRE_MASK);               // empty again
                 acia_transmit_state = STATE_WRITE_DATABITS;
-                put_bit(&drives[curdrive], 0);                  // startbit
+                tx_bit = 0;                                     // startbit
             }
             break;
         case STATE_WRITE_DATABITS:
             tx_bit = tx_databyte & (1 << tx_curdatabit);
-            put_bit(&drives[curdrive], tx_bit);
             parity_calc ^= tx_bit;
             tx_curdatabit++;
             if (tx_curdatabit >= ndatabits) {
@@ -668,14 +667,14 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             break;
         case STATE_WRITE_PARITY:
             if (parity_type == EVEN_PARITY) {
-                put_bit(&drives[curdrive], parity_calc);
+                tx_bit = parity_calc;
             } else if (parity_type == ODD_PARITY) {
-                put_bit(&drives[curdrive], !parity_calc);
+                tx_bit = !parity_calc;
             }
             acia_transmit_state = STATE_WRITE_STOPBIT1;
             break;
         case STATE_WRITE_STOPBIT1:
-            put_bit(&drives[curdrive], 1);
+            tx_bit = 1;
             if (two_stopbits) {
                 acia_transmit_state = STATE_WRITE_STOPBIT2;
             } else {
@@ -683,10 +682,11 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             }
             break;
         case STATE_WRITE_STOPBIT2:
-            put_bit(&drives[curdrive], 1);
+            tx_bit = 1;
             acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
             break;
         }
+        put_bit(&drives[curdrive], tx_bit);
     }
 }
 

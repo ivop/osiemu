@@ -59,7 +59,6 @@ static void usage(void) {
     fprintf(stderr,
 
 "usage: osiemu <config-file>\n"
-"or\n"
 "       osiemu [options]\n\n"
 "options:\n"
 "\n"

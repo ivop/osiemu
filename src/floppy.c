@@ -572,17 +572,17 @@ static void floppy_one_emulation_cycle(void) {
     if (!write_enable) {
         // collect serial framed bits and pass on to ACIA
 
-        bool bit = get_bit(&drives[curdrive]);
+        bool rx_bit = get_bit(&drives[curdrive]);
 
         switch (acia_receive_state) {
         case STATE_WAIT_FOR_STARTBIT:
-            if (bit) break;
+            if (rx_bit) break;
             acia_receive_state = STATE_COLLECT_DATABITS;
             rx_curdatabit = rx_databyte = parity_calc = 0;
             break;
         case STATE_COLLECT_DATABITS:
-            rx_databyte |= bit << rx_curdatabit;
-            parity_calc ^= bit;     // note: ^= because += does not overflow to 0
+            rx_databyte |= rx_bit << rx_curdatabit;
+            parity_calc ^= rx_bit; // note: ^= because += does not overflow to 0
             rx_curdatabit++;
             if (rx_curdatabit >= ndatabits) {
                 if (parity_type > NO_PARITY) {
@@ -593,9 +593,9 @@ static void floppy_one_emulation_cycle(void) {
             }
             break;
         case STATE_READ_PARITY:
-            if (parity_type == EVEN_PARITY && bit != parity_calc) {
+            if (parity_type == EVEN_PARITY && rx_bit != parity_calc) {
                 setbit(status, STATUS_PE_MASK);     // parity error
-            } else if (parity_type == ODD_PARITY && bit != !parity_calc) {
+            } else if (parity_type == ODD_PARITY && rx_bit != !parity_calc) {
                 setbit(status, STATUS_PE_MASK);     // parity error
             } else {
                 clrbit(status, STATUS_PE_MASK);
@@ -603,7 +603,7 @@ static void floppy_one_emulation_cycle(void) {
             acia_receive_state = STATE_READ_STOPBIT1;
             break;
         case STATE_READ_STOPBIT1:
-            if (!bit) {
+            if (!rx_bit) {
                 setbit(status, STATUS_FE_MASK);     // framing error
             } else {
                 clrbit(status, STATUS_FE_MASK);
@@ -616,7 +616,7 @@ static void floppy_one_emulation_cycle(void) {
             goto copy_byte_to_rdr;
             break;
         case STATE_READ_STOPBIT2:
-            if (!bit) {
+            if (!rx_bit) {
                 setbit(status, STATUS_FE_MASK);     // framing error
             } else {
                 clrbit(status, STATUS_FE_MASK);
@@ -637,7 +637,7 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
 
     } else { // WRITE TO DISK
 
-        bool bit;
+        bool tx_bit;
 
 //        printf("floppy: writing, state = %d\n", acia_transmit_state);
 
@@ -654,9 +654,9 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             }
             break;
         case STATE_WRITE_DATABITS:
-            bit = tx_databyte & (1 << tx_curdatabit);
-            put_bit(&drives[curdrive], bit);
-            parity_calc ^= bit;
+            tx_bit = tx_databyte & (1 << tx_curdatabit);
+            put_bit(&drives[curdrive], tx_bit);
+            parity_calc ^= tx_bit;
             tx_curdatabit++;
             if (tx_curdatabit >= ndatabits) {
                 if (parity_type > NO_PARITY) {

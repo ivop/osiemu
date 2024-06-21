@@ -620,7 +620,6 @@ static void floppy_one_emulation_cycle(void) {
         acia_receive_state = STATE_WAIT_FOR_STARTBIT;
 
 copy_byte_to_rdr:   // copy byte to RDR and set RDRF
-//            printf("%02x ", databyte);
         RDR = rx_databyte;
         if (status & STATUS_RDRF_MASK) {
             setbit(status, STATUS_OVRN_MASK);
@@ -631,62 +630,61 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
         break;
     }   // end of switch rx state
 
-        bool tx_bit;
+    bool tx_bit;
 
-//        printf("floppy: writing, state = %d\n", acia_transmit_state);
-
-        switch (acia_transmit_state) {
-        case STATE_IDLE_OR_WRITE_STARTBIT:
-            if (status & STATUS_TDRE_MASK) {    // empty
-                tx_bit = 1;
-            } else {
-                tx_curdatabit = parity_calc = 0;
-                tx_databyte = TDR;                              // consume byte
-                setbit(status, STATUS_TDRE_MASK);               // empty again
-                acia_transmit_state = STATE_WRITE_DATABITS;
-                tx_bit = 0;                                     // startbit
-            }
-            break;
-        case STATE_WRITE_DATABITS:
-            tx_bit = tx_databyte & (1 << tx_curdatabit);
-            parity_calc ^= tx_bit;
-            tx_curdatabit++;
-            if (tx_curdatabit >= ndatabits) {
-                if (parity_type > NO_PARITY) {
-                    acia_transmit_state = STATE_WRITE_PARITY;
-                } else {
-                    acia_transmit_state = STATE_WRITE_STOPBIT1;
-                }
-            }
-            break;
-        case STATE_WRITE_PARITY:
-            if (parity_type == EVEN_PARITY) {
-                tx_bit = parity_calc;
-            } else if (parity_type == ODD_PARITY) {
-                tx_bit = !parity_calc;
-            }
-            acia_transmit_state = STATE_WRITE_STOPBIT1;
-            break;
-        case STATE_WRITE_STOPBIT1:
+    switch (acia_transmit_state) {
+    case STATE_IDLE_OR_WRITE_STARTBIT:
+        if (status & STATUS_TDRE_MASK) {    // empty
             tx_bit = 1;
-            if (two_stopbits) {
-                acia_transmit_state = STATE_WRITE_STOPBIT2;
+        } else {
+            tx_curdatabit = parity_calc = 0;
+            tx_databyte = TDR;                              // consume byte
+            setbit(status, STATUS_TDRE_MASK);               // empty again
+            acia_transmit_state = STATE_WRITE_DATABITS;
+            tx_bit = 0;                                     // startbit
+        }
+        break;
+    case STATE_WRITE_DATABITS:
+        tx_bit = tx_databyte & (1 << tx_curdatabit);
+        parity_calc ^= tx_bit;
+        tx_curdatabit++;
+        if (tx_curdatabit >= ndatabits) {
+            if (parity_type > NO_PARITY) {
+                acia_transmit_state = STATE_WRITE_PARITY;
             } else {
-                acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
+                acia_transmit_state = STATE_WRITE_STOPBIT1;
             }
-            break;
-        case STATE_WRITE_STOPBIT2:
-            tx_bit = 1;
+        }
+        break;
+    case STATE_WRITE_PARITY:
+        if (parity_type == EVEN_PARITY) {
+            tx_bit = parity_calc;
+        } else if (parity_type == ODD_PARITY) {
+            tx_bit = !parity_calc;
+        }
+        acia_transmit_state = STATE_WRITE_STOPBIT1;
+        break;
+    case STATE_WRITE_STOPBIT1:
+        tx_bit = 1;
+        if (two_stopbits) {
+            acia_transmit_state = STATE_WRITE_STOPBIT2;
+        } else {
             acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
-            break;
         }
-        if (head_on_disk && write_enable) {
-        put_bit(&drives[curdrive], tx_bit);
-        }
+        break;
+    case STATE_WRITE_STOPBIT2:
+        tx_bit = 1;
+        acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
+        break;
+    } // end of switch tx state
 
-        if (!head_on_disk) {
-            get_bit(&drives[curdrive]);     // drop bit, advance pointers
-        }
+    if (head_on_disk && write_enable) {
+        put_bit(&drives[curdrive], tx_bit);
+    }
+
+    if (!head_on_disk) {
+        get_bit(&drives[curdrive]);     // drop bit, advance pointers
+    }
 }
 
 void floppy_tick(double ticks) {

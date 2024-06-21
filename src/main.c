@@ -58,7 +58,9 @@ static bool warp_speed;
 static void usage(void) {
     fprintf(stderr,
 
-"usage: ./osiemu [options]\n\n"
+"usage: osiemu <config-file>\n"
+"or\n"
+"       osiemu [options]\n\n"
 "options:\n"
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"

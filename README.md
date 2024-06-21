@@ -7,7 +7,8 @@ Ohio Scientific Instruments, Inc. Emulator
 2. [Keybindings](#keybindings)
 3. [Monitor](#monitor)
 4. [Command line options](#command-line-options)
-5. [Build instructions](#build-instructions)
+5. [Configuration files](#configuration-files)
+6. [Build instructions](#build-instructions)
 
 ## Features
 
@@ -136,6 +137,8 @@ options:
     -h/--help                  show usage information
 ```
 
+## Configuration files
+
 Configuration files contain command line options, one per line.
 The leading -- is optional.
 If an option requires an argument, the option and the argument can be
@@ -151,7 +154,7 @@ Example:
 zoom 2
 scanlines
 video-mode=32x32
---cpu-speed=c1p
+--cpu-speed c1p
 kernel=long path with spaces/synmon.rom
 ```
 

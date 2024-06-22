@@ -1,7 +1,7 @@
 CC ?= cc
 MADS ?= mads
 
-all: xex2lod test.lod hfe2osi mirrorbytes txt2bas hello.bas
+all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas
 
 %.lod: %.xex xex2lod
 	./xex2lod < $< > $@

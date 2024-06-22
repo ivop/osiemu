@@ -24,6 +24,31 @@ static unsigned int trksize;        // in bytes
 static unsigned int outtrksize;     // in 512 byte blocks
 static unsigned char *track;
 
+static void fixBE16(void *p) {
+#ifdef ENABLE_BIG_ENDIAN
+    uint8_t *q = p, t;
+    t = q[0];
+    q[0] = q[1];
+    q[1] = t;
+#else
+#endif
+}
+
+static uint8_t fullbyte;
+static bool highnib;
+
+static void put_bit(bool bit, FILE *outp) {
+    if (!highnib) {
+        if (bit) fullbyte = 0x0a;
+        else     fullbyte = 0x02;
+    } else {
+        if (bit) fullbyte |= 0xa0;
+        else     fullbyte |= 0x20;
+        fputc(fullbyte, outp);
+    }
+    highnib ^= 1;
+}
+
 int main(int argc, char **argv) {
     if (argc != 3) {
         fprintf(stderr, "error: usage: osi2hfe input.os[58]\n");
@@ -81,7 +106,8 @@ int main(int argc, char **argv) {
                                                              ph.bitrate,
                                                              ph.rpm,
                                                              ph.nsides);
-    outtrksize = 2 * ((trksize * 4 + 511) / 512);
+
+    outtrksize = 2 * ((trksize * 4 + 511) / 512);   // 4 bits per bit, 2 sides
     track = malloc(outtrksize);
 
     if (!track) {
@@ -105,9 +131,49 @@ int main(int argc, char **argv) {
 
     // calculate LUT
 
-    // create flux bitstream
+    for (int i=0; i<ph.ntracks; i++) {
+        phlut[i].offset = 0x03 + i * outtrksize;
+        phlut[i].length = outtrksize * 512;
+    }
 
     // fix possible Big Endian types
 
-    // write out file
+    for (int i=0; i<256; i++) {
+        fixBE16(&phlut[i].offset);
+        fixBE16(&phlut[i].length);
+    }
+    fixBE16(&ph.bitrate);
+    fixBE16(&ph.rpm);
+    fixBE16(&ph.offset);
+
+    // write header and LUT
+
+    fwrite(&ph, sizeof(ph), 1, outp);
+    for (int i=0; i<(512-sizeof(ph)); i++)
+        fputc(0xff, outp);
+
+    fwrite(phlut, 1024, 1, outp);
+
+    // convert tracks
+
+    fseek(inp, oh.offset * 256, SEEK_SET);
+
+    for (int i=0; i<ph.ntracks; i++) {
+        for (int k=0; k<trksize; k+=64) {
+            for (int j=0; j<64; j++) {
+                int b = fgetc(inp);
+                for (uint8_t m = 0x80; m; m>>=1) {
+                    bool bit = b & m;
+                    put_bit(!bit, outp);
+                }
+            }
+            for (int j=0; j<256; j++) {
+                fputc(0x11, outp);
+            }
+        }
+    }
+
+    fclose(inp);
+    fclose(outp);
+    free(track);
 }

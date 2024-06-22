@@ -1,7 +1,7 @@
 /*
  * hfe2osi
  *
- * Convert HFE to OSI Disk Bitstream
+ * Convert HxC HFE to OSI Disk Bitstream
  * Includes all the 8E1 and 8N1 framing and zeroes and ones for timing.
  * This stream will be sent directly to the ACIA at the selected bitrate
  */

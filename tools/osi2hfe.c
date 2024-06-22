@@ -1,7 +1,7 @@
 /*
  * osi2hfe
  *
- * Convert OSI DIsk Bitstream to HFE
+ * Convert OSI DIsk Bitstream to HxC HFE
  */
 
 #include <stdio.h>

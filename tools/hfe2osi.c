@@ -1,7 +1,7 @@
 /*
  * hfe2osi
  *
- * Convert HFE to OSI Bitstream
+ * Convert HFE to OSI Disk Bitstream
  * Includes all the 8E1 and 8N1 framing and zeroes and ones for timing.
  * This stream will be sent directly to the ACIA at the selected bitrate
  */
@@ -15,9 +15,7 @@
 #include "osi.h"
 
 static struct picfileformatheader ph;
-
 static struct pictracklut phlut[256];
-
 static struct osibitstream oh;
 
 static FILE *inp, *outp;
@@ -74,7 +72,7 @@ static void fixLE16(void *p) {
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        fprintf(stderr, "error: usage: hfe2osi input.hfe output.osi\n");
+        fprintf(stderr, "error: usage: hfe2osi input.hfe output.os[58]\n");
         return 1;
     }
 
@@ -121,7 +119,7 @@ int main(int argc, char **argv) {
         oh.type = TYPE_525_SS;
         ntracks = 40;
         trksize = 0x0d00;
-    } else if (ph.ntracks == 70 && ph.nsides == 2 && ph.bitrate == 500 && ph.rpm == 360) {
+    } else if (ph.ntracks == 77 && ph.nsides == 2 && ph.bitrate == 500 && ph.rpm == 360) {
         printf("detected 8\", 77 tracks, 250kbps\n");
         oh.type = TYPE_8_SS;
         trksize = 0x1500;

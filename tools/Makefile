@@ -16,4 +16,5 @@ all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas
 	./txt2bas < $< > $@
 
 clean:
-	rm -f *~ xex2lod test.xex test.lod hfe2osi mirrorbytes txt2bas hello.bas
+	rm -f *~ xex2lod test.xex test.lod hfe2osi mirrorbytes txt2bas hello.bas \
+		osi2hfe

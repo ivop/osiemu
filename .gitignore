@@ -6,6 +6,7 @@ osiemu
 tools/xex2lod
 tools/*.lod
 tools/hfe2osi
+tools/osi2hfe
 tools/mirrorbytes
 tools/*.bas
 tools/txt2bas

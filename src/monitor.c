@@ -406,6 +406,7 @@ bool monitor(void) {
 
     while (1) {
         printf(">");
+        fflush(stdout);
 
         if (getline(&lineptr, &size, stdin) < 0) {
             printf("EOF\n");

@@ -29,8 +29,15 @@ osiemu: $(OBJ_FILES)
 strip: osiemu
 	strip $<
 
+launcher/build/launcher:
+	+make -C launcher
+
+osiemu-launcher: launcher/build/launcher
+	cp $< $@
+
 clean:
 	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~
+	+make -C launcher clean
 
 .depend: $(SRC_FILES)
 	rm -f $@

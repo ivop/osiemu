@@ -12,3 +12,4 @@ tools/*.bas
 tools/txt2bas
 tapeout.dat
 launcher/src/launcher.pro.user
+launcher/build

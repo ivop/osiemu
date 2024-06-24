@@ -472,6 +472,9 @@ int main_program(int argc, char **argv) {
     sound_start();
 
     while (1) {
+        fflush(stdout);
+        fflush(stderr);
+
         target += sdl_ticks_per_frame;
 
         screen_update();
@@ -581,9 +584,6 @@ exit_out:
     myargv[myargc-1] = (x)
 
 int main(int argc, char **argv) {
-    setbuf(stdout, NULL);
-    setbuf(stderr, NULL);
-
     if (argc == 1 || argc > 2 || (argv[1] && argv[1][0] == '-')) {
         return main_program(argc, argv);
     }

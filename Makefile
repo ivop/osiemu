@@ -30,7 +30,7 @@ strip: osiemu
 	strip $<
 
 clean:
-	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~
+	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~
 
 .depend: $(SRC_FILES)
 	rm -f $@

@@ -228,7 +228,7 @@ int main_program(int argc, char **argv) {
             break;
         case 'z':
             zoom = strtol(optarg, NULL, 10);
-            if (zoom != 2 && zoom != 3 && zoom != 4) {
+            if (zoom != 1 && zoom != 2 && zoom != 3 && zoom != 4) {
                 fprintf(stderr, "error: invalid zoom factor\n");
                 return 1;
             }
@@ -581,6 +581,9 @@ exit_out:
     myargv[myargc-1] = (x)
 
 int main(int argc, char **argv) {
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+
     if (argc == 1 || argc > 2 || (argv[1] && argv[1][0] == '-')) {
         return main_program(argc, argv);
     }

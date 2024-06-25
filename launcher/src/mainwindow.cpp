@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QFileDialog>
 #include "consolewindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -10,14 +11,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
-
-void MainWindow::on_button_launch_clicked()
-{
+void MainWindow::on_button_launch_clicked() {
     QString program;
     QStringList arguments;
 
@@ -173,11 +171,84 @@ void MainWindow::on_button_launch_clicked()
     arguments.append(ui->combo_tape_location->currentText());
 
     // Files
-    // TODO
+
+    struct file_list_e {
+        QString option;
+        QString text_field;
+    } file_list[] = {
+        { "--kernel",      ui->line_kernel->text() },
+        { "--basic",       ui->line_basic->text() },
+        { "--font",        ui->line_font->text() },
+        { "--graph-font",  ui->line_graphics_font->text() },
+        { "--tape-input",  ui->line_tape_input->text() },
+        { "--tape-output", ui->line_tape_output->text() },
+        { "--floppy0",     ui->line_drive_a->text() },
+        { "--floppy1",     ui->line_drive_b->text() },
+        { "--floppy2",     ui->line_drive_c->text() },
+        { "--floppy3",     ui->line_drive_d->text() }
+    };
+
+    for (auto x : file_list) {
+        if (!x.text_field.isEmpty()) {
+            arguments.append(x.option);
+            arguments.append(x.text_field);
+        }
+    }
 
     ConsoleWindow *console = new ConsoleWindow(this, program, arguments);
     console->exec();
 
     this->show();
     delete(console);
+}
+
+void MainWindow::browse_all(QLineEdit *line) {
+    QString filename = QFileDialog::getOpenFileName(this, "Select File", "", "");
+    if (!filename.isEmpty()) {
+        line->setText(filename);
+    }
+}
+
+void MainWindow::on_browse_program_clicked() {
+    browse_all(ui->line_program);
+}
+
+void MainWindow::on_browse_kernel_clicked() {
+    browse_all(ui->line_kernel);
+}
+
+void MainWindow::on_browse_basic_clicked() {
+    browse_all(ui->line_basic);
+}
+
+void MainWindow::on_browse_font_clicked() {
+    browse_all(ui->line_font);
+}
+
+void MainWindow::on_browse_graphics_font_clicked() {
+    browse_all(ui->line_graphics_font);
+}
+
+void MainWindow::on_browse_tape_input_clicked() {
+    browse_all(ui->line_tape_input);
+}
+
+void MainWindow::on_browse_tape_output_clicked() {
+    browse_all(ui->line_tape_output);
+}
+
+void MainWindow::on_browse_drive_a_clicked() {
+    browse_all(ui->line_drive_a);
+}
+
+void MainWindow::on_browse_drive_b_clicked() {
+    browse_all(ui->line_drive_b);
+}
+
+void MainWindow::on_browse_drive_c_clicked() {
+    browse_all(ui->line_drive_c);
+}
+
+void MainWindow::on_browse_drive_d_clicked() {
+    browse_all(ui->line_drive_d);
 }

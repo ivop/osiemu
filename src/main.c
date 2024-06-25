@@ -119,6 +119,8 @@ static void usage(void) {
 "    -y/--sound-mode mode       mode: none, 542b (DAC+tone), 600 (DAC)\n"
 "    -Y/--sound-bufsize size    set sound buffer size (32-2048, default: 256)\n"
 "\n"
+"    -w/--warp-speed            run emulator as fast as possible\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -328,11 +330,8 @@ int main_program(int argc, char **argv) {
             tape_output_filename = strdup(optarg);
             break;
         case 'L':
-            if (!strcmp(optarg, "f000")) {
-                tape_location = 0xf000;
-            } else if (!strcmp(optarg, "fc00")) {
-                tape_location = 0xfc00;
-            } else {
+            tape_location = strtol(optarg, NULL, 16);
+            if (tape_location != 0xf000 && tape_location != 0xfc00) {
                 fprintf(stderr, "error: unknown tape location\n");
                 return 1;
             }

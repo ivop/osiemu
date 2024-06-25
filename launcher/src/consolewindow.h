@@ -21,6 +21,7 @@ private slots:
     void readyReadStandardOutput();
     void readyReadStandardError();
     void processStarted();
+    void errorOccurred(QProcess::ProcessError error);
 
 private:
     Ui::ConsoleWindow *ui;

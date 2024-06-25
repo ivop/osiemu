@@ -809,6 +809,103 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string>Tape Baseclock</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_tape_baseclock">
+          <item>
+           <property name="text">
+            <string>4800 Hz (300 baud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>9600 Hz (600 baud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>19200 Hz (1200 baud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>38400 Hz (2400 baud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>76800 Hz (4800 baud)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>153600 Hz (9600 baud)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>Tape ACIA Location</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_tape_location">
+          <item>
+           <property name="text">
+            <string>0xf000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0xfc00</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_32">
+        <property name="font">
+         <font>
+          <pointsize>2</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QLabel" name="label_30">
@@ -847,51 +944,17 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="check_warp_speed">
+          <property name="text">
+           <string>&quot;Warp&quot; Speed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="check_disable_basic">
           <property name="text">
            <string>Disable BASIC</string>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>Tape Baseclock</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox">
-          <item>
-           <property name="text">
-            <string>4800 Hz (300 baud)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>9600 Hz (600 baud)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>19200 Hz (1200 baud)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>38400 Hz (2400 baud)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>76800 Hz (4800 baud)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>153600 Hz (9600 baud)</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item>

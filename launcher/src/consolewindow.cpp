@@ -22,7 +22,7 @@ ConsoleWindow::ConsoleWindow(QWidget *parent, QString program, QStringList argum
     printable.append(arguments);
 
     for (auto &x : printable) {
-        x = "\"" + x + "\"";
+        x = "'" + x + "'";
     }
     ui->text_console->append(printable.join(" "));
 

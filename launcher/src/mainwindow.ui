@@ -303,7 +303,7 @@
         <item>
          <widget class="QComboBox" name="combo_video_mode">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <item>
            <property name="text">
@@ -393,14 +393,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="combo_zoom">
+         <widget class="QLabel" name="labelzoom">
           <property name="text">
            <string>Zoom</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_4">
+         <widget class="QComboBox" name="combo_zoom">
           <property name="currentIndex">
            <number>1</number>
           </property>

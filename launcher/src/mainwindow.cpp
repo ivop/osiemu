@@ -37,8 +37,58 @@ void MainWindow::on_button_launch_clicked()
         arguments.append(ui->combo_video_mode->currentText());
     }
 
+    arguments.append("--mono-color");
+    arguments.append(ui->combo_mono_color->currentText().toLower());
+
+    arguments.append("--aspect");
+    arguments.append(ui->combo_aspect->currentText().toLower());
+
+    arguments.append("--zoom");
+    arguments.append(ui->combo_zoom->currentText().toLower());
+
+    arguments.append("--color-mode");
+    switch (ui->combo_color_mode->currentIndex()) {
+    default:
+        arguments.append("monochrome");
+        break;
+    case 1:
+        arguments.append("440b");
+        break;
+    case 2:
+        arguments.append("540b");
+        break;
+    case 3:
+        arguments.append("630");
+        break;
+    }
+
+    arguments.append("--saturation");
+    arguments.append(ui->spin_saturation->text().replace(",","."));  // always force period
+
+    arguments.append("--hires-mode");
+    switch (ui->combo_hires->currentIndex()) {
+    default:
+        arguments.append("none");
+        break;
+    case 1:
+        arguments.append("440b");
+        break;
+    case 2:
+        arguments.append("541");
+        break;
+    }
+
+    if (ui->check_scanlines->checkState() == Qt::Checked) {
+        arguments.append("--scanlines");
+    }
+
+    if (ui->check_smooth_video->checkState() == Qt::Checked) {
+        arguments.append("--smooth-video");
+    }
+
     ConsoleWindow *console = new ConsoleWindow(this, program, arguments);
     console->exec();
+
     this->show();
     delete(console);
 }

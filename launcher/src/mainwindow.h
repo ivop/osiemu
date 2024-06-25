@@ -29,9 +29,11 @@ private slots:
     void on_browse_drive_b_clicked();
     void on_browse_drive_c_clicked();
     void on_browse_drive_d_clicked();
+    void on_button_save_settings_clicked();
+    void on_button_load_settings_clicked();
 
 private:
     Ui::MainWindow *ui;
-    void browse_all(QLineEdit *line);
+    void browse_all(QLineEdit *line, QString filter = "");
 };
 #endif // MAINWINDOW_H

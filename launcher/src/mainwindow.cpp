@@ -202,8 +202,9 @@ void MainWindow::on_button_launch_clicked() {
     delete(console);
 }
 
-void MainWindow::browse_all(QLineEdit *line) {
-    QString filename = QFileDialog::getOpenFileName(this, "Select File", "", "");
+void MainWindow::browse_all(QLineEdit *line, QString filter) {
+    filter = filter + ";;All Files (*.*)";
+    QString filename = QFileDialog::getOpenFileName(this, "Select File", "", filter);
     if (!filename.isEmpty()) {
         line->setText(filename);
     }
@@ -214,41 +215,47 @@ void MainWindow::on_browse_program_clicked() {
 }
 
 void MainWindow::on_browse_kernel_clicked() {
-    browse_all(ui->line_kernel);
+    browse_all(ui->line_kernel, "ROM Files (*.rom)");
 }
 
 void MainWindow::on_browse_basic_clicked() {
-    browse_all(ui->line_basic);
+    browse_all(ui->line_basic, "ROM Files (*.rom)");
 }
 
 void MainWindow::on_browse_font_clicked() {
-    browse_all(ui->line_font);
+    browse_all(ui->line_font, "PNG Files (*.png)");
 }
 
 void MainWindow::on_browse_graphics_font_clicked() {
-    browse_all(ui->line_graphics_font);
+    browse_all(ui->line_graphics_font, "PNG Files (*.png)");
 }
 
 void MainWindow::on_browse_tape_input_clicked() {
-    browse_all(ui->line_tape_input);
+    browse_all(ui->line_tape_input, "Tape Files (*.bas *.lod)");
 }
 
 void MainWindow::on_browse_tape_output_clicked() {
-    browse_all(ui->line_tape_output);
+    browse_all(ui->line_tape_output, "");
 }
 
 void MainWindow::on_browse_drive_a_clicked() {
-    browse_all(ui->line_drive_a);
+    browse_all(ui->line_drive_a, "Disk Images (*.os5 *.os8)");
 }
 
 void MainWindow::on_browse_drive_b_clicked() {
-    browse_all(ui->line_drive_b);
+    browse_all(ui->line_drive_b, "Disk Images (*.os5 *.os8)");
 }
 
 void MainWindow::on_browse_drive_c_clicked() {
-    browse_all(ui->line_drive_c);
+    browse_all(ui->line_drive_c, "Disk Images (*.os5 *.os8)");
 }
 
 void MainWindow::on_browse_drive_d_clicked() {
-    browse_all(ui->line_drive_d);
+    browse_all(ui->line_drive_d, "Disk Images (*.os5 *.os8)");
+}
+
+void MainWindow::on_button_save_settings_clicked() {
+}
+
+void MainWindow::on_button_load_settings_clicked() {
 }

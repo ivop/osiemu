@@ -2,6 +2,7 @@
 #include "ui_consolewindow.h"
 #include <QDebug>
 #include <QProcess>
+#include <QFileInfo>
 
 ConsoleWindow::ConsoleWindow(QWidget *parent, QString program, QStringList arguments) :
     QDialog(parent),
@@ -26,6 +27,7 @@ ConsoleWindow::ConsoleWindow(QWidget *parent, QString program, QStringList argum
     }
     ui->text_console->append(printable.join(" "));
 
+    process->setWorkingDirectory(QFileInfo(program).path());
     process->start(program, arguments);
 }
 

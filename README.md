@@ -216,6 +216,8 @@ Preferably the version that is distributed with Qt itself.
 
 ## Future additions?
 
+* main: command line option to enable hires and graphfont switches at startup
+* main: command line option to start fullscreen
 * floppy: swap disks
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Sound: 1-bit ACIA RTS DAC (which model?)

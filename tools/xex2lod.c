@@ -26,7 +26,8 @@ int main(int argc, char **argv) {
             break;
         }
 
-        printf(".%04X%c/", start, 13);
+        //printf(".%04X%c/", start, 13);
+        printf(".%04X/", start);
         for (; start <= end; start++)
             printf("%02X%c", getchar(), 13);
 

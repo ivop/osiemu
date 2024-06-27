@@ -178,7 +178,7 @@ You can override the sdl2-config utility used by setting the SDL2CONFIG variable
 
 ### Windows
 
-Use Cygwin64. MingW64 doesn't work because it is missing mmap and getline.
+Use Cygwin64. MinGW64 doesn't work because it is missing mmap and getline.
 
 ## Disk images
 

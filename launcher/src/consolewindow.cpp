@@ -47,7 +47,6 @@ void ConsoleWindow::readyReadStandardOutput() {
     if (process->bytesAvailable()) {
         ui->text_console->append(process->readAllStandardOutput().trimmed());
     }
-    ui->tab_widget->setCurrentIndex(0);
 }
 
 void ConsoleWindow::readyReadStandardError() {

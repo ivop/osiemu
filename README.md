@@ -8,8 +8,9 @@ Ohio Scientific Instruments, Inc. Emulator
 3. [Monitor](#monitor)
 4. [Command line options](#command-line-options)
 5. [Configuration files](#configuration-files)
-6. [Disk images](#disk-images)
-7. [Build instructions](#build-instructions)
+6. [Build instructions](#build-instructions)
+7. [Disk images](#disk-images)
+8. [GUI launcher](#gui-launcher)
 
 ## Features
 
@@ -159,6 +160,8 @@ video-mode=32x32
 kernel=long path with spaces/synmon.rom
 ```
 
+More examples are in the _config_ directory.  
+
 ## Build instructions
 
 ### Linux
@@ -169,7 +172,9 @@ cd osiemu
 make release
 ```
 
-```make``` without any arguments will build a debug version (no optimizations, and level 3 debug info).
+```make``` without any arguments will build a debug version (no optimizations, and level 3 debug info).  
+You can override the sdl2-config utility used by setting the SDL2CONFIG variable on the command line, i.e.
+``` make -j8 release SDL2CONFIG=/path/to/sdl2-config CC=/path/to/my/compiler```  
 
 ### Windows
 
@@ -183,6 +188,29 @@ including all the framing and prolonged stop bits for timing.
 See [_doc/disk-format.txt_](doc/disk-format.txt) for details.
 The _tools_ directory contains ```hfe2osi``` and ```osi2hfe``` to convert
 from and to HFE flux dumps from real hardware.
+
+## GUI launcher
+
+<img src="screenshots/osiemu-launcher.png" alt="screenshot-launcher" height="256"/>  
+
+If you are tired of fiddling with command line options, there's also a GUI launcher.
+To build, use:
+
+```
+make osiemu-launcher
+```
+
+You'll need either Qt5 or Qt6 to build it.
+If you want to override the default ```qmake``` that's used during the build process,
+you can specify it on the command line.
+For example:
+
+```
+make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CC=/path/to/clang
+```
+
+forces a build against Qt 6.7.2 and use the clang compiler.
+It has been tested with Qt 5.15.x and Qt 6.5.x and up.
 
 ## Future additions?
 

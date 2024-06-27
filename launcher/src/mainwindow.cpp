@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "consolewindow.h"
+#include "../../version.h"
 
 static const char *const magic = "OSIEMU-LAUNCHER!";
 
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->version_string->setText(VERSION_STRING);
 }
 
 MainWindow::~MainWindow() {

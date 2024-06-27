@@ -29,6 +29,7 @@
 #include "floppy.h"
 #include "sound.h"
 #include "control.h"
+#include "../version.h"
 
 // ----------------------------------------------------------------------------
 
@@ -168,7 +169,7 @@ int main_program(int argc, char **argv) {
     int option, index;
     double cpu_ticks = 0.0;
 
-    printf("OSIEMU v0.9 - Copyright © 2024 Ivo van Poorten\n");
+    printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
     while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwy:Y:z",
                                  long_options, &index)) != -1) {

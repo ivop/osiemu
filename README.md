@@ -215,7 +215,6 @@ It has been tested with Qt 5.15.x and Qt 6.5.x and up.
 ## Future additions?
 
 * floppy: swap disks
-* GUI launcher
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Sound: 1-bit ACIA RTS DAC (which model?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard

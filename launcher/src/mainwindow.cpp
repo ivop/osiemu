@@ -2,7 +2,10 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFileDialog>
+#include <QMessageBox>
 #include "consolewindow.h"
+
+static const char *const magic = "OSIEMU-LAUNCHER!";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -255,7 +258,166 @@ void MainWindow::on_browse_drive_d_clicked() {
 }
 
 void MainWindow::on_button_save_settings_clicked() {
+    QMessageBox msg;
+
+    QString filename = QFileDialog::getSaveFileName(this, "Save Settings To...", "", "Settings (*.settings);;All Files (*.*)");
+    if (filename.isEmpty()) return;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        msg.setText("Failed to open " + filename + "\n\n" + file.errorString());
+        msg.exec();
+        return;
+    }
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_15);
+
+    out.writeRawData(magic, 16);
+
+    // serialize all settings
+    // be careful when adding new settings, always add them at the end
+    // even if that does not reflect how they are shown!
+
+    out << ui->line_program->text();
+    out << ui->line_kernel->text();
+    out << ui->line_basic->text();
+    out << ui->line_font->text();
+    out << ui->line_graphics_font->text();
+    out << ui->line_tape_input->text();
+    out << ui->line_tape_output->text();
+    out << ui->line_drive_a->text();
+    out << ui->line_drive_b->text();
+    out << ui->line_drive_c->text();
+    out << ui->line_drive_d->text();
+
+    out << (quint8) ui->combo_video_mode->currentIndex();
+    out << (quint8) ui->combo_mono_color->currentIndex();
+    out << (quint8) ui->combo_aspect->currentIndex();
+    out << (quint8) ui->combo_zoom->currentIndex();
+    out << (quint8) ui->combo_color_mode->currentIndex();
+    out << (double) ui->spin_saturation->value();
+    out << (quint8) ui->combo_hires->currentIndex();
+
+    out << ui->check_scanlines->checkState();
+    out << ui->check_smooth_video->checkState();
+
+    out << (quint8) ui->combo_keyboard->currentIndex();
+    out << (quint8) ui->combo_cooked_raw->currentIndex();
+    out << ui->check_ascii_keyboard->checkState();
+
+    out << ui->check_joystick_1->checkState();
+    out << ui->check_joystick_2->checkState();
+    out << (quint8) ui->spin_joystick_1->value();
+    out << (quint8) ui->spin_joystick_2->value();
+
+    out << (quint8) ui->combo_sound_mode->currentIndex();
+    out << (quint16) ui->spin_sound_bufsize->value();
+
+    out << (quint8) ui->combo_tape_baseclock->currentIndex();
+    out << (quint8) ui->combo_tape_location->currentIndex();
+
+    out << (quint8) ui->combo_cpu_speed->currentIndex();
+    out << ui->check_warp_speed->checkState();
+    out << ui->check_disable_basic->checkState();
+
+    auto error = file.error();
+    auto errorstring = file.errorString();
+
+    file.close();
+
+    if (error != file.NoError) {
+        msg.setText("Failed to save " + filename + "\n\n" + errorstring);
+        msg.exec();
+    }
 }
 
 void MainWindow::on_button_load_settings_clicked() {
+    int error;
+    QString errorstring;
+    // temporary variables for deserialization
+    QString tstring;
+    quint8 t8;
+    quint16 t16;
+    double tdouble;
+    Qt::CheckState tcs;
+
+    QString filename = QFileDialog::getOpenFileName(this, "Load Settings From...", "", "Settings (*.settings);;All Files (*.*)");
+    if (filename.isEmpty()) return;
+
+    QMessageBox msg;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        msg.setText("Failed to open " + filename + "\n\n" + file.errorString());
+        msg.exec();
+        return;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_15);
+
+    char checkmagic[16];
+    in.readRawData(checkmagic, 16);
+    if (memcmp(magic, checkmagic, 16)) {
+        error = QFile::OpenError;
+        errorstring = "This is not an osiemu-launcher settings file";
+        goto error_out;
+    }
+
+    // deserialize all settings
+    // same order as save settings, future settings always added to the end
+
+    in >> tstring; ui->line_program->setText(tstring);
+    in >> tstring; ui->line_kernel->setText(tstring);
+    in >> tstring; ui->line_basic->setText(tstring);
+    in >> tstring; ui->line_font->setText(tstring);
+    in >> tstring; ui->line_graphics_font->setText(tstring);
+    in >> tstring; ui->line_tape_input->setText(tstring);
+    in >> tstring; ui->line_tape_output->setText(tstring);
+    in >> tstring; ui->line_drive_a->setText(tstring);
+    in >> tstring; ui->line_drive_b->setText(tstring);
+    in >> tstring; ui->line_drive_c->setText(tstring);
+    in >> tstring; ui->line_drive_d->setText(tstring);
+
+    in >> t8; ui->combo_video_mode->setCurrentIndex(t8);
+    in >> t8; ui->combo_mono_color->setCurrentIndex(t8);
+    in >> t8; ui->combo_aspect->setCurrentIndex(t8);
+    in >> t8; ui->combo_zoom->setCurrentIndex(t8);
+    in >> t8; ui->combo_color_mode->setCurrentIndex(t8);
+    in >> tdouble; ui->spin_saturation->setValue(tdouble);
+    in >> t8; ui->combo_hires->setCurrentIndex(t8);
+
+    in >> tcs; ui->check_scanlines->setCheckState(tcs);
+    in >> tcs; ui->check_smooth_video->setCheckState(tcs);
+
+    in >> t8; ui->combo_keyboard->setCurrentIndex(t8);
+    in >> t8; ui->combo_cooked_raw->setCurrentIndex(t8);
+    in >> tcs; ui->check_ascii_keyboard->setCheckState(tcs);
+
+    in >> tcs; ui->check_joystick_1->setCheckState(tcs);
+    in >> tcs; ui->check_joystick_2->setCheckState(tcs);
+    in >> t8; ui->spin_joystick_1->setValue(t8);
+    in >> t8; ui->spin_joystick_2->setValue(t8);
+
+    in >> t8; ui->combo_sound_mode->setCurrentIndex(t8);
+    in >> t16; ui->spin_sound_bufsize->setValue(t16);
+
+    in >> t8; ui->combo_tape_baseclock->setCurrentIndex(t8);
+    in >> t8; ui->combo_tape_location->setCurrentIndex(t8);
+
+    in >> t8; ui->combo_cpu_speed->setCurrentIndex(t8);
+    in >> tcs; ui->check_warp_speed->setCheckState(tcs);
+    in >> tcs; ui->check_disable_basic->setCheckState(tcs);
+
+    error = file.error();
+    errorstring = file.errorString();
+
+error_out:
+    file.close();
+
+    if (error != file.NoError) {
+        msg.setText("Failed to load " + filename + "\n\n" + errorstring);
+        msg.exec();
+    }
 }

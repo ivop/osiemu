@@ -207,11 +207,11 @@ void write6502(uint16_t address, uint8_t value) {
 // of the buffer.
 // Return false if file I/O failed.
 //
-bool mmu_load_file(uint8_t *buf, unsigned int size, char *filename, bool iskernel) {
-    printf("loading %s\n", filename);
+bool mmu_load_file(char *heading, uint8_t *buf, unsigned int size, char *filename, bool iskernel) {
+    printf("%s: loading %s\n", heading, filename);
     FILE *f = fopen(filename, "rb");
     if (!f) {
-        fprintf(stderr, "error: %s: unable to open\n", filename);
+        fprintf(stderr, "error: %s: unable to open '%s'\n", heading, filename);
         return false;
     }
 

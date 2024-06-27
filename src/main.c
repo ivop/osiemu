@@ -412,10 +412,10 @@ int main_program(int argc, char **argv) {
     }
 
     if (mmu_basic_enabled) {
-        if (!mmu_load_file(BASIC, 8192, basic_filename, false))
+        if (!mmu_load_file("basic", BASIC, 8192, basic_filename, false))
             return 1;
     }
-    if (!mmu_load_file(KERNEL, 4096, kernel_filename, true)) {
+    if (!mmu_load_file("kernel", KERNEL, 4096, kernel_filename, true)) {
         return 1;
     }
 

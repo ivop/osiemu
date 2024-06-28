@@ -136,6 +136,14 @@ options:
     -y/--sound-mode mode       mode: none, 542b (DAC+tone), 600 (DAC)
     -Y/--sound-bufsize size    set sound buffer size (32-2048, default: 256)
 
+    -w/--warp-speed            run emulator as fast as possible
+
+    -Z/--switches switches     comma separated list of hardware switches
+                               "flipped" before startup
+                                   hires     enable high resolution overlay
+                                   graph     enable graphics font
+                                   nobasic   disable BASIC ROM (8kB extra RAM)
+
     -h/--help                  show usage information
 ```
 

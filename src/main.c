@@ -122,6 +122,12 @@ static void usage(void) {
 "\n"
 "    -w/--warp-speed            run emulator as fast as possible\n"
 "\n"
+"    -Z/--switches switches     comma separated list of hardware switches\n"
+"                               \"flipped\" before startup\n"
+"                                   hires     enable high resolution overlay\n"
+"                                   graph     enable graphics font\n"
+"                                   nobasic   disable BASIC ROM (8kB extra RAM)\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -135,7 +141,6 @@ static struct option long_options[] = {
     { "tape-baseclock", required_argument,  0, 'B' },
     { "font",           required_argument,  0, 'c' },
     { "color-mode",     required_argument,  0, 'C' },
-    { "disable-basic",  no_argument,        0, 'd' },
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
     { "floppy2",        required_argument,  0, 'g' },
@@ -163,15 +168,18 @@ static struct option long_options[] = {
     { "sound-mode",     required_argument,  0, 'y' },
     { "sound-bufsize",  required_argument,  0, 'Y' },
     { "zoom",           required_argument,  0, 'z' },
+    { "switches",       required_argument,  0, 'Z' },
 };
 
 int main_program(int argc, char **argv) {
     int option, index;
     double cpu_ticks = 0.0;
+    bool switch_hires = false;
+    bool switch_graph_font = false;
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:df:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwy:Y:z",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:f:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwy:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -218,10 +226,6 @@ int main_program(int argc, char **argv) {
             } else {
                 cpu_clock = strtol(optarg, NULL, 10);
             }
-            break;
-        case 'd':
-            mmu_basic_enabled = false;
-            mmu_ram_top = 0xbfff;
             break;
         case 'v':
             video_enabled = false;
@@ -397,6 +401,26 @@ int main_program(int argc, char **argv) {
                 return 1;
             }
             break;
+        case 'Z': {
+            char *sw = strtok(optarg, ",\r\n");
+            while (sw) {
+                if (!strcmp(sw, "hires")) {
+                    puts("switch: hires on");
+                    switch_hires = true;
+                } else if (!strcmp(sw, "graph")) {
+                    puts("switch: graph font on");
+                    switch_graph_font = true;
+                } else if (!strcmp(sw, "nobasic")) {
+                    mmu_basic_enabled = false;
+                    mmu_ram_top = 0xbfff;
+                } else {
+                    fprintf(stderr, "unrecognized switch '%s'\n", sw);
+                    return 1;
+                }
+                sw = strtok(NULL, ",\r\n");
+            }
+            }
+            break;
         case 'h':
             usage();
             return 1;
@@ -470,6 +494,9 @@ int main_program(int argc, char **argv) {
     double cpu_target = cpu_ticks + ticks_per_frame;
 
     sound_start();
+
+    if (switch_hires) screen_toggle_hires();
+    if (switch_graph_font) screen_swap_fonts();
 
     while (1) {
         fflush(stdout);

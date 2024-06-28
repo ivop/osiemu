@@ -988,13 +988,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="check_disable_basic">
-          <property name="text">
-           <string>Disable BASIC</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_8">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -1011,6 +1004,62 @@
       </item>
       <item>
        <widget class="QLabel" name="label_25">
+        <property name="font">
+         <font>
+          <pointsize>2</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QCheckBox" name="check_disable_basic">
+          <property name="text">
+           <string>Disable BASIC</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_enable_hires">
+          <property name="text">
+           <string>Enable Hires Overlay At Startup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_enable_graph_font">
+          <property name="text">
+           <string>Enable Graphics Font</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_34">
         <property name="font">
          <font>
           <pointsize>2</pointsize>

@@ -200,6 +200,23 @@ void MainWindow::on_button_launch_clicked() {
         }
     }
 
+    // Switches
+    QString switches;
+    if (ui->check_disable_basic->checkState() == Qt::Checked) {
+        switches += "nobasic,";
+    }
+    if (ui->check_enable_hires->checkState() == Qt::Checked) {
+        switches += "hires,";
+    }
+    if (ui->check_enable_graph_font->checkState() == Qt::Checked) {
+        switches += "graph,";
+    }
+
+    if (!switches.isEmpty()) {
+        arguments.append("--switches");
+        arguments.append(switches.chopped(1));
+    }
+
     ConsoleWindow *console = new ConsoleWindow(this, program, arguments);
     console->exec();
 
@@ -322,6 +339,8 @@ void MainWindow::on_button_save_settings_clicked() {
     out << (quint8) ui->combo_cpu_speed->currentIndex();
     out << ui->check_warp_speed->checkState();
     out << ui->check_disable_basic->checkState();
+    out << ui->check_enable_hires->checkState();
+    out << ui->check_enable_graph_font->checkState();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -411,6 +430,8 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> t8; ui->combo_cpu_speed->setCurrentIndex(t8);
     in >> tcs; ui->check_warp_speed->setCheckState(tcs);
     in >> tcs; ui->check_disable_basic->setCheckState(tcs);
+    in >> tcs; ui->check_enable_hires->setCheckState(tcs);
+    in >> tcs; ui->check_enable_graph_font->setCheckState(tcs);
 
     error = file.error();
     errorstring = file.errorString();

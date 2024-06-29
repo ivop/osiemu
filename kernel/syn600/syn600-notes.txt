@@ -1,30 +1,30 @@
-	// SYN600 - OSI multiboard Monitor ROM
-	// page 000 'H/D/M'   maps to $FF00 for a C2/C4 540Vid disk system
-	// page 100 keypoller maps to $FD00 for a C2/C4 540Vid system
-	// page 200 monitor   maps to $FE00 for a C2/C4 540Vid system
-	// page 300 'C/W/M'   maps to $FF00 for a C2/C4 540Vid tape system
-	// page 400 disk boot maps to $FC00 for a C1 system
-	// page 500 keypoller maps to $FD00 for a C1 system
-	// page 600 monitor   maps to $FE00 for a C1 system
-	// page 700 'D/C/W/M' maps to $FF00 for a C1 system
-	//
+        // SYN600 - OSI multiboard Monitor ROM
+        // page 000 'H/D/M'   maps to $FF00 for a C2/C4 540Vid disk system
+        // page 100 keypoller maps to $FD00 for a C2/C4 540Vid system
+        // page 200 monitor   maps to $FE00 for a C2/C4 540Vid system
+        // page 300 'C/W/M'   maps to $FF00 for a C2/C4 540Vid tape system
+        // page 400 disk boot maps to $FC00 for a C1 system
+        // page 500 keypoller maps to $FD00 for a C1 system
+        // page 600 monitor   maps to $FE00 for a C1 system
+        // page 700 'D/C/W/M' maps to $FF00 for a C1 system
+        //
 
         // $FC00-$FCFF = C1: SYN600 page 4
         //
         //
-	// $FD00-FDFF = 500: SYN600 Page 1	          CEGMON: Page 5
-	//              502:        Page 1
-	//              505:        Page 1
-	//               C1:        Page 5
+        // $FD00-FDFF = 500: SYN600 Page 1                CEGMON: Page 5
+        //              502:        Page 1
+        //              505:        Page 1
+        //               C1:        Page 5
         //
-	// $FE00-FEFF = 500: SYN600 Page 2			 Page 6
-	//              502:        Page 2
-	//              505:        Page 2
+        // $FE00-FEFF = 500: SYN600 Page 2                       Page 6
+        //              502:        Page 2
+        //              505:        Page 2
         //               C1:        Page 6
-	//
-	// $FF00-FFFF = 500: SYN600 Page 3			 Page 7
-	//              502:        Page 3
-	//              505:        Page 0
+        //
+        // $FF00-FFFF = 500: SYN600 Page 3                       Page 7
+        //              502:        Page 3
+        //              505:        Page 0
         //               C1:        Page 7
-	//
-	//
+        //
+        //

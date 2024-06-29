@@ -1,0 +1,20 @@
+Windows
+=======
+
+osiemu
+------
+
+cygwin64 DLL's
+
+for i in `ldd osiemu | grep /usr/bin | cut -d= -f1` ; do
+    cp "/usr/bin/$i" .
+done
+
+osiemu-launcher
+---------------
+
+Qt and gcc DLL's
+
+windeployqt --no-translations --no-virtualkeyboard --no-webkit2 \
+    --compiler-runtime osiemu-launcher.exe
+

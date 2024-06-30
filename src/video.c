@@ -27,8 +27,8 @@
 
 #define OSD_COLOR 0xff, 0x00, 0x00
 
-char *font_filename = "chargen/type1.png";
-char *graph_font_filename = "chargen/graph.png";
+char *font_filename = "fonts/type1.png";
+char *graph_font_filename = "fonts/graph.png";
 
 uint8_t SCREEN[0x0800];      // 2kB Video RAM
 uint8_t COLOR[0x0800];       // 2kB Color RAM

@@ -245,7 +245,7 @@ uint8_t keyboard_read(void) {
             if (mask & (1<<i)) value &= keyboard_osi_matrix[i];
         }
     } else {
-        for (int i=0; i<8; i++) {   // Model 540
+        for (int i=0; i<8; i++) {   // Model 542
             if (mask & (1<<i)) value |= keyboard_osi_matrix[i];
         }
     }

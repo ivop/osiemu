@@ -236,16 +236,26 @@ void keyboard_tick(double ticks) {
 // ----------------------------------------------------------------------------
 
 uint8_t keyboard_read(void) {
-    return keyboard_osi_matrix[keyboard_osi_row];
+    uint8_t mask = keyboard_osi_row;
+    uint8_t value = 0xff;
+    if (keyboard_inverted) {        // Model 540
+        mask ^= 0xff;
+        value ^= 0xff;
+        for (int i=0; i<8; i++) {
+            if (mask & (1<<i)) value |= keyboard_osi_matrix[i];
+        }
+    } else {
+        for (int i=0; i<8; i++) {   // Model 600
+            if (mask & (1<<i)) value &= keyboard_osi_matrix[i];
+        }
+    }
+    return value;
 }
 
 // ----------------------------------------------------------------------------
 
 void keyboard_write(uint8_t value) {
-    if (keyboard_inverted) value ^= 0xff;
-    for (int i=0; i<8; i++) {
-        if (value & (1<<i)) keyboard_osi_row = i;
-    }
+    keyboard_osi_row = value;
 }
 
 // ----------------------------------------------------------------------------

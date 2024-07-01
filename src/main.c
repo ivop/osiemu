@@ -35,8 +35,6 @@
 
 static char *basic_filename = "basic/basic-osi-fix.rom";
 static char *kernel_filename = "kernel/syn-600-c1-dcwm.rom";
-static char *tape_input_filename = NULL;
-static char *tape_output_filename = "tapeout.dat";
 static char *drive0_filename = NULL;
 static char *drive1_filename = NULL;
 static char *drive2_filename = NULL;
@@ -106,7 +104,7 @@ static void usage(void) {
 "    -J/--joystick2 index       specify joystick 2\n"
 "\n"
 "    -t/--tape-input file       specify tape input file (default: none)\n"
-"    -T/--tape-output file      specify tape output file (default: tapeout.dat)\n"
+"    -T/--tape-output file      specify tape output file (default: none)\n"
 "    -L/--tape-location         ACIA location: f000 (default), fc00\n"
 "    -B/--tape-baseclock        set baseclock (default: 19200)\n"
 "\n"

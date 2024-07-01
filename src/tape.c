@@ -16,6 +16,9 @@
 
 double tape_baseclock = 4800.0;
 
+char *tape_input_filename;
+char *tape_output_filename;
+
 static FILE *inputf;
 static FILE *outputf;
 static double timer;

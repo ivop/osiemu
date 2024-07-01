@@ -3,6 +3,8 @@
 #include <stdbool.h>
 
 extern double tape_baseclock;
+extern char *tape_input_filename;
+extern char *tape_output_filename;
 extern bool tape_running;
 
 bool tape_init(char *input_file, char *output_file, double cpu_clock);

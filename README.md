@@ -224,9 +224,9 @@ Preferably the version that is distributed with Qt itself.
 
 ## Future additions?
 
-* main: command line option to enable hires and graphfont switches at startup
 * main: command line option to start fullscreen
-* floppy: swap disks
+* monitor: eject/insert tapes
+* monitor: mount/unmount floppies
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Sound: 1-bit ACIA RTS DAC (which model?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard

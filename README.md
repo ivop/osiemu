@@ -80,7 +80,7 @@ Ohio Scientific Instruments, Inc. Emulator
 | sety | val            | set Y to value |
 | setsp | val           | set SP to value |
 | setp | val            | set P to value |
-| tapes |               | show current tape files |
+| tapes |               | list current tape files |
 | eject | input\|output | eject input or output tape |
 | insert | input\|output file | insert input or output tape |
 

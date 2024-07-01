@@ -425,7 +425,7 @@ static struct command {
     { "sety",   sety,   "val",         "set Y to value" },
     { "setsp",  setsp,  "val",         "set SP to value" },
     { "setp",   setp,   "val",         "set P to value" },
-    { "tapes",  tapes,  "",            "show current tape files" },
+    { "tapes",  tapes,  "",            "list current tape files" },
     { "eject",  eject,  "input|output","eject input or output tape" },
     { "insert", insert, "input|output file", "insert input or output tape" },
     { "", NULL, "", "" }

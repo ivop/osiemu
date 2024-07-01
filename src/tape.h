@@ -12,3 +12,7 @@ uint8_t tape_read(uint16_t address);
 void tape_write(uint16_t address, uint8_t value);
 void tape_tick(double ticks);
 void tape_rewind(void);
+void tape_eject_input(void);
+void tape_eject_output(void);
+bool tape_insert_input(char *filename);
+bool tape_insert_output(char *filename);

@@ -21,6 +21,7 @@
 #include "monitor.h"
 #include "video.h"
 #include "disasm.h"
+#include "tape.h"
 
 static struct distabitem *distab = distabNMOS6502;
 
@@ -218,7 +219,7 @@ err_usage:
 
     loc = strtol(p, NULL, 16);
 
-    p = strtok(NULL, " \t\n\r");
+    p = strtok(NULL, "\t\n\r");
 
     if (!p) goto err_usage;
 
@@ -257,7 +258,7 @@ err_usage:
 
     end = strtol(p, NULL, 16);
 
-    p = strtok(NULL, " \t\n\r");
+    p = strtok(NULL, "\t\n\r");
 
     if (!p) goto err_usage;
 
@@ -338,10 +339,62 @@ static void show(void) {
     screen_update();
 }
 
-// ----------------------------------------------------------------------------
-
 static void hide(void) {
     screen_hide();
+}
+
+// ----------------------------------------------------------------------------
+
+static void tapes(void) {
+    printf("tape input: %s\n",  tape_input_filename);
+    printf("tape output: %s\n", tape_output_filename);
+}
+
+static void eject(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: eject input|output");
+        return;
+    }
+
+    if (!strcmp(p, "input")) {
+        tape_eject_input();
+    } else if (!strcmp(p, "output")) {
+        tape_eject_output();
+    } else {
+        goto err_usage;
+    }
+}
+
+static void insert(void) {
+    bool output = false;
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: eject input|output");
+        return;
+    }
+
+    if (!strcmp(p, "input")) {
+        output = false;
+    } else if (!strcmp(p, "output")) {
+        output = true;
+    } else {
+        goto err_usage;
+    }
+
+    p = strtok(NULL, "\t\n\r");
+
+    if (!p) goto err_usage;
+
+    if (output) {
+        tape_insert_output(strdup(p));
+    } else {
+        tape_insert_input(strdup(p));
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -372,21 +425,24 @@ static struct command {
     { "sety",   sety,   "val",         "set Y to value" },
     { "setsp",  setsp,  "val",         "set SP to value" },
     { "setp",   setp,   "val",         "set P to value" },
+    { "tapes",  tapes,  "",            "show current tape files" },
+    { "eject",  eject,  "input|output","eject input or output tape" },
+    { "insert", insert, "input|output file", "insert input or output tape" },
     { "", NULL, "", "" }
 };
 
 // ----------------------------------------------------------------------------
 
 static void help(void) {
-    char temp[21];
+    char temp[26];
 
     puts("commands: (all values are in hexadecimal)\n"
            "q,quit              - exit emulator\n"
            "cont                - continue emulation");
 
     for (int i=0; commands[i].func; i++) {
-        snprintf(temp, 21, "%s %s", commands[i].name, commands[i].args);
-        printf("%-20s- %s\n", temp, commands[i].desc);
+        snprintf(temp, 26, "%s %s", commands[i].name, commands[i].args);
+        printf("%-25s- %s\n", temp, commands[i].desc);
     }
 }
 

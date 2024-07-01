@@ -80,6 +80,10 @@ Ohio Scientific Instruments, Inc. Emulator
 | sety | val            | set Y to value |
 | setsp | val           | set SP to value |
 | setp | val            | set P to value |
+| tapes |               | show current tape files |
+| eject | input\|output | eject input or output tape |
+| insert | input\|output file | insert input or output tape |
+
 
 ## Command line options
 
@@ -225,7 +229,6 @@ Preferably the version that is distributed with Qt itself.
 ## Future additions?
 
 * main: command line option to start fullscreen
-* monitor: eject/insert tapes
 * monitor: mount/unmount floppies
 * Serial: Serial I/O without keyboard and display (named sockets)
 * Sound: 1-bit ACIA RTS DAC (which model?)

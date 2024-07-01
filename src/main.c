@@ -49,8 +49,9 @@ static char *drive3_filename = NULL;
 static int cpu_clock = CPU_CLOCK_510C_SLOW;
 static double fps = 60.0;
 static double ticks_per_frame;
-
 static bool warp_speed;
+static char *tape_input_arg;
+static char *tape_output_arg;
 
 // ----------------------------------------------------------------------------
 
@@ -327,10 +328,10 @@ int main_program(int argc, char **argv) {
             keyboard_inverted ^= 1;
             break;
         case 't':
-            tape_input_filename = strdup(optarg);
+            tape_input_arg = strdup(optarg);
             break;
         case 'T':
-            tape_output_filename = strdup(optarg);
+            tape_output_arg = strdup(optarg);
             break;
         case 'L':
             tape_location = strtol(optarg, NULL, 16);
@@ -474,7 +475,7 @@ int main_program(int argc, char **argv) {
     if (!keyboard_init(cpu_clock)) {
         return 1;
     }
-    if (!tape_init(tape_input_filename, tape_output_filename, cpu_clock)) {
+    if (!tape_init(tape_input_arg, tape_output_arg, cpu_clock)) {
         return 1;
     }
     if (!floppy_init(drive0_filename, drive1_filename,

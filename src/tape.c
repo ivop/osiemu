@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "portability.h"
 #include "tape.h"
 #include "acia.h"
@@ -48,20 +49,51 @@ static int word_select_times[8] = {
     11,     // start bit + 8 bits + even parity + 1 stop bit
     11      // start bit + 8 bits +  odd parity + 1 stop bit
 };
- 
+
+void tape_eject_input(void) {
+    fclose(inputf);
+    free(tape_input_filename);
+    tape_input_filename = NULL;
+    inputf = NULL;
+    puts("tape: input ejected");
+}
+
+void tape_eject_output(void) {
+    fclose(outputf);
+    free(tape_output_filename);
+    tape_output_filename = NULL;
+    outputf = NULL;
+    puts("tape: output ejected");
+}
+
+bool tape_insert_input(char *filename) {
+    if (inputf) tape_eject_input();
+    if (!(inputf = fopen(filename, "rb"))) {
+        fprintf(stderr, "tape: input: cannot open %s\n", filename);
+        return false;
+    }
+    printf("tape: input: %s\n", filename);
+    tape_input_filename = filename;
+    return true;
+}
+
+bool tape_insert_output(char *filename) {
+    if (outputf) tape_eject_output();
+    if (!(outputf = fopen(filename, "wb"))) {
+        fprintf(stderr, "tape: output: cannot open %s\n", filename);
+        return false;
+    }
+    printf("tape: input: %s\n", filename);
+    tape_output_filename = filename;
+    return true;
+}
+
 bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     if (input_file) {
-        if (!(inputf = fopen(input_file, "rb"))) {
-            fprintf(stderr, "error: cannot open %s\n", input_file);
-            return false;
-        }
+        if (!tape_insert_input(input_file)) return false;
     }
-
     if (output_file) {
-        if (!(outputf = fopen(output_file, "wb"))) {
-            fprintf(stderr, "error: cannot open %s\n", output_file);
-            return false;
-        }
+        if (!tape_insert_output(output_file)) return false;
     }
 
     ticks_per_clock = cpu_clock / tape_baseclock;

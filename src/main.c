@@ -528,7 +528,6 @@ int main_program(int argc, char **argv) {
                     break;
                 case SDLK_F5:
                     reset6502();
-                    tape_rewind();
                     break;
                 case SDLK_F8:
                     {

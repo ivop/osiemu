@@ -83,7 +83,7 @@ bool tape_insert_output(char *filename) {
         fprintf(stderr, "tape: output: cannot open %s\n", filename);
         return false;
     }
-    printf("tape: input: %s\n", filename);
+    printf("tape: output: %s\n", filename);
     tape_output_filename = filename;
     return true;
 }
@@ -101,18 +101,19 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     return true;
 }
 
-static void tape_rewind_input(void) {
+void tape_rewind_input(void) {
     if (inputf) {
-        printf("tape: rewinding input tape\n");
+        puts("tape: rewinding input tape");
         fseek(inputf, 0, SEEK_SET);
     }
 }
 
-void tape_rewind(void) {
-    tape_rewind_input();
-    tape_running = false;
-    reading = false;
-    writing = false;
+void tape_rewind_output(void) {
+    if (outputf) {
+        puts("tape: rewinding output tape");
+        fclose(outputf);
+        outputf = fopen(tape_output_filename, "wb");
+    }
 }
 
 void tape_tick(double ticks) {
@@ -220,7 +221,6 @@ void tape_write(uint16_t address, uint8_t value) {
     case 1:                     // transmit register
         if (tape_running) {
             if (!writing) {
-                tape_rewind_input();
                 printf("tape: switch to writing\n");
                 reading = false;
                 writing = true;     // switch to writing

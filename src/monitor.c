@@ -398,6 +398,24 @@ err_usage:
     }
 }
 
+static void xrewind(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: rewind input|output");
+        return;
+    }
+
+    if (!strcmp(p, "input")) {
+        tape_rewind_input();
+    } else if (!strcmp(p, "output")) {
+        tape_rewind_output();
+    } else {
+        goto err_usage;
+    }
+}
+
 // ----------------------------------------------------------------------------
 
 static void help(void);
@@ -429,6 +447,7 @@ static struct command {
     { "tapes",  tapes,  "",            "list current tape files" },
     { "eject",  eject,  "input|output","eject input or output tape" },
     { "insert", insert, "input|output file", "insert input or output tape" },
+    { "rewind", xrewind,"input|output","rewind input or output tape" },
     { "", NULL, "", "" }
 };
 

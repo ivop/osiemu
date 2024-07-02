@@ -14,6 +14,8 @@
 #include <string.h>
 #include <signal.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "fake6502/fake6502.h"
 
 #include <SDL.h>
@@ -446,8 +448,18 @@ static void help(void) {
     }
 }
 
-
 // ----------------------------------------------------------------------------
+
+void purge_stdin(void) {
+    char buf[256];
+    int retval;
+    int save_fcntl = fcntl(0, F_GETFL);
+    fcntl(0, F_SETFL, save_fcntl | O_NONBLOCK);
+    do {
+        retval = read(0, buf, 256);
+    } while (retval > 0);
+    fcntl(0, F_SETFL, save_fcntl);
+}
 
 bool monitor(void) {
     int i;
@@ -459,6 +471,8 @@ bool monitor(void) {
 
     puts("MONITOR");
     regs();
+
+    purge_stdin();
 
     while (1) {
         printf(">");

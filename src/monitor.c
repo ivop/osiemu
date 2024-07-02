@@ -16,10 +16,9 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "fake6502/fake6502.h"
-
 #include <SDL.h>
 
+#include "fake6502/fake6502.h"
 #include "monitor.h"
 #include "video.h"
 #include "disasm.h"
@@ -450,16 +449,20 @@ static void help(void) {
 
 // ----------------------------------------------------------------------------
 
-void purge_stdin(void) {
+static void purge_stdin(void) {
     char buf[256];
-    int retval;
-    int save_fcntl = fcntl(0, F_GETFL);
+    int retval, save_fcntl = fcntl(0, F_GETFL);
+
     fcntl(0, F_SETFL, save_fcntl | O_NONBLOCK);
+
     do {
         retval = read(0, buf, 256);
     } while (retval > 0);
+
     fcntl(0, F_SETFL, save_fcntl);
 }
+
+// ----------------------------------------------------------------------------
 
 bool monitor(void) {
     int i;

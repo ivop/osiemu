@@ -23,6 +23,7 @@
 #include "video.h"
 #include "disasm.h"
 #include "tape.h"
+#include "floppy.h"
 
 static struct distabitem *distab = distabNMOS6502;
 
@@ -347,8 +348,10 @@ static void hide(void) {
 // ----------------------------------------------------------------------------
 
 static void tapes(void) {
-    printf("tape input: %s\n",  tape_input_filename);
-    printf("tape output: %s\n", tape_output_filename);
+    printf("tape input: %s\n", tape_input_filename ? tape_input_filename :
+                                                                    "<empty>");
+    printf("tape output: %s\n", tape_output_filename ? tape_output_filename :
+                                                                    "<empty>");
 }
 
 static void eject(void) {
@@ -418,6 +421,16 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+static void xdrives(void) {
+    if (disk_type < 0) return;
+    printf("controller: %s\"\n", disk_type == TYPE_525_SS ? "5.25" : "8");
+    for (int i=0; i<4; i++) {
+        printf("%d: %s\n", i, drives[i].fname ? drives[i].fname : "<empty>");
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 static void help(void);
 
 static struct command {
@@ -448,6 +461,7 @@ static struct command {
     { "eject",  eject,  "input|output","eject input or output tape" },
     { "insert", insert, "input|output file", "insert input or output tape" },
     { "rewind", xrewind,"input|output","rewind input or output tape" },
+    { "drives", xdrives,"",            "list mounted floppies" },
     { "", NULL, "", "" }
 };
 
@@ -457,8 +471,8 @@ static void help(void) {
     char temp[26];
 
     puts("commands: (all values are in hexadecimal)\n"
-           "q,quit              - exit emulator\n"
-           "cont                - continue emulation");
+           "q,quit                   - exit emulator\n"
+           "cont                     - continue emulation");
 
     for (int i=0; commands[i].func; i++) {
         snprintf(temp, 26, "%s %s", commands[i].name, commands[i].args);

@@ -40,29 +40,9 @@ struct pia {
 
 static struct pia pia;
 
-enum osi_disk_type {
-    TYPE_525_SS,
-    TYPE_8_SS
-};
+int disk_type = -1;
+struct drive drives[4];
 
-static int disk_type = -1;
-
-struct drive {
-    FILE *f;
-    char *fname;
-    off_t offset;
-    char *map;
-    size_t mapsize;
-
-    unsigned int pos;
-    uint8_t bit;
-
-    unsigned int curtrk;
-    bool ready;
-    bool r_w;
-};
-
-static struct drive drives[4];
 static int curdrive;
 
 static double floppy_ticks;

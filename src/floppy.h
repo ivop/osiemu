@@ -2,6 +2,29 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+struct drive {
+    FILE *f;
+    char *fname;
+    off_t offset;
+    char *map;
+    size_t mapsize;
+
+    unsigned int pos;
+    uint8_t bit;
+
+    unsigned int curtrk;
+    bool ready;
+    bool r_w;
+};
+
+enum osi_disk_type {
+    TYPE_525_SS,
+    TYPE_8_SS
+};
+
+extern int disk_type;
+extern struct drive drives[4];
+
 extern bool floppy_enable;
 extern bool head_on_disk;
 

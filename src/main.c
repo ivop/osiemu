@@ -63,7 +63,6 @@ static void usage(void) {
 "options:\n"
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"
-"    -d/--disable-basic         disable BASIC (default: enabled)\n"
 "\n"
 "    -k/--kernel filename.rom   specify kernel ROM\n"
 "\n"

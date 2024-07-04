@@ -63,7 +63,6 @@ static void usage(void) {
 "options:\n"
 "\n"
 "    -b/--basic filename.rom    specify BASIC ROM\n"
-"\n"
 "    -k/--kernel filename.rom   specify kernel ROM\n"
 "\n"
 "    -c/--font filename         specify character set font (8x2048 image)\n"

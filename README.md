@@ -96,8 +96,6 @@ usage: osiemu <config-file>
 options:
 
     -b/--basic filename.rom    specify BASIC ROM
-    -d/--disable-basic         disable BASIC (default: enabled)
-
     -k/--kernel filename.rom   specify kernel ROM
 
     -c/--font filename         specify character set font (8x2048 image)

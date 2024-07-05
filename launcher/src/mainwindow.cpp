@@ -1,10 +1,10 @@
 #include "mainwindow.h"
+#include "../../version.h"
+#include "consolewindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "consolewindow.h"
-#include "../../version.h"
 
 static const char *const magic = "OSIEMU-LAUNCHER!";
 

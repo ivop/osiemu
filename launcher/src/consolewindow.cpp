@@ -1,8 +1,8 @@
 #include "consolewindow.h"
 #include "ui_consolewindow.h"
 #include <QDebug>
-#include <QProcess>
 #include <QFileInfo>
+#include <QProcess>
 
 ConsoleWindow::ConsoleWindow(QWidget *parent, QString program, QStringList arguments) :
     QDialog(parent),

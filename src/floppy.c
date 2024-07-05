@@ -19,6 +19,7 @@
 #include "portability.h"
 #include "floppy.h"
 #include "acia.h"
+#include "stdlib.h"
 
 // ----------------------------------------------------------------------------
 
@@ -161,7 +162,7 @@ enum acia_tx_state_e acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
 static bool login_drive(struct drive *d) {
     d->f = fopen(d->fname, "r+b");
     if (!d->f) {
-        fprintf(stderr, "floppy: unable to open %s for R/W\n", d->fname);
+        fprintf(stderr, "floppy: unable to open '%s' for R/W\n", d->fname);
         return false;
     }
 
@@ -183,6 +184,7 @@ static bool login_drive(struct drive *d) {
 
     int type = fgetc(d->f);
     if (disk_type >= 0 && type != disk_type) {
+        fprintf(stderr, "floppy: wrong disk type\n");
         fprintf(stderr, "floppy: all drives must be of the same type\n");
         return false;
     }
@@ -683,11 +685,33 @@ void floppy_get_current_track_and_drive(int *track, int *drive) {
 
 // ----------------------------------------------------------------------------
 
-void floppy_quit(void) {
-    for (int i=0; i<4; i++) {
-        if (drives[i].f) {
-            munmap(drives[i].map, drives[i].mapsize);
-            fclose(drives[i].f);
-        }
+void floppy_unmount(struct drive *d) {
+    if (!floppy_enable) {
+        puts("floppy: drives are disabled");
+        return;
+    }
+    if (d->f) {
+        printf("floppy: unmounting %s\n", d->fname);
+        munmap(d->map, d->mapsize);
+        fclose(d->f);
+        d->f = NULL;
+        free(d->fname);
+        d->fname = NULL;
     }
 }
+
+void floppy_mount(struct drive *d, char *filename) {
+    if (!floppy_enable) {
+        puts("floppy: drives are disabled");
+        return;
+    }
+    floppy_unmount(d);
+    d->fname = filename;
+    if (login_drive(d)) init_memory_mapped_io(d);
+}
+
+void floppy_quit(void) {
+    for (int i=0; i<4; i++) floppy_unmount(&drives[i]);
+}
+
+// ----------------------------------------------------------------------------

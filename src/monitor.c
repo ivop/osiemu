@@ -437,30 +437,34 @@ static void xdrives(void) {
     }
 }
 
+static int check_drive_number(char *p) {
+    int num = atoi(p);
+    if (num < 0 || num > 3) {
+        puts("invalid drive number");
+        return -1;
+    }
+    return num;
+}
+
 static void swap(void) {
     if (!check_controller()) return;
 
     char *p = strtok(NULL, " \t\n\r");
-
     if (!p) {
 err_usage:
         puts("usage: swap numx numy");
         return;
     }
 
-    int numx = atoi(p);
-    if (numx < 0 || numx > 3) {
-err_invalid_drive:
-        puts("invalid drive number");
-        return;
-    }
+    int numx = check_drive_number(p);
+    if (numx < 0) return;
 
     p = strtok(NULL, " \t\n\r");
 
     if (!p) goto err_usage;
 
-    int numy = atoi(p);
-    if (numy < 0 || numy > 3) goto err_invalid_drive;
+    int numy = check_drive_number(p);
+    if (numy < 0) return;
 
     struct drive temp;
 
@@ -473,10 +477,36 @@ err_invalid_drive:
 
 static void unmount(void) {
     if (!check_controller()) return;
+
+    char *p = strtok(NULL, " \t\n\r");
+    if (!p) {
+        puts("usage: unmount num");
+        return;
+    }
+
+    int num = check_drive_number(p);
+    if (num < 0) return;
+
+    floppy_unmount(&drives[num]);
 }
 
 static void xmount(void) {
     if (!check_controller()) return;
+
+    char *p = strtok(NULL, " \t\n\r");
+    if (!p) {
+err_usage:
+        puts("usage: mount num file");
+        return;
+    }
+
+    int num = check_drive_number(p);
+    if (num < 0) return;
+
+    p = strtok(NULL, "\t\n\r");
+    if (!p) goto err_usage;
+
+    floppy_mount(&drives[num], strdup(p));
 }
 
 // ----------------------------------------------------------------------------

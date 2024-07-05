@@ -14,7 +14,7 @@ class ConsoleWindow : public QDialog
 
 public:
     explicit ConsoleWindow(QWidget *parent, const QString& program, const QStringList& arguments);
-    ~ConsoleWindow();
+    ~ConsoleWindow() override;
 
 private slots:
     void on_button_send_clicked();

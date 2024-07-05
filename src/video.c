@@ -458,13 +458,11 @@ static void init_colors_440b(void) {
 // ----------------------------------------------------------------------------
 
 bool screen_init(double cpu_clock, double fps) {
-    int window_width, window_height;
-
     screen_width = osi_width * 8;
     screen_height = osi_height * 8;
 
-    window_width = aspectx * stretchx * zoom * screen_width;
-    window_height = aspecty * stretchy * zoom * screen_height;
+    int window_width = aspectx * stretchx * zoom * screen_width;
+    int window_height = aspecty * stretchy * zoom * screen_height;
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, video_smooth ? "linear" : "");
 
@@ -581,9 +579,10 @@ bool screen_init(double cpu_clock, double fps) {
     interval = cpu_clock / fps / 2.0;
 
     if (zoom > 1 && scanlines_enable) {
+        int scanlines_height = screen_height * 2;
         scanlines = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                                SDL_TEXTUREACCESS_TARGET,
-                                               window_width, window_height);
+                                               1, scanlines_height);
         if (!scanlines) {
             fprintf(stderr, "error: unable to create scanlines texture\n");
             return false;
@@ -591,11 +590,11 @@ bool screen_init(double cpu_clock, double fps) {
 
         SDL_SetRenderTarget(renderer, scanlines);
         SDL_SetTextureBlendMode(scanlines, SDL_BLENDMODE_BLEND);
-        for (int y=0; y<window_height; y+=2) {
+        for (int y=0; y<scanlines_height; y+=2) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-            SDL_RenderDrawLine(renderer, 0, y, window_width-1, y);
+            SDL_RenderDrawLine(renderer, 0, y, 0, y);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
-            SDL_RenderDrawLine(renderer, 0, y+1, window_width-1, y+1);
+            SDL_RenderDrawLine(renderer, 0, y+1, 0, y+1);
         }
     }
 

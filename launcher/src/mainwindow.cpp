@@ -217,7 +217,7 @@ void MainWindow::on_button_launch_clicked() {
         arguments.append(switches.chopped(1));
     }
 
-    ConsoleWindow *console = new ConsoleWindow(this, program, arguments);
+    auto *console = new ConsoleWindow(this, program, arguments);
     console->exec();
 
     this->show();
@@ -380,7 +380,7 @@ void MainWindow::on_button_load_settings_clicked() {
 
     char checkmagic[16];
     in.readRawData(checkmagic, 16);
-    if (memcmp(magic, checkmagic, 16)) {
+    if (memcmp(magic, checkmagic, 16) != 0) {
         error = QFile::OpenError;
         errorstring = "This is not an osiemu-launcher settings file";
         goto error_out;

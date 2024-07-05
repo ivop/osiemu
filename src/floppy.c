@@ -711,6 +711,7 @@ void floppy_mount(struct drive *d, char *filename) {
 }
 
 void floppy_quit(void) {
+    if (!floppy_enable) return;
     for (int i=0; i<4; i++) floppy_unmount(&drives[i]);
 }
 

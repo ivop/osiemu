@@ -421,12 +421,62 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+static bool check_controller(void) {
+    if (disk_type < 0) {
+        puts("no drive controller available");
+        return false;
+    }
+    return true;
+}
+
 static void xdrives(void) {
-    if (disk_type < 0) return;
+    if (!check_controller()) return;
     printf("controller: %s\"\n", disk_type == TYPE_525_SS ? "5.25" : "8");
     for (int i=0; i<4; i++) {
         printf("%d: %s\n", i, drives[i].fname ? drives[i].fname : "<empty>");
     }
+}
+
+static void swap(void) {
+    if (!check_controller()) return;
+
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: swap numx numy");
+        return;
+    }
+
+    int numx = atoi(p);
+    if (numx < 0 || numx > 3) {
+err_invalid_drive:
+        puts("invalid drive number");
+        return;
+    }
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    int numy = atoi(p);
+    if (numy < 0 || numy > 3) goto err_invalid_drive;
+
+    struct drive temp;
+
+    memcpy(&temp, &drives[numx], sizeof(struct drive));
+    memcpy(&drives[numx], &drives[numy], sizeof(struct drive));
+    memcpy(&drives[numy], &temp, sizeof(struct drive));
+
+    printf("swapped drives %d and %d\n", numx, numy);
+}
+
+static void unmount(void) {
+    if (!check_controller()) return;
+}
+
+static void xmount(void) {
+    if (!check_controller()) return;
 }
 
 // ----------------------------------------------------------------------------
@@ -462,6 +512,9 @@ static struct command {
     { "insert", insert, "input|output file", "insert input or output tape" },
     { "rewind", xrewind,"input|output","rewind input or output tape" },
     { "drives", xdrives,"",            "list mounted floppies" },
+    { "swap",   swap,   "numx numy",   "swap drives numx and numy" },
+    { "unmount",unmount,"num",         "unmount drive" },
+    { "mount",  xmount, "num file",    "mount file to drive num" },
     { "", NULL, "", "" }
 };
 

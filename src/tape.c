@@ -51,6 +51,10 @@ static int word_select_times[8] = {
 };
 
 void tape_eject_input(void) {
+    if (!inputf) {
+        puts("tape: input already empty");
+        return;
+    }
     fclose(inputf);
     free(tape_input_filename);
     tape_input_filename = NULL;
@@ -59,6 +63,11 @@ void tape_eject_input(void) {
 }
 
 void tape_eject_output(void) {
+    if (!outputf) {
+        puts("tape: output already empty");
+        return;
+    }
+    printf("tape: closing %s\n", tape_output_filename);
     fclose(outputf);
     free(tape_output_filename);
     tape_output_filename = NULL;

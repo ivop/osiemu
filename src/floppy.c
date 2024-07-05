@@ -235,6 +235,9 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
             if (!login_drive(&drives[i])) {
                 return false;
             }
+            if (!init_memory_mapped_io(&drives[i])) {
+                return false;
+            }
         }
     }
 
@@ -260,14 +263,6 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         hole_length = 5.0;
         seek_time = 3.0;
         break;
-    }
-
-    for (int i=0; i<=3; i++) {
-        if (drives[i].f) {
-            if (!init_memory_mapped_io(&drives[i])) {
-                return false;
-            }
-        }
     }
 
     interval = cpu_clock / bitrate;

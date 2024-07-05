@@ -4,7 +4,7 @@
 #include <QFileInfo>
 #include <QProcess>
 
-ConsoleWindow::ConsoleWindow(QWidget *parent, QString program, QStringList arguments) :
+ConsoleWindow::ConsoleWindow(QWidget *parent, const QString& program, const QStringList& arguments) :
     QDialog(parent),
     ui(new Ui::ConsoleWindow)
 {

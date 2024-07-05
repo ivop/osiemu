@@ -13,7 +13,7 @@ class ConsoleWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit ConsoleWindow(QWidget *parent, QString program, QStringList arguments);
+    explicit ConsoleWindow(QWidget *parent, const QString& program, const QStringList& arguments);
     ~ConsoleWindow();
 
 private slots:

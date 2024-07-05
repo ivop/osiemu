@@ -85,6 +85,9 @@ Ohio Scientific Instruments, Inc. Emulator
 | insert | input\|output file | insert input or output tape |
 | rewind | input\|output | rewind input or output tape |
 | drives |              | list mounted floppies |
+| swap | numx numy      | swap drives numx and numy |
+| unmount | num         | unmount drive |
+| mount | num file      | mount file to drive num |
 
 
 ## Command line options
@@ -229,7 +232,6 @@ Preferably the version that is distributed with Qt itself.
 ## Future additions?
 
 * Main: command line option to start fullscreen
-* Monitor: mount/unmount floppies
 * Serial: Serial I/O without keyboard and display, rewrite tape code, make it
 work with mkfifo fifos and minicom
 * Sound: 1-bit ACIA RTS DAC (which model?)

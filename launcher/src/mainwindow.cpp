@@ -193,7 +193,7 @@ void MainWindow::on_button_launch_clicked() {
         { "--floppy3",     ui->line_drive_d->text() }
     };
 
-    for (auto x : file_list) {
+    for (const auto& x : file_list) {
         if (!x.text_field.isEmpty()) {
             arguments.append(x.option);
             arguments.append(x.text_field);

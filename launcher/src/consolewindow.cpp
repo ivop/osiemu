@@ -1,4 +1,5 @@
 #include "consolewindow.h"
+#include "toolswindow.h"
 #include "ui_consolewindow.h"
 #include <QDebug>
 #include <QFileInfo>
@@ -79,10 +80,18 @@ void ConsoleWindow::errorOccurred(QProcess::ProcessError error) {
     ui->tab_widget->setCurrentIndex(1);
 }
 
-void ConsoleWindow::on_button_send_clicked()
-{
+void ConsoleWindow::on_button_send_clicked() {
     ui->text_console->append(ui->line_console->text());
     process->write(ui->line_console->text().toLocal8Bit());
     process->write("\n");
     ui->line_console->clear();
+}
+
+void ConsoleWindow::on_button_tools_clicked() {
+    auto *tw = new ToolsWindow(this);
+    tw->exec();
+    if (tw->command.isEmpty()) return;
+    ui->text_console->append(tw->command);
+    process->write(tw->command.toLocal8Bit());
+    process->write("\n");
 }

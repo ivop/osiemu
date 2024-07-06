@@ -11,15 +11,18 @@ CONFIG += c++11
 SOURCES += \
     consolewindow.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    toolswindow.cpp
 
 HEADERS += \
     consolewindow.h \
-    mainwindow.h
+    mainwindow.h \
+    toolswindow.h
 
 FORMS += \
     consolewindow.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    toolswindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

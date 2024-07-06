@@ -23,6 +23,8 @@ private slots:
     void processStarted();
     void errorOccurred(QProcess::ProcessError error);
 
+    void on_button_tools_clicked();
+
 private:
     Ui::ConsoleWindow *ui;
     QProcess *process;

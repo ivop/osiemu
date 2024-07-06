@@ -330,7 +330,6 @@ static uint8_t merge_pins(struct port *p) {
 // ----------------------------------------------------------------------------
 
 uint8_t floppy_pia_read(uint16_t address) {
-//    printf("floppy: pia read $%04x\n", address);
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
@@ -387,7 +386,6 @@ static void act_on_portb_output_value(uint8_t prev_value) {
     bool move_now  =      value & MOVE_HEAD_MASK;
 
     if (move_prev && !move_now) {
-//        printf("floppy: step, curtrk = %d\n", drives[curdrive].curtrk);
         if (step_to_3976) {
             if (drives[curdrive].curtrk < ntracks-1) {
                 drives[curdrive].curtrk++;
@@ -397,7 +395,6 @@ static void act_on_portb_output_value(uint8_t prev_value) {
                 drives[curdrive].curtrk--;
             }
         }
-//        printf("floppy: seek to %d\n", drives[curdrive].curtrk);
         seek_counter = seek_time;
     }
 }
@@ -405,15 +402,12 @@ static void act_on_portb_output_value(uint8_t prev_value) {
 // ----------------------------------------------------------------------------
 
 void floppy_pia_write(uint16_t address, uint8_t value) {
-//    printf("floppy: pia write $%04x, $%02x\n", address, value);
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
-//            printf("floppy: set porta I/O mask to $%02x\n", value);
             pia.porta.output_mask = value;
             pia.porta.input_mask = ~value;
         } else {
-//            printf("floppy: porta: output value $%02x\n", value);
             pia.porta.output_value = value;
             determine_current_drive();
         }
@@ -423,11 +417,9 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
         break;
     case 2:     // ORB or DDRB
         if (!(pia.crb & DATA_DIRECTION_ACCESS)) {
-//            printf("floppy: set portb I/O mask to $%02x\n", value);
             pia.portb.output_mask = value;
             pia.portb.input_mask = ~value;
         } else {
-//            printf("floppy: portb: output value $%02x\n", value);
             uint8_t prev_value = pia.portb.output_value;
             pia.portb.output_value = value;
             act_on_portb_output_value(prev_value);
@@ -470,7 +462,7 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
         case 2:
             break;
         case 3:
-            puts("floppy: master reset");
+//            puts("floppy: master reset");
             status = 0;
             setbit(status, STATUS_TDRE_MASK);   // empty
             acia_receive_state = STATE_WAIT_FOR_STARTBIT;
@@ -482,7 +474,7 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
         ndatabits    = word_select[ws].ndatabits;
         parity_type  = word_select[ws].parity;
         two_stopbits = word_select[ws].two_stopbits;
-        printf("floppy: select %s\n", word_select[ws].name);
+//        printf("floppy: select %s\n", word_select[ws].name);
         break;
     case 1:                 // transmit register
         TDR = value;
@@ -686,10 +678,7 @@ void floppy_get_current_track_and_drive(int *track, int *drive) {
 // ----------------------------------------------------------------------------
 
 void floppy_unmount(struct drive *d) {
-    if (!floppy_enable) {
-        puts("floppy: drives are disabled");
-        return;
-    }
+    if (!floppy_enable) return;
     if (d->f) {
         printf("floppy: unmounting %s\n", d->fname);
         munmap(d->map, d->mapsize);
@@ -701,13 +690,14 @@ void floppy_unmount(struct drive *d) {
 }
 
 void floppy_mount(struct drive *d, char *filename) {
-    if (!floppy_enable) {
-        puts("floppy: drives are disabled");
-        return;
-    }
+    if (!floppy_enable) return;
     floppy_unmount(d);
     d->fname = filename;
-    if (login_drive(d)) init_memory_mapped_io(d);
+    if (login_drive(d)) {
+        if (init_memory_mapped_io(d)) {
+            printf("floppy: mounted '%s'\n", filename);
+        }
+    }
 }
 
 void floppy_quit(void) {

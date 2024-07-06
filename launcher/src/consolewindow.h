@@ -25,6 +25,8 @@ private slots:
 
     void on_button_tools_clicked();
 
+    void on_button_continue_clicked();
+
 private:
     Ui::ConsoleWindow *ui;
     QProcess *process;

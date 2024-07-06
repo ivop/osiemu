@@ -95,3 +95,9 @@ void ConsoleWindow::on_button_tools_clicked() {
     process->write(tw->command.toLocal8Bit());
     process->write("\n");
 }
+
+void ConsoleWindow::on_button_continue_clicked() {
+    ui->text_console->append("cont");
+    process->write("cont\n");
+}
+

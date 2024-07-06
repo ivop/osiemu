@@ -231,7 +231,6 @@ Preferably the version that is distributed with Qt itself.
 
 ## Future additions?
 
-* Main: command line option to start fullscreen
 * Serial: Serial I/O without keyboard and display, rewrite tape code, make it
 work with mkfifo fifos and minicom
 * Sound: 1-bit ACIA RTS DAC (which model?)

@@ -121,9 +121,10 @@ static void usage(void) {
 "\n"
 "    -Z/--switches switches     comma separated list of hardware switches\n"
 "                               \"flipped\" before startup\n"
-"                                   hires     enable high resolution overlay\n"
-"                                   graph     enable graphics font\n"
-"                                   nobasic   disable BASIC ROM (8kB extra RAM)\n"
+"                                 hires       enable high resolution overlay\n"
+"                                 graph       enable graphics font\n"
+"                                 nobasic     disable BASIC ROM (8kB extra RAM)\n"
+"                                 fullscreen  start fullscreen\n"
 "\n"
 "    -h/--help                  show usage information\n"
 );
@@ -173,6 +174,7 @@ int main_program(int argc, char **argv) {
     double cpu_ticks = 0.0;
     bool switch_hires = false;
     bool switch_graph_font = false;
+    bool switch_fullscreen = false;
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
@@ -410,6 +412,9 @@ int main_program(int argc, char **argv) {
                 } else if (!strcmp(sw, "nobasic")) {
                     mmu_basic_enabled = false;
                     mmu_ram_top = 0xbfff;
+                } else if (!strcmp(sw, "fullscreen")) {
+                    puts("switch: start fullscreen");
+                    switch_fullscreen = true;
                 } else {
                     fprintf(stderr, "unrecognized switch '%s'\n", sw);
                     return 1;
@@ -494,6 +499,7 @@ int main_program(int argc, char **argv) {
 
     if (switch_hires) screen_toggle_hires();
     if (switch_graph_font) screen_swap_fonts();
+    if (switch_fullscreen) screen_toggle_fullscreen();
 
     while (1) {
         fflush(stdout);

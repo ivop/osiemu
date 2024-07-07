@@ -202,7 +202,7 @@ For each track it contains the complete bitstream that enters the floppy ACIA,
 including all the framing and prolonged stop bits for timing.
 See [_doc/disk-format.txt_](doc/disk-format.txt) for details.
 The _tools_ directory contains ```hfe2osi``` and ```osi2hfe``` to convert
-from and to HFE flux dumps from real hardware.
+from and to HFE flux dumps from/for real hardware.
 
 ## GUI launcher
 
@@ -226,7 +226,7 @@ make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CXX=/path/to/
 
 forces a build against Qt 6.7.2 and use the clang compiler.
 It has been tested with Qt 5.15.x and Qt 6.5.x and up.
-Contrary to the main ```osiemu``` binary that has to be built with Cygwin, the launcher binary has to be built with MinGW.
+On Windows, contrary to the main ```osiemu``` binary that has to be built with Cygwin, the launcher binary has to be built with MinGW.
 Preferably the version that is distributed with Qt itself.
 
 ## Future additions?

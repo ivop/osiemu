@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>817</width>
-    <height>831</height>
+    <height>837</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -582,6 +582,13 @@
          <widget class="QCheckBox" name="check_smooth_video">
           <property name="text">
            <string>Smooth Video</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_start_fullscreen">
+          <property name="text">
+           <string>Start Fullscreen</string>
           </property>
          </widget>
         </item>

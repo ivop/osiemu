@@ -211,6 +211,9 @@ void MainWindow::on_button_launch_clicked() {
     if (ui->check_enable_graph_font->checkState() == Qt::Checked) {
         switches += "graph,";
     }
+    if (ui->check_start_fullscreen->checkState() == Qt::Checked) {
+        switches += "fullscreen,";
+    }
 
     if (!switches.isEmpty()) {
         arguments.append("--switches");
@@ -341,6 +344,7 @@ void MainWindow::on_button_save_settings_clicked() {
     out << ui->check_disable_basic->checkState();
     out << ui->check_enable_hires->checkState();
     out << ui->check_enable_graph_font->checkState();
+    out << ui->check_start_fullscreen->checkState();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -432,6 +436,7 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> tcs; ui->check_disable_basic->setCheckState(tcs);
     in >> tcs; ui->check_enable_hires->setCheckState(tcs);
     in >> tcs; ui->check_enable_graph_font->setCheckState(tcs);
+    in >> tcs; ui->check_start_fullscreen->setCheckState(tcs);
 
     error = file.error();
     errorstring = file.errorString();

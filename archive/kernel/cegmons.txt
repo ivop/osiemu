@@ -1,0 +1,7 @@
+cegmon0.rom             64x16       48x16
+cegmon2.rom             64x32       64x28
+cegmonc1.rom            32x32       24x26
+cegmonjsc.rom           64x32       42x30
+cegmon.rom              64x32       48x28
+cegmonuk16.rom          64x16       48x14
+cegmonuk32.rom          64x32       48x32

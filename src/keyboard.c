@@ -106,7 +106,7 @@ bool keyboard_init(double cpu_clock) {
 
 // ----------------------------------------------------------------------------
 
-static void raw_keyboard_modifiers(SDL_Keysym *key) {
+static void keyboard_modifiers(SDL_Keysym *key) {
     if (key->mod & KMOD_CAPS)
         keyboard_osi_matrix[0] ^= 1 << 0;
     if (key->mod & KMOD_LSHIFT)
@@ -117,9 +117,37 @@ static void raw_keyboard_modifiers(SDL_Keysym *key) {
         keyboard_osi_matrix[0] ^= 1 << 6;
 }
 
-void keyboard_press_key(SDL_Keysym *key) {
+static void raw_keycodes(SDL_Keysym *key, bool release) {
     int i, row, col;
 
+    if (!key->sym) return;
+
+    if (key->sym == SDLK_LCTRL || key->sym == SDLK_RCTRL) {
+        keyboard_osi_matrix[0] ^= 1 << 6;
+        return;
+    } else if (key->sym == SDLK_LSHIFT) {
+        keyboard_osi_matrix[0] ^= 1 << 2;
+        return;
+    } else if (key->sym == SDLK_RSHIFT) {
+        keyboard_osi_matrix[0] ^= 1 << 1;
+        return;
+    } else if (key->sym == SDLK_CAPSLOCK && !release) {
+        keyboard_osi_matrix[0] ^= 1 << 0;
+        return;
+    }
+
+    for (i = 0; i < 64; i++) {
+        row = i / 8;
+        col = i % 8;
+        if (keyboard_matrix[row][col] == key->sym) break;
+    }
+    if (i == 64) return;    // not found
+
+    keyboard_osi_matrix[row] ^= 1 << col;
+}
+
+void keyboard_press_key(SDL_Keysym *key) {
+//    printf("keyboard: press: %x\n", key->sym);
     if (keyboard_cooked) {
         if ( (key->sym != SDLK_LCTRL && (key->mod & KMOD_LCTRL)) ||
              (key->sym != SDLK_RCTRL && (key->mod & KMOD_RCTRL)) ) {
@@ -141,32 +169,18 @@ void keyboard_press_key(SDL_Keysym *key) {
         return;
     }
 
-    // RAW keyboard
-
-    clear_matrix();
-
-    if (key->sym > 127 || !key->sym) {
-        raw_keyboard_modifiers(key);
-        return;
-    }
-
-    for (i = 0; i < 64; i++) {
-        row = i / 8;
-        col = i % 8;
-        if (keyboard_matrix[row][col] == key->sym) break;
-    }
-    if (i == 64) return;    // not found
-
-    keyboard_osi_matrix[row] ^= 1 << col;
-
-    raw_keyboard_modifiers(key);
+    raw_keycodes(key, false);
 }
 
 // ----------------------------------------------------------------------------
 
 void keyboard_release_key(SDL_Keysym *key UNUSED) {
-    clear_matrix();
-    raw_keyboard_modifiers(key);
+//    printf("keyboard: release: %x\n", key->sym);
+    if (keyboard_cooked) {
+        clear_matrix();
+        keyboard_modifiers(key);
+    }
+    raw_keycodes(key, true);
 }
 
 // ----------------------------------------------------------------------------

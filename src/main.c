@@ -516,6 +516,7 @@ int main_program(int argc, char **argv) {
                 goto exit_out;
                 break;
             case SDL_KEYDOWN:
+                if (e.key.repeat) break;
                 switch (e.key.keysym.sym) {
                 default:
                     keyboard_press_key(&e.key.keysym);
@@ -523,6 +524,7 @@ int main_program(int argc, char **argv) {
                 }
                 break;
             case SDL_KEYUP:
+                if (e.key.repeat) break;
                 switch (e.key.keysym.sym) {
                 case SDLK_F3:
                     screen_toggle_hires();

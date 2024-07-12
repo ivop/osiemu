@@ -35,8 +35,14 @@ launcher/build/launcher:
 osiemu-launcher: launcher/build/launcher
 	cp $< $@
 
+launcher/build/release/launcher.exe:
+	+make -C launcher
+
+osiemu-launcher.exe: launcher/build/release/launcher.exe
+	cp $< $@
+
 clean:
-	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher
+	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher osiemu-launcher.exe
 	+make -C launcher clean
 
 .depend: $(SRC_FILES)

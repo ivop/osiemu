@@ -147,7 +147,6 @@ static void raw_keycodes(SDL_Keysym *key, bool release) {
 }
 
 void keyboard_press_key(SDL_Keysym *key) {
-//    printf("keyboard: press: %x\n", key->sym);
     if (keyboard_cooked) {
         if ( (key->sym != SDLK_LCTRL && (key->mod & KMOD_LCTRL)) ||
              (key->sym != SDLK_RCTRL && (key->mod & KMOD_RCTRL)) ) {
@@ -175,10 +174,10 @@ void keyboard_press_key(SDL_Keysym *key) {
 // ----------------------------------------------------------------------------
 
 void keyboard_release_key(SDL_Keysym *key UNUSED) {
-//    printf("keyboard: release: %x\n", key->sym);
     if (keyboard_cooked) {
         clear_matrix();
         keyboard_modifiers(key);
+        return;
     }
     raw_keycodes(key, true);
 }

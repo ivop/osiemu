@@ -28,7 +28,7 @@
         <widget class="QTextBrowser" name="text_console">
          <property name="font">
           <font>
-           <family>DejaVu Sans Mono</family>
+           <family>Courier</family>
           </font>
          </property>
         </widget>

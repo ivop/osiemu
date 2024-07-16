@@ -40,13 +40,12 @@ static char *drive1_filename = NULL;
 static char *drive2_filename = NULL;
 static char *drive3_filename = NULL;
 
-#define CPU_CLOCK_C1P       (3932160/4.0)   // 1P / Superboard II Service Manual
-#define CPU_CLOCK_510C_SLOW (8000000/8.0)   // 510C Schematics
-#define CPU_CLOCK_510C_FAST (8000000/4.0)   // 510C Schematics
-#define CPU_CLOCK_UK101     (8000000/8.0)   // ???
-#define CPU_CLOCK_C2P        2000000/1.0
+#define CPU_CLOCK_QUARTER   (3932160/4.0)   // 1/4 Video (SB II Service Manual)
+#define CPU_CLOCK_HALF      (3932160/2.0)   // 1/2 Video
+#define CPU_CLOCK_510C_SLOW (8000000/8.0)   //           (510C Schematics)
+#define CPU_CLOCK_510C_FAST (8000000/4.0)   //           (510C Schematics)
 
-static int cpu_clock = CPU_CLOCK_510C_SLOW;
+static int cpu_clock = CPU_CLOCK_QUARTER;
 static double fps = 60.0;
 static double ticks_per_frame;
 static bool warp_speed;
@@ -68,13 +67,12 @@ static void usage(void) {
 "    -c/--font filename         specify character set font (8x2048 image)\n"
 "    -q/--graph-font filename   specify graphics font (8x2048 image)\n"
 "\n"
-"    -K/--cpu-speed speed       select speed: c1p        %.1lf Hz\n"
-"                                             510c-slow  %.1lf Hz (default)\n"
-"                                             510c-fast  %.1lf Hz\n"
-"                                             uk101      %.1lf Hz\n"
-"                                             c2p        %.1lf Hz\n",
-    CPU_CLOCK_C1P, CPU_CLOCK_510C_SLOW, CPU_CLOCK_510C_FAST, CPU_CLOCK_UK101,
-    CPU_CLOCK_C2P);
+"    -K/--cpu-speed speed       select speed: quarter    %.6lf MHz (default)\n"
+"                                             half       %.6lf MHz\n"
+"                                             510c-slow  %.6lf MHz\n"
+"                                             510c-fast  %.6lf MHz\n",
+    CPU_CLOCK_QUARTER / 1000000.0, CPU_CLOCK_HALF / 1000000.0,
+    CPU_CLOCK_510C_SLOW / 1000000.0, CPU_CLOCK_510C_FAST / 1000000.0);
 
     fprintf(stderr, 
 "\n"
@@ -212,16 +210,14 @@ int main_program(int argc, char **argv) {
             kernel_filename = strdup(optarg);
             break;
         case 'K':
-            if (!strcmp(optarg, "c1p")) {
-                cpu_clock = CPU_CLOCK_C1P;
+            if (!strcmp(optarg, "quarter")) {
+                cpu_clock = CPU_CLOCK_QUARTER;
+            } else if (!strcmp(optarg, "half")) {
+                cpu_clock = CPU_CLOCK_HALF;
             } else if (!strcmp(optarg, "510c-slow")) {
                 cpu_clock = CPU_CLOCK_510C_SLOW;
             } else if (!strcmp(optarg, "510c-fast")) {
                 cpu_clock = CPU_CLOCK_510C_FAST;
-            } else if (!strcmp(optarg, "uk101")) {
-                cpu_clock = CPU_CLOCK_UK101;
-            } else if (!strcmp(optarg, "c2p")) {
-                cpu_clock = CPU_CLOCK_C2P;
             } else {
                 cpu_clock = strtol(optarg, NULL, 10);
             }

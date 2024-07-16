@@ -138,19 +138,16 @@ void MainWindow::on_button_launch_clicked() {
 
     switch (ui->combo_cpu_speed->currentIndex()) {
     default:
-        arguments.append("c1p");
+        arguments.append("quarter");
         break;
     case 1:
-        arguments.append("510c-slow");
+        arguments.append("half");
         break;
     case 2:
-        arguments.append("510c-fast");
+        arguments.append("510c-slow");
         break;
     case 3:
-        arguments.append("uk101");
-        break;
-    case 4:
-        arguments.append("c2p");
+        arguments.append("510c-fast");
         break;
     }
 

@@ -104,11 +104,10 @@ options:
     -c/--font filename         specify character set font (8x2048 image)
     -q/--graph-font filename   specify graphics font (8x2048 image)
 
-    -K/--cpu-speed speed       select speed: c1p        983040.0 Hz
-                                             510c-slow  1000000.0 Hz (default)
-                                             510c-fast  2000000.0 Hz
-                                             uk101      1000000.0 Hz
-                                             c2p        2000000.0 Hz
+    -K/--cpu-speed speed       select speed: quarter    0.983040 MHz (default)
+                                             half       1.966080 MHz
+                                             510c-slow  1.000000 MHz
+                                             510c-fast  2.000000 MHz
 
     -v/--disable-video         disable video RAM (default: enabled)
     -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64
@@ -147,9 +146,10 @@ options:
 
     -Z/--switches switches     comma separated list of hardware switches
                                "flipped" before startup
-                                   hires     enable high resolution overlay
-                                   graph     enable graphics font
-                                   nobasic   disable BASIC ROM (8kB extra RAM)
+                                 hires       enable high resolution overlay
+                                 graph       enable graphics font
+                                 nobasic     disable BASIC ROM (8kB extra RAM)
+                                 fullscreen  start fullscreen
 
     -h/--help                  show usage information
 ```

@@ -130,7 +130,7 @@ options:
     -t/--tape-input file       specify tape input file (default: none)
     -T/--tape-output file      specify tape output file (default: tapeout.dat)
     -L/--tape-location         ACIA location: f000 (default), fc00
-    -B/--tape-baseclock        set baseclock (default: 19200)
+    -B/--tape-baseclock        set baseclock (default: 4800)
 
     -f/--floppy0 file          specify floppy0 file (default: none)
     -F/--floppy1 file          specify floppy1 file (default: none)

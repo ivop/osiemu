@@ -103,7 +103,7 @@ static void usage(void) {
 "    -t/--tape-input file       specify tape input file (default: none)\n"
 "    -T/--tape-output file      specify tape output file (default: none)\n"
 "    -L/--tape-location         ACIA location: f000 (default), fc00\n"
-"    -B/--tape-baseclock        set baseclock (default: 19200)\n"
+"    -B/--tape-baseclock        set baseclock (default: 4800)\n"
 "\n"
 "    -f/--floppy0 file          specify floppy0 file (default: none)\n"
 "    -F/--floppy1 file          specify floppy1 file (default: none)\n"

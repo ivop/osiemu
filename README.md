@@ -118,7 +118,8 @@ options:
     -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630
     -s/--saturation            color saturation [0.0-1.0], default: 0.75
     -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)
-    -S/--scanlines             emulate visual scanlines
+    -S/--scanlines             emulate visual scanlines (zoom >= 2 only)
+    -x/--pixels                emulate visual pixels (implies scanlines)
 
     -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01
     -r/--raw-keyboard          enable raw keyboard mode

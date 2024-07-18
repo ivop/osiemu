@@ -38,6 +38,7 @@ extern bool color_ram_enabled;
 extern bool video_smooth;
 extern bool fullscreen;
 extern bool scanlines_enable;
+extern bool pixels_enable;
 
 extern double aspectx;
 extern double aspecty;

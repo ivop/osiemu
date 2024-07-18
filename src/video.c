@@ -71,6 +71,7 @@ static SDL_Texture *drive4_icon;
 static SDL_Texture *digits;
 static SDL_Texture *background;         // single character "font"
 static SDL_Texture *scanlines;
+static SDL_Texture *pixels;
 
 static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
 static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
@@ -132,6 +133,7 @@ static SDL_Texture *hires_screen;
 static bool hires_visible;
 
 bool scanlines_enable;
+bool pixels_enable;
 
 static double interval;
 static double counter;
@@ -325,6 +327,9 @@ void screen_update(void) {
 
     if (scanlines_enable) {
         SDL_RenderCopy(renderer, scanlines, NULL, NULL);
+    }
+    if (pixels_enable) {
+        SDL_RenderCopy(renderer, pixels, NULL, NULL);
     }
 
     // On-Screen-Display
@@ -595,6 +600,26 @@ bool screen_init(double cpu_clock, double fps) {
             SDL_RenderDrawLine(renderer, 0, y, 0, y);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
             SDL_RenderDrawLine(renderer, 0, y+1, 0, y+1);
+        }
+    }
+
+    if (zoom > 1 && pixels_enable) {
+        int pixels_width = screen_width * 2;
+        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                             SDL_TEXTUREACCESS_TARGET,
+                                             pixels_width, 1);
+        if (!pixels) {
+            fprintf(stderr, "error: unable to create pixels texture\n");
+            return false;
+        }
+
+        SDL_SetRenderTarget(renderer, pixels);
+        SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
+        for (int x=0; x<pixels_width; x+=2) {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+            SDL_RenderDrawLine(renderer, x, 0, x, 0);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
+            SDL_RenderDrawLine(renderer, x+1, 0, x+1, 0);
         }
     }
 

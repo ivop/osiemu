@@ -91,7 +91,8 @@ static void usage(void) {
 
     fprintf(stderr,
 "    -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)\n"
-"    -S/--scanlines             emulate visual scanlines\n"
+"    -S/--scanlines             emulate visual scanlines (zoom >= 2 only)\n"
+"    -x/--pixels                emulate visual pixels (implies scanlines)\n"
 "\n"
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
@@ -161,6 +162,7 @@ static struct option long_options[] = {
     { "disable-video",  no_argument,        0, 'v' },
     { "smooth-video",   no_argument,        0, 'V' },
     { "warp-speed",     no_argument,        0, 'w' },
+    { "pixels",         no_argument,        0, 'x' },
     { "sound-mode",     required_argument,  0, 'y' },
     { "sound-bufsize",  required_argument,  0, 'Y' },
     { "zoom",           required_argument,  0, 'z' },
@@ -176,7 +178,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:f:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwy:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:f:F:g:G:hH:ij:J:k:K:L:m:M:rR:s:St:T:vVwxy:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -305,6 +307,10 @@ int main_program(int argc, char **argv) {
             }
             break;
         case 'S':
+            scanlines_enable = true;
+            break;
+        case 'x':
+            pixels_enable = true;
             scanlines_enable = true;
             break;
         case 'H':

@@ -86,6 +86,9 @@ void MainWindow::on_button_launch_clicked() {
     if (ui->check_scanlines->checkState() == Qt::Checked) {
         arguments.append("--scanlines");
     }
+    if (ui->check_pixels->checkState() == Qt::Checked) {
+        arguments.append("--pixels");
+    }
     if (ui->check_smooth_video->checkState() == Qt::Checked) {
         arguments.append("--smooth-video");
     }
@@ -342,6 +345,7 @@ void MainWindow::on_button_save_settings_clicked() {
     out << ui->check_enable_hires->checkState();
     out << ui->check_enable_graph_font->checkState();
     out << ui->check_start_fullscreen->checkState();
+    out << ui->check_pixels->checkState();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -434,6 +438,7 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> tcs; ui->check_enable_hires->setCheckState(tcs);
     in >> tcs; ui->check_enable_graph_font->setCheckState(tcs);
     in >> tcs; ui->check_start_fullscreen->setCheckState(tcs);
+    in >> tcs; ui->check_pixels->setCheckState(tcs);
 
     error = file.error();
     errorstring = file.errorString();

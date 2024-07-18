@@ -8,6 +8,10 @@
 
 static const char *const magic = "OSIEMU-LAUNCHER!";
 
+enum file_format_version {
+    FILE_FORMAT_1 = 0
+};
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -297,6 +301,8 @@ void MainWindow::on_button_save_settings_clicked() {
 
     out.writeRawData(magic, 16);
 
+    out << (quint8) FILE_FORMAT_1;
+
     // serialize all settings
     // be careful when adding new settings, always add them at the end
     // even if that does not reflect how they are shown!
@@ -388,6 +394,18 @@ void MainWindow::on_button_load_settings_clicked() {
     if (memcmp(magic, checkmagic, 16) != 0) {
         error = QFile::OpenError;
         errorstring = "This is not an osiemu-launcher settings file";
+        goto error_out;
+    }
+
+    quint8 file_format;
+    in >> file_format;
+
+    // In the future, use switch statement to call loaders for older version.
+    // Saving will always save the latest version
+
+    if (file_format != FILE_FORMAT_1) {
+        error = QFile::OpenError;
+        errorstring = "This settings file is from a newer version of osiemu-launcher!";
         goto error_out;
     }
 

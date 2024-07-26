@@ -4,7 +4,7 @@ ifeq ($(MAKECMDGOALS),release)
 else
 	DEBUG = -Og -g3
 endif
-WARN ?= -W -Wall -Wextra
+WARN ?= -W -Wall -Wextra -pedantic
 CFLAGS = -flto=auto $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
 		-fsigned-char
 LFLAGS = -flto=auto

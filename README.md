@@ -189,8 +189,10 @@ make release
 ```
 
 ```make``` without any arguments will build a debug version (no optimizations, and level 3 debug info).  
-You can override the sdl2-config utility used by setting the SDL2CONFIG variable on the command line, i.e.
-``` make -j8 release SDL2CONFIG=/path/to/sdl2-config CC=/path/to/my/compiler```  
+You can override the sdl2-config utility used by setting the SDL2CONFIG variable on the command line, i.e.  
+```
+make -j8 release SDL2CONFIG=/path/to/sdl2-config CC=/path/to/my/compiler
+```  
 
 ### Windows
 

@@ -183,7 +183,7 @@ More examples are in the _config_ directory.
 ### Linux
 
 ```
-git clone https://github.com/ivop/osiemu
+git clone --recurse-submodules https://github.com/ivop/osiemu
 cd osiemu
 make release
 ```

@@ -6,7 +6,7 @@ SCREEN = 0xd000
 
 ptr:    .fill 2
 
-zproc main
+zproc _start
     ldy #0
     lda #' '
     zrepeat

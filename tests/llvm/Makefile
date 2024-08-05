@@ -7,7 +7,7 @@ all: test.lod
 	$(XEX2LOD) < $< > $@
 
 %.xex: %.S
-	$(MOSCLANG) -o $@ $<
+	$(MOSCLANG) -nostartfiles -o $@ $<
 
 clean:
 	rm -f *~ *.xex *.lod *.elf

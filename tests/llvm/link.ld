@@ -31,5 +31,5 @@ OUTPUT_FORMAT {
 
     SHORT(0x02e0)
     SHORT(0x02e1)
-    SHORT(main)
+    SHORT(_start)
 }

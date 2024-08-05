@@ -236,6 +236,7 @@ Preferably the version that is distributed with Qt itself.
 
 * Serial: Serial I/O without keyboard and display, rewrite tape code, make it
 work with socat, (virtual) serial ports, and minicom
+* Serial: Implement S1883 UART for C2/C4 systems
 * Sound: 1-bit ACIA RTS DAC (which model?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

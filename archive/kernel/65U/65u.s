@@ -5,6 +5,8 @@
 ; Assemble with Mad-Assembler
 ;
 ; mads -o:65u.rom 65u.s
+;
+; ROM is binary identical to OSI540-65V-FE00.ROM
 
 FLAG=$FB
 DAT=$FC

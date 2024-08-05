@@ -1,0 +1,2 @@
+OSI540-65V-FE00.ROM is binary identical to 65u.rom. See ../65U for source
+code.

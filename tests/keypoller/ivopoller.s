@@ -8,7 +8,8 @@ wait_cntr = $0214
 tmpval = $0215
 last_char = $0216
 
-modifiers = $0100
+modifiers = $02ff   ; should be unused by BASIC, how about non-BASIC programs?
+                    ; assume programs load from $0300 ?
 
 KEYBD = $df00
 
@@ -59,14 +60,12 @@ GETKEY:
     pha
 
 scan_again:
-    lda #0
-    sta modifiers
-
     lda #$01
-    ldy #$fe
+    ldy #0
+    sty modifiers
+    dey
 
 @:
-    iny
     eor #$ff
     sta KEYBD
     eor #$ff
@@ -81,6 +80,7 @@ scan_again:
     bne key_pressed
 
 next:
+    iny
     asl
     bne @-
     beq no_key_pressed

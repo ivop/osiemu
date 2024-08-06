@@ -8,8 +8,8 @@ wait_cntr = $0214
 tmpval = $0215
 last_char = $0216
 
-modifiers = $02ff   ; should be unused by BASIC, how about non-BASIC programs?
-                    ; assume programs load from $0300 ?
+modifiers = $0100   ; BASIC area that is used to build numerals before printing
+                    ; After some testing, this seems safe.
 
 KEYBD = $df00
 

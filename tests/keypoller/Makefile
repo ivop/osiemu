@@ -1,8 +1,8 @@
 MADS ?= mads
 
-ivopoll.com: ivopoller.s
+ivopoll.rom: ivopoller.s
 	mads -o:$@ $<
 
 clean:
-	rm -f ivopoll.com *~
+	rm -f ivopoll.rom *~
 

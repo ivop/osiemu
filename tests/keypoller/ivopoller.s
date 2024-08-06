@@ -1,8 +1,5 @@
-
-; Key Poller, Model 600 keyboard
-; Based on Synmon and Cegmon, but less code.
-; Helper functions and kmatrix still don't fit in page $fd though.
-; Need to shave 15 bytes
+; Key Poller, Model 600 keyboard, by Ivo van Poorten, August 2024
+; Based on Synmon and Cegmon, but less code and heavily optimized.
 ; Test with syn600, replace $fd00 and put extra page in front to create
 ; a $500 bytes ROM.
 

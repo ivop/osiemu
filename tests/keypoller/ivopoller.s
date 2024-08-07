@@ -34,6 +34,26 @@ KEYBD = $df00
 
 ; ----------------------------------------------------------------------------
 
+.ifdef MODEL_542            ; Model 542 keyboard
+    .macro STA_KEYBD
+        sta KEYBD
+    .endm
+    .macro LDA_KEYBD
+        lda KEYBD
+    .endm
+.else                       ; Model 600 keyboard
+    .macro STA_KEYBD
+        eor #$ff
+        sta KEYBD
+        eor #$ff
+    .endm
+
+    .macro LDA_KEYBD
+        lda KEYBD
+        eor #$ff
+    .endm
+.endif
+
     org $fd00
 
 GETKEY:
@@ -49,13 +69,10 @@ scan_again:
     dey
 
 @:
-    eor #$ff
-    sta KEYBD
-    eor #$ff
+    STA_KEYBD
 
     pha
-    lda KEYBD
-    eor #$FF
+    LDA_KEYBD
     tax                     ; Key pressed in X
     pla
 

@@ -1,7 +1,6 @@
 ; Key Poller, Model 600 keyboard, by Ivo van Poorten, August 2024
 ; Based on Synmon and Cegmon, but less code and heavily optimized.
-; Test with syn600, replace $fd00 and put extra page in front to create
-; a $500 bytes ROM.
+; Test with syn600, replaces $fd00-$fdff
 
 cur_char = $0213
 wait_cntr = $0214
@@ -15,33 +14,6 @@ KEYBD = $df00
 
     opt h-      ; no XEX headers
     opt f+      ; single block, fills with $ff
-
-; ----------------------------------------------------------------------------
-
-; extra bank in front of fc00-ffff
-
-    org $fb00
-
-begin_extra:
-
-keyboard_matrix:
-    dta 'p;/ zaq'
-    dta ',mnbvcx'
-    dta 'kjhgfds'
-    dta 'iuytrew'
-;    dta $00,$00,$0D,$0A,'ol.'      ; removed unused columns
-    dta $0D,$0A,'ol.'
-;    dta $00,$5F,'-:098'
-    dta $5F,'-:098'
-    dta '7654321'
-
-matrix_index_tab:
-;    dta 0, 7, 14, 21, 28, 35, 42
-    dta 0, 7, 14, 21, 26, 32, 39    ; corrected indeces for removed unused keys
-
-end_extra:
-
-    .print "EXTRA size: ", end_extra-begin_extra
 
 ; ----------------------------------------------------------------------------
 
@@ -221,6 +193,23 @@ getkey_done:
     tax
     lda tmpval
     rts
+
+; ----------------------------------------------------------------------------
+
+keyboard_matrix:
+    dta 'p;/ zaq'
+    dta ',mnbvcx'
+    dta 'kjhgfds'
+    dta 'iuytrew'
+;    dta $00,$00,$0D,$0A,'ol.'      ; removed unused columns
+    dta $0D,$0A,'ol.'
+;    dta $00,$5F,'-:098'
+    dta $5F,'-:098'
+    dta '7654321'
+
+matrix_index_tab:
+;    dta 0, 7, 14, 21, 28, 35, 42
+    dta 0, 7, 14, 21, 26, 32, 39    ; corrected indeces for removed unused keys
 
     .print "space left: ", $fe00-*
 

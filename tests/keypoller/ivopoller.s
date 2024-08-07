@@ -1,15 +1,27 @@
-; Key Poller, Model 600 keyboard, by Ivo van Poorten, August 2024
-; Based on Synmon and Cegmon, but less code and heavily optimized.
-; Test with syn600, replaces $fd00-$fdff
+; ----------------------------------------------------------------------------
+;
+; Alternative Key Poller
+;
+; Copyright © 2024 by Ivo van Poorten
+;
+; Inspired by Synmon and Cegmon poller, but most code is new and heavily
+; optimized. Cegmon functionality in Synmon space.
+;
+; ----------------------------------------------------------------------------
 
-cur_char = $0213
+; Page 2 Variables
+
+cur_char  = $0213
 wait_cntr = $0214
-tmpval = $0215
+tmpval    = $0215
 last_char = $0216
-
 modifiers = $02ff   ; should be free to use
 
+; Hardware Registers
+
 KEYBD = $df00
+
+; ----------------------------------------------------------------------------
 
     opt h-      ; no XEX headers
     opt f+      ; single block, fills with $ff
@@ -25,14 +37,14 @@ KEYBD = $df00
     org $fd00
 
 GETKEY:
-    txa         ; Push X and Y to the stack
+    txa
     pha
     tya
     pha
 
 scan_again:
-    lda #$01
-    ldy #0
+    lda #$01                ; Row mask
+    ldy #0                  ; Row counter
     sty modifiers
     dey
 
@@ -44,26 +56,28 @@ scan_again:
     pha
     lda KEYBD
     eor #$FF
-    tax
+    tax                     ; Key pressed in X
     pla
 
     cpx #0
     bne key_pressed
 
 next:
-    iny
+    iny                     ; Increase row counter
     asl
     bne @-
     beq no_key_pressed
 
+; ----------------------------------------------------------------------------
+
 key_pressed:
-    lsr                             ; check row 0 ($01)
-    bcc normal_character_pressed
+    lsr                     ; check if row 0 ($01)
+    bcc normal_key_pressed
 
-    rol                             ; correct back to $01
-    stx modifiers                   ; save modifiers
+    rol                     ; correct back to $01
+    stx modifiers           ; save modifiers
 
-    cpx #$21                        ; ESC+CAPS
+    cpx #$21                ; ESC+CAPS
     bne next
 
 ; all ESC combos: cpx #$20 ! bcc next ! cpx #$28 ! bcs next ; 4 bytes bigger
@@ -71,7 +85,7 @@ key_pressed:
     lda #$1b
     bne lookup_done
 
-normal_character_pressed:
+normal_key_pressed:
     lda matrix_index_tab,y
     sta tmpval              ; store "corrected" row*7 
 
@@ -126,59 +140,59 @@ delay_loop:
     beq scan_again
 
 debounce_done:
-    ldx #$64            ; long delay on first character
+    ldx #$64                ; long delay on first character
     cmp last_char
     bne set_wait_cntr
 
-    ldx #$0f            ; shorter repeat rate
+    ldx #$0f                ; shorter repeat rate
 
 set_wait_cntr:
     stx wait_cntr
     sta last_char
     sta tmpval
 
-; apply key modifiers
+; Apply key modifiers --------------------------------------------------------
 
     lda modifiers
-    tay                 ; save modifiers in Y
+    tay                     ; save modifiers in Y
 
     and #7
     tax
     beq no_shift_or_caps
 
     lda tmpval
-    cmp #$5f            ; RUB, case modifiers have no effect
+    cmp #$5f                ; RUB, case modifiers have no effect
     beq getkey_done
 
-    cmp #$61            ; >= 0x61 always toupper() SHIFT+CAPS
+    cmp #$61                ; >= 0x61 always toupper() SHIFT+CAPS
     bcc @+
 
     eor #$20
-    bne adjust_done
+    bne case_adjust_done
 
 @:
-    cpx #1              ; just CAPS?
-    beq adjust_done     ; for < 0x60, CAPS has no effect
+    cpx #1                  ; just CAPS?
+    beq case_adjust_done    ; for < 0x60, CAPS has no effect
 
-    cmp #$30            ; special case, add #$10
+    cmp #$30                ; special case, add #$10
     bne @+
 
     clc
     adc #$10
-    bne adjust_done
+    bne case_adjust_done
 
 @:
-    cmp #$21            ; don't adjust space (0x20) and below
-    bcc adjust_done
+    cmp #$21                ; don't adjust space (0x20) and below
+    bcc case_adjust_done
 
-    eor #$10            ; all other keys with lshift or rshift
+    eor #$10                ; all other keys with lshift or rshift
 
-adjust_done:
+case_adjust_done:
     sta tmpval
 
 no_shift_or_caps:
-    tya                 ; restore saved modifiers
-    and #$40            ; control key?
+    tya                     ; restore saved modifiers
+    and #$40                ; control key?
     beq getkey_done
 
     lda tmpval

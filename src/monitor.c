@@ -613,6 +613,8 @@ bool monitor(void) {
             continue;
         }
 
+        for (char *q = p; *q; q++) *q = tolower(*q);
+
         if (!strcmp(p, "quit") || !strcmp(p, "q")) {
             return false;
         } else if (!strcmp(p, "cont")) {

@@ -199,7 +199,7 @@ void keyboard_text_input(char *text) {
         ascii_state = STATE_PULSE_DOWN;
     }
 
-    if (cooked_lut[key].row > 0) {
+    if (cooked_lut[key].row > 0 || key == 27) {
         clear_matrix();
         keyboard_osi_matrix[cooked_lut[key].row] ^= 1 << cooked_lut[key].col;;
 

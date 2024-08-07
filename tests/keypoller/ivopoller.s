@@ -197,6 +197,9 @@ set_wait_cntr:
     bne adjust_done
 
 @:
+    cmp #$21            ; don't adjust space (0x20) and below
+    bcc adjust_done
+
     eor #$10            ; all other keys with lshift or rshift
 
 adjust_done:

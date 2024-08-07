@@ -7,8 +7,7 @@ wait_cntr = $0214
 tmpval = $0215
 last_char = $0216
 
-modifiers = $0100   ; BASIC area that is used to build numerals before printing
-                    ; After some testing, this seems safe.
+modifiers = $02ff   ; should be free to use
 
 KEYBD = $df00
 

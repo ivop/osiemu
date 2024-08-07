@@ -166,8 +166,6 @@ set_wait_cntr:
     sta last_char
     sta tmpval
 
-foo:
-
 ; apply key modifiers
 
     lda modifiers
@@ -178,10 +176,10 @@ foo:
     beq no_shift_or_caps
 
     lda tmpval
-    cmp #$5f            ; RUB
+    cmp #$5f            ; RUB, case modifiers have no effect
     beq getkey_done
 
-    cmp #$61
+    cmp #$61            ; >= 0x61 always toupper() SHIFT+CAPS
     bcc @+
 
     eor #$20
@@ -189,16 +187,9 @@ foo:
 
 @:
     cpx #1              ; just CAPS?
-    beq adjust_done
+    beq adjust_done     ; for < 0x60, CAPS has no effect
 
-    cmp #$31
-    bcc @+
-
-    eor #$10
-    bne adjust_done
-
-@:
-    cmp #$30
+    cmp #$30            ; special case, add #$10
     bne @+
 
     clc
@@ -206,10 +197,7 @@ foo:
     bne adjust_done
 
 @:
-    cmp #$2c
-    bcc adjust_done
-
-    eor #$10
+    eor #$10            ; all other keys with lshift or rshift
 
 adjust_done:
     sta tmpval

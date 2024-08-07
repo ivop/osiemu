@@ -77,12 +77,16 @@ key_pressed:
     rol                     ; correct back to $01
     stx modifiers           ; save modifiers
 
-    cpx #$21                ; ESC+CAPS
+;    cpx #$21                ; ESC+CAPS only
+    pha
+    txa
+    and #$20
+    tax
+    pla
+    cpx #$20
     bne next
 
-; all ESC combos: cpx #$20 ! bcc next ! cpx #$28 ! bcs next ; 4 bytes bigger
-
-    lda #$1b
+    lda #$1b                ; ESC
     bne lookup_done
 
 normal_key_pressed:

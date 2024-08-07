@@ -1,0 +1,57 @@
+0a  lf
+0c  cr
+1b  esc
+20  space
+
+                SHIFT
+
+2c  ,           eor #$10 / ora #$10     --> <
+2d  -           eor #$10 / ora #$10     --> =
+2e  .           eor #$10 / ora #$10     --> >
+2f  /           eor #$10 / ora #$10     --> ?
+
+30  0
+
+31  1           eor #$10 / and #~$10    --> !
+32  2           eor #$10 / and #~$10    --> "
+33  3           eor #$10 / and #~$10    --> #
+34  4           eor #$10 / and #~$10    --> $
+35  5           eor #$10 / and #~$10    --> %
+36  6           eor #$10 / and #~$10    --> &
+37  7           eor #$10 / and #~$10    --> '
+38  8           eor #$10 / and #~$10    --> (
+39  9           eor #$10 / and #~$10    --> )
+3a  :           eor #$10 / and #~$10    --> *
+3b  ;           eor #$10 / and #~$10    --> +
+
+5f  rub
+
+                SHIFT / CAPS
+
+61  a           eor #$20 / and #~$20    --> A
+62  b           eor #$20 / and #~$20    --> B
+63  c           eor #$20 / and #~$20    --> C
+64  d           eor #$20 / and #~$20    --> D
+65  e           eor #$20 / and #~$20    --> E
+66  f           eor #$20 / and #~$20    --> F
+67  g           eor #$20 / and #~$20    --> G
+68  h           eor #$20 / and #~$20    --> H
+69  i           eor #$20 / and #~$20    --> I
+6a  j           eor #$20 / and #~$20    --> J
+6b  k           eor #$20 / and #~$20    --> K
+6c  l           eor #$20 / and #~$20    --> L
+6d  m           eor #$20 / and #~$20    --> M
+6e  n           eor #$20 / and #~$20    --> N
+6f  o           eor #$20 / and #~$20    --> O
+70  p           eor #$20 / and #~$20    --> P
+71  q           eor #$20 / and #~$20    --> Q
+72  r           eor #$20 / and #~$20    --> R
+73  s           eor #$20 / and #~$20    --> S
+74  t           eor #$20 / and #~$20    --> T
+75  u           eor #$20 / and #~$20    --> U
+76  v           eor #$20 / and #~$20    --> V
+77  w           eor #$20 / and #~$20    --> W
+78  x           eor #$20 / and #~$20    --> X
+79  y           eor #$20 / and #~$20    --> Y
+7a  z           eor #$20 / and #~$20    --> Z
+

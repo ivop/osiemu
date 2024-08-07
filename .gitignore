@@ -1,5 +1,6 @@
 *~
 *.o
+*.elf
 fake6502/*.o
 osiemu
 osiemu-launcher

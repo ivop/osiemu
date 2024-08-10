@@ -1,7 +1,7 @@
 CC ?= cc
 MADS ?= mads
 
-all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas
+all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas img2osi
 
 %.lod: %.xex xex2lod
 	./xex2lod < $< > $@
@@ -17,4 +17,4 @@ all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas
 
 clean:
 	rm -f *~ xex2lod test.xex test.lod hfe2osi mirrorbytes txt2bas hello.bas \
-		osi2hfe
+		osi2hfe img2osi

@@ -15,7 +15,8 @@ cur_char  = $0213
 wait_cntr = $0214
 tmpval    = $0215
 last_char = $0216
-modifiers = $02ff   ; should be free to use
+modifiers = $0100   ; Used by basic to build a printable number, should be
+                    ; save during getkey
 
 ; Hardware Registers
 

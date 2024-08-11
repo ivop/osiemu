@@ -14,6 +14,19 @@
 
 ; ----------------------------------------------------------------------------
 
+; DEBUG
+
+SCREEN = $d000
+
+; ----------------------------------------------------------------------------
+
+; Variables
+
+tmp     = $f0
+curtrk  = $f1       ; under head
+
+; ----------------------------------------------------------------------------
+
 DATA_DIRECTION_ACCESS = $04     ; bit 2, 0 active (!)
 
 ORA   = $c000       ; output register A
@@ -122,12 +135,142 @@ TCB_nRTS_LOW_BREAK_LVL_IRQ_DIS = 0x03
 
 ; ----------------------------------------------------------------------------
 
-main:
+; NOT_INDEX_HOLE_MASK = 0x80, 0 = above hole, 1 = not above
+
+.proc wait_past_index_hole
+
+not_above_hole:
+    lda PORTA
+    bmi not_above_hole
+
+above_hole:
+    lda PORTA
+    bpl above_hole
+
+    rts                 ; right after hole
+.endp
+
+; ----------------------------------------------------------------------------
+
+; Head Movement, step in and step out
+
+.proc step_in
+    lda PORTB
+    ora #DIRECTION_MASK
+    bne step
+.endp
+
+.proc step_out
+    lda PORTB
+    and #~DIRECTION_MASK
+    ; [[fallthrough]]
+.endp
+
+.proc step
+    sta PORTB
+
+    jsr short_delay             ; jsr + rts = 6 + 6 = 12 cycles
+
+    and #~MOVE_HEAD_MASK
+    sta PORTB                   ; 1->0 transition, move
+
+    jsr short_delay             ; jsr + rts = 6 + 6 = 12 cycles
+
+    ora #MOVE_HEAD_MASK
+    sta PORTB                   ; back to 1, ready for next transition
+
+    ldx #8
+    bne long_delay_X            ; branch always
+.endp
+
+; SEEK TO TRACK 0 ENTRY POINT
+
+.proc seek_to_track0
+    jsr step_out
+
+    jsr long_delay              ; always returns with X=Y=0, and Z=1
+
+    sty curtrk
+
+keep_moving:
+    lda #HEAD_NOT_TRACK0_MASK
+    bit PORTA
+    beq long_delay              ; bit 1 is 0, means track 0 sensor is triggered
+
+    jsr step_in                 ; ends with long_delay_X, hence Z=1
+    beq keep_moving             ; branch always
+
+    ; [[fallthrough]]
+.endp
+
+; Long delays always return with X=Y=0 and Z=1
+
+.proc long_delay
+    ldx #$0c
+
+    ; [[fallthrough]]
+.endp
+
+.proc long_delay_X
+    ldy #$c7
+@:
+    dey
+    bne @-
+
+    dex
+    bne long_delay_X
+
+    ; [[fallthrough]]
+.endp
+
+.proc short_delay
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+; convert binary to BCD (0-99 max.)
+; code size: 21 bytes
+
+.proc convert_to_bcd
+    ldx #0
+@:
+    cmp #10
+    bcc final_step
+
+    inx
+
+; carry is always set
+    sbc #10
+    bcs @-
+
+final_step:
+    sta tmp
+
+    txa
+    asl
+    asl
+    asl
+    asl
+
+; carry is always clear
+    adc tmp
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+.proc main
     jsr init_pia
     jsr init_acia
 
+    jsr wait_past_index_hole
+
     jmp *
+.endp
 
 ; ----------------------------------------------------------------------------
 
     run main
+
+; vim: filetype=asm sw=4 ts=4 et

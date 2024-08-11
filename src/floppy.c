@@ -400,7 +400,6 @@ static void act_on_portb_output_value(uint8_t prev_value) {
         }
         seek_counter = seek_time;
     }
-    printf("debug: curtrk: %d\n", drives[curdrive].curtrk);
 }
 
 // ----------------------------------------------------------------------------

@@ -179,7 +179,7 @@ above_hole:
     ora #MOVE_HEAD_MASK
     sta PORTB                   ; back to 1, ready for next transition
 
-    ldx #8
+    ldx #$18                    ; 65D: $18, OS65D: $08
     bne long_delay_X            ; branch always
 .endp
 
@@ -206,19 +206,22 @@ keep_moving:
 ; Long delays always return with X=Y=0 and Z=1
 
 .proc long_delay
-    ldx #$0c
+    ldx #$18                    ; 65D: $18, OS65D: $0c
 
     ; [[fallthrough]]
 .endp
 
 .proc long_delay_X
-    ldy #$c7
+    ldy #$f8                    ; 65D: $f8, OS65D: $c7      2 cycles
 @:
-    dey
-    bne @-
+    dey                         ; 2 cycles
+    bne @-                      ; 3 cycles if taken, $f8*5-1 = 1239 cycles
 
-    dex
-    bne long_delay_X
+    dex                         ; 2 cycles
+    bne long_delay_X            ; 3 cycles if taken, $18*1244-1 = 29855 cycles
+
+                                ; long delay = ca. 30.3 ms @ 983040 Hz CPU
+                                ; X times ca. 1.265 ms
 
     ; [[fallthrough]]
 .endp
@@ -260,11 +263,80 @@ final_step:
 
 ; ----------------------------------------------------------------------------
 
+.proc put_head_on_disk
+    lda PORTB
+    and #~HEAD_NOT_ON_DISK_MASK
+
+    ; [[fallthrough]]
+.endp
+
+.proc move_head
+    sta PORTB
+    ldx #$28
+    jmp long_delay_X
+.endp
+
+.proc lift_head_from_disk
+    lda PORTB
+    ora #HEAD_NOT_ON_DISK_MASK
+    bne move_head
+.endp
+
+; ----------------------------------------------------------------------------
+
+; Write all 1's on track 0
+; Return C=1 on error, C=0 when OK
+
+.proc erase_track0
+    lda #DISK_R_W_MASK
+    bit PORTA
+    bne not_write_protected
+
+error_out:
+    sec
+    rts
+
+not_write_protected:
+    jsr seek_to_track0
+
+    jsr put_head_on_disk
+    jsr wait_past_index_hole
+
+    ; enable write and erase
+
+    lda PORTB
+    and #~(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
+    sta PORTB
+
+    jsr wait_past_index_hole
+
+    ; disable write and erase
+
+    lda PORTB
+    ora #(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
+    sta PORTB
+
+    jsr lift_head_from_disk
+
+    clc
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+; Write all 1's, then write 43h 57h BCD_trknum 58h, then all 1's again
+
+.proc write_track
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
 .proc main
     jsr init_pia
     jsr init_acia
 
-    jsr wait_past_index_hole
+    jsr erase_track0
 
     jmp *
 .endp

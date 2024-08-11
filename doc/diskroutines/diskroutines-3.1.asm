@@ -182,14 +182,14 @@ set_current_based_on_track
     lda PIA_DRB
     ldx #$42
     cpx track_under_head_bcd
-    bcc lower_than_42
+    bcc higher_than_42
 
 ; set current bit
     ora #$40
     bne store_current_bit
 
 ; clear current bit
-lower_than_42
+higher_than_42
     and #$bf
 store_current_bit
     sta PIA_DRB

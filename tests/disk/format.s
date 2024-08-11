@@ -23,7 +23,7 @@ SCREEN = $d000
 ; Variables
 
 tmp     = $f0
-curtrk  = $f1       ; under head
+curtrk  = $f1       ; under head, BCD(!)
 
 ; ----------------------------------------------------------------------------
 
@@ -190,7 +190,7 @@ above_hole:
 
     jsr long_delay              ; always returns with X=Y=0, and Z=1
 
-    sty curtrk
+    sty curtrk                  ; set curtrk to zero
 
 keep_moving:
     lda #HEAD_NOT_TRACK0_MASK
@@ -232,6 +232,8 @@ keep_moving:
 
 ; ----------------------------------------------------------------------------
 
+.ifdef DO_NOT_ASSEMBLE
+
 ; convert binary to BCD (0-99 max.)
 ; code size: 21 bytes
 
@@ -261,6 +263,8 @@ final_step:
     rts
 .endp
 
+.endif
+
 ; ----------------------------------------------------------------------------
 
 .proc put_head_on_disk
@@ -284,37 +288,40 @@ final_step:
 
 ; ----------------------------------------------------------------------------
 
+.proc enable_write_and_erase
+    lda PORTB
+    and #~(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
+    ; [[fallthrough]]
+.endp
+
+.proc common_write_and_erase
+    sta PORTB
+    rts
+.endp
+
+.proc disable_write_and_erase
+    lda PORTB
+    ora #(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
+    bne common_write_and_erase
+.endp
+
+; ----------------------------------------------------------------------------
+
 ; Write all 1's on track 0
 ; Return C=1 on error, C=0 when OK
 
 .proc erase_track0
-    lda #DISK_R_W_MASK
-    bit PORTA
-    bne not_write_protected
-
-error_out:
-    sec
-    rts
-
-not_write_protected:
     jsr seek_to_track0
 
     jsr put_head_on_disk
-    jsr wait_past_index_hole
-
-    ; enable write and erase
-
-    lda PORTB
-    and #~(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
-    sta PORTB
 
     jsr wait_past_index_hole
 
-    ; disable write and erase
+    jsr enable_write_and_erase
 
-    lda PORTB
-    ora #(READ_FROM_DISK_MASK | ERASE_ENABLE_MASK)
-    sta PORTB
+    jsr wait_past_index_hole
+
+    jsr disable_write_and_erase
 
     jsr lift_head_from_disk
 
@@ -324,19 +331,103 @@ not_write_protected:
 
 ; ----------------------------------------------------------------------------
 
+; Write byte in X to ACIA
+
+.proc output_byte
+
+wait_until_tdr_empty:
+    lda ACIA_STATUS
+    lsr
+    lsr
+    bcc wait_until_tdr_empty
+
+    stx ACIA_TDR
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
 ; Write all 1's, then write 43h 57h BCD_trknum 58h, then all 1's again
 
-.proc write_track
+.proc write_track_marker
+    jsr wait_past_index_hole
+
+    jsr enable_write_and_erase
+
+    ldx #$08
+    jsr long_delay_X
+
+    ldx #$43
+    jsr output_byte
+    ldx #$57
+    jsr output_byte
+    ldx curtrk
+    jsr output_byte
+    ldx #$58
+    jsr output_byte
+
+    jsr wait_past_index_hole
+
+    jsr disable_write_and_erase
+
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+.proc initialize_tracks_1_39
+    jsr seek_to_track0
+
+    jsr put_head_on_disk
+
+next_track:
+    jsr step_out
+
+    sed                     ; to avoid using BCD conversion, we count in BCD
+    lda curtrk              ; inc does not work in BCD mode
+    clc
+    adc #1
+    sta curtrk
+    cld
+
+    jsr write_track_marker
+
+    lda curtrk
+    cmp #$39
+    bne next_track
+
+    jsr lift_head_from_disk
+
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+.proc format_disk
+    jsr init_pia
+    jsr init_acia
+
+    lda #DISK_R_W_MASK
+    bit PORTA
+    bne not_write_protected
+
+error_out:
+    sec
+    rts
+
+not_write_protected:
+    jsr erase_track0
+    jsr initialize_tracks_1_39
+    jsr seek_to_track0
+
+    clc
     rts
 .endp
 
 ; ----------------------------------------------------------------------------
 
 .proc main
-    jsr init_pia
-    jsr init_acia
-
-    jsr erase_track0
+    jsr format_disk
 
     jmp *
 .endp

@@ -68,7 +68,9 @@ static bool erase_enable;
 static bool step_to_3976;
 static bool drive_01_23;
 static bool low_current UNUSED;
-       bool head_on_disk;
+static bool head_on_disk;
+
+int floppy_activity;
 
 // ACIA
 
@@ -191,7 +193,7 @@ static bool login_drive(struct drive *d) {
     disk_type = type;
 
     d->offset = fgetc(d->f) * 256;
-    d->curtrk = 7;                  // just somewhere not track 0
+    d->curtrk = 20;                  // just somewhere not track 0
     d->pos = d->bit = 0;
     d->ready = true;
     d->r_w = true;
@@ -330,6 +332,7 @@ static uint8_t merge_pins(struct port *p) {
 // ----------------------------------------------------------------------------
 
 uint8_t floppy_pia_read(uint16_t address) {
+    floppy_activity = 25;
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
@@ -397,11 +400,13 @@ static void act_on_portb_output_value(uint8_t prev_value) {
         }
         seek_counter = seek_time;
     }
+    printf("debug: curtrk: %d\n", drives[curdrive].curtrk);
 }
 
 // ----------------------------------------------------------------------------
 
 void floppy_pia_write(uint16_t address, uint8_t value) {
+    floppy_activity = 25;
     switch (address & 3) {
     case 0:     // ORA or DDRA
         if (!(pia.cra & DATA_DIRECTION_ACCESS)) {
@@ -434,6 +439,7 @@ void floppy_pia_write(uint16_t address, uint8_t value) {
 // ----------------------------------------------------------------------------
 
 uint8_t floppy_acia_read(uint8_t address) {
+    floppy_activity = 25;
     switch (address & 1) {
     case 0:                 // status register
         return status;
@@ -450,6 +456,7 @@ uint8_t floppy_acia_read(uint8_t address) {
 // ----------------------------------------------------------------------------
 
 void floppy_acia_write(uint16_t address, uint8_t value) {
+    floppy_activity = 25;
     int ws;
     switch (address & 1) {
     case 0:                 // control register

@@ -334,9 +334,7 @@ void screen_update(void) {
 
     // On-Screen-Display
 
-    if (tape_running) {
-        SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
-    } else if (head_on_disk) {
+    if (floppy_activity) {
         int drive, track;
         SDL_Texture *p;
 
@@ -359,6 +357,10 @@ void screen_update(void) {
         src_rect_digits.x = m * 32;
         dst_rect_digits.x = 96 + 32;
         SDL_RenderCopy(renderer, digits, &src_rect_digits, &dst_rect_digits);
+
+        floppy_activity--;
+    } else if (tape_running) {
+        SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
     }
 
     SDL_RenderPresent(renderer);

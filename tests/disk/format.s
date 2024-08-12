@@ -155,13 +155,13 @@ above_hole:
 
 ; Head Movement, step in and step out
 
-.proc step_in
+.proc step_out                  ; to edge, track--
     lda PORTB
     ora #DIRECTION_MASK
     bne step
 .endp
 
-.proc step_out
+.proc step_in                   ; to center hole, track++
     lda PORTB
     and #~DIRECTION_MASK
     ; [[fallthrough]]
@@ -187,7 +187,7 @@ above_hole:
 ; SEEK TO TRACK 0 ENTRY POINT
 
 .proc seek_to_track0
-    jsr step_out
+    jsr step_in
 
     jsr long_delay              ; always returns with X=Y=0, and Z=1
 
@@ -198,7 +198,7 @@ keep_moving:
     bit PORTA
     beq long_delay              ; bit 1 is 0, means track 0 sensor is triggered
 
-    jsr step_in                 ; ends with long_delay_X, hence Z=1
+    jsr step_out                ; ends with long_delay_X, hence Z=1
     beq keep_moving             ; branch always
 
     ; [[fallthrough]]
@@ -418,7 +418,7 @@ next_byte:
     jsr put_head_on_disk
 
 next_track:
-    jsr step_out
+    jsr step_in
 
     sed                     ; to avoid using BCD conversion, we count in BCD
     lda curtrk              ; inc does not work in BCD mode

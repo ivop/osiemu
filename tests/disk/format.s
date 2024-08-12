@@ -24,6 +24,7 @@ SCREEN = $d000
 
 tmp     = $f0
 curtrk  = $f1       ; under head, BCD(!)
+ptr     = $f2       ; + $f3
 
 ; ----------------------------------------------------------------------------
 
@@ -232,41 +233,6 @@ keep_moving:
 
 ; ----------------------------------------------------------------------------
 
-.ifdef DO_NOT_ASSEMBLE
-
-; convert binary to BCD (0-99 max.)
-; code size: 21 bytes
-
-.proc convert_to_bcd
-    ldx #0
-@:
-    cmp #10
-    bcc final_step
-
-    inx
-
-; carry is always set
-    sbc #10
-    bcs @-
-
-final_step:
-    sta tmp
-
-    txa
-    asl
-    asl
-    asl
-    asl
-
-; carry is always clear
-    adc tmp
-    rts
-.endp
-
-.endif
-
-; ----------------------------------------------------------------------------
-
 .proc put_head_on_disk
     lda PORTB
     and #~HEAD_NOT_ON_DISK_MASK
@@ -307,30 +273,6 @@ final_step:
 
 ; ----------------------------------------------------------------------------
 
-; Write all 1's on track 0
-; Return C=1 on error, C=0 when OK
-
-.proc erase_track0
-    jsr seek_to_track0
-
-    jsr put_head_on_disk
-
-    jsr wait_past_index_hole
-
-    jsr enable_write_and_erase
-
-    jsr wait_past_index_hole
-
-    jsr disable_write_and_erase
-
-    jsr lift_head_from_disk
-
-    clc
-    rts
-.endp
-
-; ----------------------------------------------------------------------------
-
 ; Write byte in X to ACIA
 
 .proc output_byte
@@ -347,14 +289,81 @@ wait_until_tdr_empty:
 
 ; ----------------------------------------------------------------------------
 
-; Write all 1's, then write 43h 57h BCD_trknum 58h, then all 1's again
+.proc init_trkbuf_ptr
+    lda #<trkbuf
+    sta ptr
+    lda #>trkbuf
+    sta ptr+1
+    rts
+.endp
 
-.proc write_track_marker
+; ----------------------------------------------------------------------------
+
+; Erase track 0 and write empty boot sector of 8 pages.
+; Return C=1 on error, C=0 when OK
+
+.proc erase_track0
+    lda #8
+    sta tmp
+    jsr init_trkbuf_ptr
+
+    jsr seek_to_track0
+
+    jsr put_head_on_disk
+
     jsr wait_past_index_hole
 
     jsr enable_write_and_erase
 
+    ldx #$07
+    jsr long_delay_X
+
+    ldx #$00
+    jsr output_byte
+    ldx #$22
+    jsr output_byte
     ldx #$08
+    jsr output_byte
+
+    ldy #0
+next_byte:
+    lda (ptr),y
+    tax
+    jsr output_byte
+
+    iny
+    bne next_byte
+
+    inc ptr+1
+    dec tmp
+    bne next_byte
+
+    jsr wait_past_index_hole
+
+    jsr disable_write_and_erase
+
+    jsr lift_head_from_disk
+
+    clc
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
+; Write all 1's, then write 43h 57h BCD_trknum 58h, then write empty sector
+; of 8 pages. 76h 01h 08h (secnum 01h and 08h pages), 2048 zeroes, and end
+; with 47h and 53h.
+
+.proc write_track
+    lda #8
+    sta tmp
+    jsr init_trkbuf_ptr
+
+    jsr wait_past_index_hole
+
+    jsr enable_write_and_erase
+
+    ldx #$07
     jsr long_delay_X
 
     ldx #$43
@@ -364,6 +373,34 @@ wait_until_tdr_empty:
     ldx curtrk
     jsr output_byte
     ldx #$58
+    jsr output_byte
+
+    ldx #$02
+    jsr long_delay_X
+
+    ldx #$76
+    jsr output_byte
+    ldx #$01
+    jsr output_byte
+    ldx #$08
+    jsr output_byte
+
+    ldy #0
+next_byte:
+    lda (ptr),y
+    tax
+    jsr output_byte
+
+    iny
+    bne next_byte
+
+    inc ptr+1
+    dec tmp
+    bne next_byte
+
+    ldx #$47
+    jsr output_byte
+    ldx #$53
     jsr output_byte
 
     jsr wait_past_index_hole
@@ -390,7 +427,7 @@ next_track:
     sta curtrk
     cld
 
-    jsr write_track_marker
+    jsr write_track
 
     lda curtrk
     cmp #$39
@@ -426,11 +463,38 @@ not_write_protected:
 
 ; ----------------------------------------------------------------------------
 
+.proc clear_trkbuf
+    jsr init_trkbuf_ptr
+
+    ldx #8
+    ldy #0
+    tya
+@:
+    sta (ptr),y
+    dey
+    bne @-
+
+    inc ptr+1
+    dex
+    bne @-
+
+    rts
+.endp
+
+; ----------------------------------------------------------------------------
+
 .proc main
+    jsr clear_trkbuf
+
     jsr format_disk
 
     jmp *
 .endp
+
+; ----------------------------------------------------------------------------
+
+trkbuf:
+    .ds 2048
 
 ; ----------------------------------------------------------------------------
 

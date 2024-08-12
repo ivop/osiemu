@@ -12,7 +12,7 @@
  *      OSI Disk Stream format
  *
  *      Track 0, special case, load at $2200, 2048 bytes
- *      Rest: OS65D track marker plus 1 sectors of 2048 bytes (8 pages)
+ *      Rest: OS65D track marker plus 1 sector of 2048 bytes (8 pages)
  *
  * Use case: CP/M-65 port with deblocking
  *      Always read and write full track to simplify writing sectors and

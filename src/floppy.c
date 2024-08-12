@@ -256,7 +256,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         trksize = 0x0d00;
         rpm = 300;
         bitrate = 125000.0;
-        hole_length = 5.5;
+        hole_length = 5.5;          // see doc/disk-format.txt
         seek_time = 3.0;
         break;
     case TYPE_8_SS:
@@ -264,7 +264,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         trksize = 0x1500;
         rpm = 360;
         bitrate = 250000.0;
-        hole_length = 3.0;  // docs say 5ms?, but Mike's 8" OS65D needs 3ms
+        hole_length = 3.0;          // see doc/disk-format.txt
         seek_time = 3.0;
         break;
     }

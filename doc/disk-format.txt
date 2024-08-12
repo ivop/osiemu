@@ -69,3 +69,64 @@ This is inverse compared to how the HFE files store a bitstream, but my way
 makes it easier to be read by a human (i.e. reading and decoding the hexdump
 visually). Computationally there's no difference.
 
+
+CHARACTERISTICS
+===============
+
+5.25" floppies
+--------------
+
+Jacket:         5.25" x 5.25"
+Disk:           5.125" diameter
+Center hole:    1.125" diameter
+
+Index hole:     RS 5.25" Floppy Disk Drive Manual
+                    4.0ms +/- 3.0ms
+                Mitsubishi M4851 OEM Manual
+                    4.0ms
+                BASF 6101/6108 Technical Manual
+                    2.0ms +/- 0.4ms
+                Mitsubishi MF504 Maintenance Manual
+                    1.0-8.0ms
+                QumeTrak 142 Maintenance Manual
+                    2.0-5.0ms
+                MPI B51 Product Manuals 1980, 1982, and 1984
+                    No information (this is the drive OSI used)
+
+Track to track: 3.0ms
+
+8" floppies
+-----------
+
+Jacket:         8" x 8"
+Disk:           ???
+Center hole:    1 5/16" diameter
+
+Low current:    A low active level on this line is required for writing on
+                tracks 44 trough 76. This input (of the drive) is used to
+                lower the write current by 20% which consequently improves
+                the read output resolution of the inner tracks.
+
+Index hole :    Y-E DATA YD-174 8" floppy drive Manual
+                    1.8ms +/- 0.6ms
+                Siemend FDD 100-8 Technical Manual
+                    1.7ms +/- 0.5ms
+                Mitsubishi M2896-63 OEM Manual
+                    1-8ms
+                Tandon TM848-1E Product Specification
+                    4ms nominally
+                Shugart SA810/SA860
+                    0.2-2.4ms
+
+Track to track: 3.0ms
+
+
+Note:   OSI waits until after the index hole. Considering the wide variation
+        in widths of the index hole pulse, it would have been better to sync
+        to the leading edge of the pulse.
+
+osiemu:
+
+    5.25" index hole:   5.5ms
+       8" index hole:   3.0ms   (higher won't boot 65D for 8" by Mike)
+

@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
     } else if (ph.ntracks == 77 && ph.nsides == 2 && ph.bitrate == 500 && ph.rpm == 360) {
         printf("detected 8\", 77 tracks, 250kbps\n");
         oh.type = TYPE_8_SS;
+        ntracks = 77;
         trksize = 0x1500;
     } else {
         printf("unknown format detected\n");

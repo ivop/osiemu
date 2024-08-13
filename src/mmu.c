@@ -50,11 +50,11 @@ static uint16_t kernel_bottom;
 // cf00-cf1f    Up to 16 ACIA's (Model 550 serial port board)
 //              used by multishare system and C3s
 //
-// d000-d7ff    Screen RAM 1kB or 2kB
+// d000-d7ff    Screen RAM 1kB or 2kB / 1kB screen + 1kB colors (Model 630)
 // d800         Superboard II/Model 600 control register
 // de00         Model 54x control register
 //              write:
-//                  bit 0, 1=32, 0=64
+//                  bit 0, 1=64x32, 0=32x32s64
 //                  bit 1, 1=tone on (542 keyboard)
 //                  bit 2, 1=color on (540 graphics)
 //                  bit 3, 1=enable 38-40kHz AC Home control output
@@ -65,7 +65,7 @@ static uint16_t kernel_bottom;
 // df01         ASCII keyboard
 // df01         8R DAC output, or tone generator at 49152/(value+1) Hz
 //
-// e000-e7ff    Color RAM / 2kB 128x128 hires 440B
+// e000-e7ff    Color RAM 540B or 2kB 128x128 hires 440B
 //
 // f000-f0ff    ACIA for tape input
 //

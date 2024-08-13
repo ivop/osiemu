@@ -1,0 +1,12 @@
+Model 540 adds a control register located at de00.
+
+write:
+
+bit 0   1=32x32s64  0=64x32
+bit 1   1=tone generator on (542 keyboard), 0=off
+bit 2   1=color on, 0=off
+bit 3   1=enable AC Home Control output, 0=off
+
+read:
+
+bit 7   square wave, 50:50, duty cycle 60Hz

@@ -729,3 +729,33 @@ void screen_toggle_hires(void) {
 }
 
 // ----------------------------------------------------------------------------
+
+static void create_screen_texture(void) {
+    screen_width = osi_width * 8;
+    screen_height = osi_height * 8;
+
+    if (screen) SDL_DestroyTexture(screen);
+    screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                         SDL_TEXTUREACCESS_TARGET,
+                                         screen_width, screen_height);
+}
+
+void screen_reinit_540(void) {
+    if (control_5xx & 1) {
+        osi_width = 64;
+    } else {
+        osi_width = 32;
+    }
+    create_screen_texture();
+}
+
+void screen_reinit_600(void) {
+    if (control_6xx & 1) {
+        osi_width = osi_stride = 64;
+        osi_height = 16;
+    } else {
+        osi_width = osi_stride = 32;
+        osi_height = 32;
+    }
+    create_screen_texture();
+}

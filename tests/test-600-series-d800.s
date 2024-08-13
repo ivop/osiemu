@@ -35,6 +35,7 @@ end_of_text1:
     iny
     bne @-
 
+loop:
     tya
     tax
 
@@ -55,15 +56,19 @@ end_of_text2:
 
 ; Set n32 --> 64x16
 
-    lda #$01
+    lda mode
+    eor #1
+    sta mode
     sta CONTROL
 
-    jmp *
+    jmp loop
 
 text1:
     dta 'Hello, world!',0
 text2:
     dta 'Goodbye, cruel world...',0
+mode:
+    dta 0
 
     run start
 

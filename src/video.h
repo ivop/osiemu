@@ -86,3 +86,6 @@ void screen_swap_fonts(void);
 void screen_tick(double ticks);
 
 void screen_toggle_hires(void);
+
+void screen_reinit_540(void);
+void screen_reinit_600(void);

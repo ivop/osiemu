@@ -77,7 +77,12 @@ static void usage(void) {
     fprintf(stderr, 
 "\n"
 "    -v/--disable-video         disable video RAM (default: enabled)\n"
-"    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64\n"
+"    -m/--video-mode mode       forced modes:   64x32 (default)\n"
+"                                               64x16\n"
+"                                               32x32\n"
+"                                               32x32s64\n"
+"                               variable modes: 540b (32x32s64 / 64x32)\n"
+"                                               600 (32x32 / 64x16)\n"
 "    -M/--mono-color color      monochrome color green, amber, bluish or white\n"
 "    -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3\n"
 "    -z/--zoom factor           increase display size by factor (2, 3, or 4)\n"
@@ -252,7 +257,7 @@ int main_program(int argc, char **argv) {
             } else if (!strcmp(optarg, "32x32s64")) {
                 osi_width = 32;
                 osi_height = 32;
-                osi_stride = 64;    // Model 440B
+                osi_stride = 64;
                 stretchx = 2;
                 screen_ram_top = 0xd7ff;
             } else if (!strcmp(optarg, "64x16")) {
@@ -261,6 +266,20 @@ int main_program(int argc, char **argv) {
                 osi_stride = 64;
                 stretchy = 2;
                 screen_ram_top = 0xd3ff;
+            } else if (!strcmp(optarg, "540b")) {
+                osi_width = 32;
+                osi_height = 32;
+                osi_stride = 64;
+                stretchx = 2;
+                screen_ram_top = 0xd7ff;
+                control_5xx_enable = true;
+            } else if (!strcmp(optarg, "600")) {
+                osi_width = 32;
+                osi_height = 32;
+                osi_stride = 32;
+                stretchx = 2;
+                screen_ram_top = 0xd3ff;
+                control_6xx_enable = true;
             } else {
                 fprintf(stderr, "error: unrecognized mode: %s\n", optarg);
                 return 1;

@@ -110,7 +110,12 @@ options:
                                              510c-fast  2.000000 MHz
 
     -v/--disable-video         disable video RAM (default: enabled)
-    -m/--video-mode mode       mode: 64x32 (default), 64x16, 32x32, 32x32s64
+    -m/--video-mode mode       forced modes:   64x32 (default)
+                                               64x16
+                                               32x32
+                                               32x32s64
+                               variable modes: 540b (32x32s64 / 64x32)
+                                               600 (32x32 / 64x16)
     -M/--mono-color color      monochrome color green, amber, bluish or white
     -a/--aspect mode           aspect mode: full (default), 16:9 or 4:3
     -z/--zoom factor           increase display size by factor (2, 3, or 4)
@@ -129,7 +134,7 @@ options:
     -J/--joystick2 index       specify joystick 2
 
     -t/--tape-input file       specify tape input file (default: none)
-    -T/--tape-output file      specify tape output file (default: tapeout.dat)
+    -T/--tape-output file      specify tape output file (default: none)
     -L/--tape-location         ACIA location: f000 (default), fc00
     -B/--tape-baseclock        set baseclock (default: 4800)
 

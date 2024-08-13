@@ -9,16 +9,16 @@ bit comes from U72, located at 2C1 (OSI 600 schematic).
 U72 is wired confusingly, like:
 
 databus     LS174 inputs    function
-D0      --> 3D              /32                 (32x32 mode (?))
+D0      --> 3D              /32
 D1      --> 2D              COLOR EN
 D2      --> 1D              BK0
 D3      --> 5D              BK1
-D4      --> 6D              DAC DISABLE
+D4      --> 6D              /DAC DISABLE
 D5      --> 4D              N.C.
 
 Documentation is scarce.
 
-Location of this register seems to be $d800 (ref. Third Book Of OSI, page 89)
+Location of this register is $d800 (ref. Third Book Of OSI, page 89)
 
     lda #$10        ; turn DAC on, output of LS74 is inverted(!)
     sta $d800
@@ -31,10 +31,10 @@ output is identical.
 
 Bit 1 (D1) controls the 630 color enable.
 
-/32 probably switches between 32x32 and 64x16. Both take 1kB of screen
+Setting the /32 bit to 1 switches from 32x32 to 64x16. Both take 1kB of screen
 memory located at $d000-$d3ff. Color RAM is located at $d400-$d7ff.
 
-Todo:
 
-BK0 and BK1 seem to be for bank switching. Need to investigate the schematics
-further.
+BK0 and BK1 are used for bank switching. Found one use on github. Cegmon
+Monitor Select uses an 8kB ROM in the monitor ROM socket and uses BK0 and BK1
+to select which 2kB bank is visible.

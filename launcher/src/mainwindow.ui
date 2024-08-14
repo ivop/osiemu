@@ -367,6 +367,16 @@
             <string>32x32s64</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>540b</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>600</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>

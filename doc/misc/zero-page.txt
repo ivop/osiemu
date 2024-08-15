@@ -1,0 +1,130 @@
+Ohio Scientific zero page memory map
+
+This memory map is from an Ohio Scientific C2-4P computer with 16K or memory and a BASIC-IN-ROM version 1.0, Rev 3.2. Most entries are due to Bruce Hoyt and Jim Butterfield. The Ohio Scientific used a 6502 CPU, so the first 256 bytes, or page zero of memory, was very special, as it could be accessed easier than any of the other memory in the system.
+
+Zero Page
+
+00 4C 74 A2 JMP to warm start. $BD11 earlier, cold start.
+03 4C C3 A8 JMP to message printer. Registers A,Y contain the lo,hi address of the start of message. Message ends with a null
+06 05 AE    INVAR, USR get argument routine address
+08 C1 AF    OUTVAR, address of the USR return value routine
+0A 4C 88 AE JMP to USR(X) routine
+0D 00       number of nulls after a line feed, set by NULL command
+            Note! not the nulls after a carriage return
+0E 00       line buffer pointer
+0F 48       terminal width $48=72
+10 38       input column limit
+11 00 40    integer address
+13 to 5A    line buffer
+5B 22       used by dec. to bin. routine, search character, etc.
+5C 22       scan between quotes flag
+5D --       line buffer pointer, number of subscripts
+5E --       default DIM flag
+5F FF       type: $FF=string, $00=numeric
+60 --       DATA scan flag, LIST quote flag, memory flag
+61 00       subscript flag, FNx flag
+62 --       $00=input, $98=read
+63 --       comparison evaluation flag
+64 00       CTRL-O flag. $80= means supress output
+65 68 65 00 temporary string (descriptor stack) pointers
+68 06 92 A1 stack of descriptors for temporary strings
+6B -- -- -- stack of descriptors for temporary strings
+6E -- -- -- stack of descriptors for temporary strings
+71 92 A1    temporary variable pointer, also used by dec to bin
+73 47 9B    pointers, etc.
+75 -- --    product staging area for multiplication
+77 -- --    product staging area for multiplication
+79 01 03    TXTTAB: address of start of the source program in RAM.
+7B 03 03    VARTAB: address of start of the single variable table
+7D 03 03    ARYTAB: address of start of the array variable table
+7F 03 03    STREND: address of start of the empty basic memory
+81 FF 3F    FRETOP: address of start of the high string storage space
+83 -- --    FRESPC: point to top of RAM memory. User can set to less than max RAM.
+85 00 40    MEMSIZ: address + 1 of the end of basic memory
+87 -- FF    CURLIN: current line number
+89 -- --    OLDLIN: line number at stop, end, or CTRL-C break
+8B -- 00    program scan pointer, address of current line
+8D -- --    line number of present DATA statement
+8F 00 03    next address in DATA statements
+91 -- --    address of the next value after comma in present DATA statement
+93 -- --    last variable name
+95 12 --    last variable value address
+97 -- --    address of current variable, pointer for FOR/NEXT
+99 -- -- -- work area, pointers, constant save, etc.
+9C -- -- -- work area, pointers, constant save, etc.
+9F -- 03    work area, pointers, constant save, etc.
+A1 4C -- 00 JMP, a general purpose JMP
+A4 -- -- -- misc. work area and storage
+A7 -- FE 00 misc. work area and storage
+AA -- -- -- pointer to current program line
+AC to B0    first floating point accumulator. E,M,M,M,S
+AC 06 92    AD and AE are printed in decimal by $B962
+AE 68       FACHI, byte transferred by USR(X)
+AF 00       FACLO, byte transferred by USR(X)
+B0 20       sign of Acc. #1
+B1 --       series evaluation constant pointer
+B2 00       accumulator #1 high order (overflow) word
+B3 to B7    second floating point accumulator. E,M,M,M,S
+B8 92       sign comparison, acc #1 vs #2
+B9 A1       acc. #1 low order (rounding) word
+BA 98 A1    series pointer
+BC to D3    routine copied from $BCEE. It is the start of a subroutine to go through a line character by character.
+BC E6 C3    INC lo byte of address of character
+BE D0 02    BNE
+C0 E6 C4    INC hi byte if needed
+C2 AD 00 03 LDA with a character of the line
+C5 C9 3A    CMP #$3A is it a colon?
+C7 B0 0A    BCS branch is yes, statement done
+C9 C9 20    CMP #$20 is it a space?
+CB F0 EF    BEQ branch if yes, get another character
+CD 38       SEC set carry
+CE E9 30    SBC #$30
+D0 38       SEC set carry
+D1 E9 D0    SBC #$D0
+D3 60       RTS end of subroutine, character in A
+D4 80 4F    random seed
+D6 C7 52    random seed
+D8 to FF    unused by BASIC
+FB --       monitor load flag
+FC --       monitor data byte
+FD --       monitor data byte
+FE -- --    monitor current address
+
+Page $0100
+
+100 to 10C  ASCII numerals built in this space
+10D to 12F  ???
+130         NMI interrupt location
+1C0         IRQ interrupt location (can be overwritten by BASIC)
+133 to 1FF  BASIC stack
+
+Page $0200
+
+200 to 20E  used to output to the screen and tape
+200         cursor location, initialized to contents of $FFE0
+201         save character to be printed
+202         temporary
+203         LOAD flag, $80 means load from tape
+204         temporary
+205         SAVE flag, $0 means not save mode
+206         repeat rate for CRT routine
+207 to 20E  part of scroll routine
+207         LDA $D700,Y
+20A         STA $D700,Y
+20D         INY
+20E         RTS
+20F to 211  unused
+212 00      CTRL/C flag, not 0 means ignore CTRL/C
+213 0D 96 0D 0D used by keyboard routine
+217         ?
+218 to 221  used in 600 board machines as follows
+218         input vector
+21A         output vector
+21C         CTRL/C vector
+21E         load vector
+220         save vector
+
+Page $0300 onwards
+
+This was the free RAM that BASIC used to store the program. It started at $0300 and went to the top of the free RAM memory, unless the user specified less memory during the first cold start. 
+

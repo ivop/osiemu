@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Single ROM for 440 board 65V Monitor (ASCII keyboard)
+; Single ROM for 400 board 65V Monitor (ASCII keyboard)
 ; Assemble with Mad-Assembler
 ; Cleanup by Ivo van Poorten, August 2024
 ;

@@ -120,8 +120,8 @@ int main(int argc, char **argv) {
             for (int j=0; j<248*8; j++)
                 put_bit(1);
 
-            put_byte_8E1(0x00);             // LSB load address
             put_byte_8E1(0x22);             // MSB load address
+            put_byte_8E1(0x00);             // LSB load address
             put_byte_8E1(0x08);             // size in pages
 
             for (int j=0; j<2048; j++)

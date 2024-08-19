@@ -193,7 +193,7 @@ static bool login_drive(struct drive *d) {
     disk_type = type;
 
     d->offset = fgetc(d->f) * 256;
-    d->curtrk = 20;                  // just somewhere not track 0
+    d->curtrk = 7;                  // just somewhere not track 0
     d->pos = d->bit = 0;
     d->ready = true;
     d->r_w = true;

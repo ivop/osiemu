@@ -314,6 +314,9 @@ static SDL_Texture *load_texture(char *filename) {
 // ----------------------------------------------------------------------------
 
 void screen_update(void) {
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+
     blit_screenmem(font);
 
     SDL_SetRenderTarget(renderer, NULL);
@@ -345,21 +348,26 @@ void screen_update(void) {
         case 2: p = drive3_icon; break;
         case 3: p = drive4_icon; break;
         }
+        dst_rect_64x64.x = w - 96;
+        dst_rect_64x64.y = 16;
         SDL_RenderCopy(renderer, p, &src_rect_64x64, &dst_rect_64x64);
 
         int n = track / 10, m = track % 10;
         if (n > 9) n = 9;
 
         src_rect_digits.x = n * 32;
-        dst_rect_digits.x = 96;
+        dst_rect_digits.x = w - 96 - 5*16;
         SDL_RenderCopy(renderer, digits, &src_rect_digits, &dst_rect_digits);
 
         src_rect_digits.x = m * 32;
-        dst_rect_digits.x = 96 + 32;
+        dst_rect_digits.x = w - 96 - 3*16;
         SDL_RenderCopy(renderer, digits, &src_rect_digits, &dst_rect_digits);
 
         floppy_activity--;
-    } else if (tape_running) {
+    }
+    if (tape_running) {
+        dst_rect_64x64.x = w - 96;
+        dst_rect_64x64.y = h - 96;
         SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
     }
 

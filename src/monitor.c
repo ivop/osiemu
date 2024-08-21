@@ -511,6 +511,42 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+static void fill(void) {
+    uint16_t start, end;
+    uint8_t val;
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+err_usage:
+        puts("usage: f start end value");
+        return;
+    }
+
+    start = strtol(p, NULL, 16);
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    end = strtol(p, NULL, 16);
+
+    p = strtok(NULL, " \t\n\r");
+
+    if (!p) goto err_usage;
+
+    val = strtol(p, NULL, 16);
+
+    if (start > end) {
+        puts("error: start > end");
+        goto err_usage;
+    }
+
+    for (int loc = start; loc <= end; loc++)
+        write6502(loc, val);
+}
+
+// ----------------------------------------------------------------------------
+
 static void help(void);
 
 static struct command {
@@ -524,6 +560,7 @@ static struct command {
     { "hide",   hide,   "",            "hide emulation window" },
     { "d",      dump,   "[mem]",       "dump memory contents" },
     { "c",      change, "mem val ...", "change memory to value(s)" },
+    { "f",      fill,   "beg end val", "fill memory with value" },
     { "regs",   regs,   "",            "display CPU registers" },
     { "setcpu", setcpu, "type",        "set CPU type to nmos|undef|cmos" },
     { "u",      unasm,  "[mem]",       "unassemble memory" },

@@ -178,7 +178,7 @@ Example:
 zoom 2
 scanlines
 video-mode=32x32
---cpu-speed c1p
+--cpu-speed half
 kernel=long path with spaces/synmon.rom
 ```
 

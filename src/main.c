@@ -40,13 +40,20 @@ static char *drive1_filename = NULL;
 static char *drive2_filename = NULL;
 static char *drive3_filename = NULL;
 
-#define CPU_CLOCK_QUARTER   (3932160/4.0)   // 1/4 Video (SB II Service Manual)
-#define CPU_CLOCK_HALF      (3932160/2.0)   // 1/2 Video
-#define CPU_CLOCK_510C_SLOW (8000000/8.0)   //           (510C Schematics)
-#define CPU_CLOCK_510C_FAST (8000000/4.0)   //           (510C Schematics)
+#define CPU_CLOCK_QUARTER   ( 3932160/ 4.0) // 1/4 Video (SB II Service Manual)
+#define CPU_CLOCK_HALF      ( 3932160/ 2.0) // 1/2 Video (SB II Service Manual)
+#define CPU_CLOCK_510C_SLOW ( 8000000/ 8.0) // 1 MHz       (510C Schematics)
+#define CPU_CLOCK_510C_FAST ( 8000000/ 4.0) // 2 MHz       (510C Schematics)
+#define CPU_CLOCK_540B_BW   (11790000/12.0) // Black/White (540B Schematics)
+#define CPU_CLOCK_540B_COL  (12080000/12.0) // Color       (540B Schematics)
 
 static int cpu_clock = CPU_CLOCK_QUARTER;
-static double fps = 60.0;
+
+#define FPS_60HZ    60.0                    // 440, 600
+#define FPS_540_BW  (11790000/196608.0)     // 540B Black and White
+#define FPS_540_COL (12080000/196608.0)     // 540B Color
+
+static double fps = FPS_60HZ;
 static double ticks_per_frame;
 static bool warp_speed;
 static char *tape_input_arg;

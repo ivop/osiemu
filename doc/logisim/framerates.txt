@@ -1,0 +1,19 @@
+OSI440:
+
+* Because of the analog nature, there is no fixed framerate.
+* Set FPS to 60Hz.
+
+OSI540:
+
+* Black and white:
+    - Horizontal Frequency: 11,790,000 /     768 = 15351.56250 Hz
+    - Vertical Frequency:   11,790,000 / 196,608 =    59.96704 Hz
+
+* Color
+    - Horizontal Frequency: 12,080,000 /     768 = 15729.16667 Hz
+    - Vertical Frequency:   12,080,000 / 196,608 =    61.44206 Hz
+
+OSI600:
+
+Horizontal Frequency: 3,932,160 /   256 = 15360 Hz
+Vertical Freqeucny:   3,932,160 / 65536 =    60 Hz

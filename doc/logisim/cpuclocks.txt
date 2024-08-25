@@ -1,0 +1,16 @@
+OSI400 series
+
+Set to 1MHz
+
+OSI500 series
+
+510 slow: 1MHz
+    fast: 2MHz
+
+540 derived
+    b/w:   11,790,000 / 12 = 0.982500 MHz
+    color: 12,080,000 / 12 = 1.006666 MHz
+
+OSI 600 series
+    quarter: 3,932,160 / 4 = 0.983040 MHz
+    half:    3,932,160 / 2 = 1.966080 MHz

@@ -979,12 +979,12 @@
          <widget class="QComboBox" name="combo_cpu_speed">
           <item>
            <property name="text">
-            <string>Quarter Video (0.983040 MHz)</string>
+            <string>Quarter 600 Video (0.983040 MHz)</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Half Video (1.966080 MHz)</string>
+            <string>Half 600 Video (1.966080 MHz)</string>
            </property>
           </item>
           <item>
@@ -995,6 +995,16 @@
           <item>
            <property name="text">
             <string>510C Fast (2 MHz)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>540B Black &amp; White (0.982500 MHz)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>540B Color (1.006667 MHz)</string>
            </property>
           </item>
          </widget>

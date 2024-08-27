@@ -156,6 +156,12 @@ void MainWindow::on_button_launch_clicked() {
     case 3:
         arguments.append("510c-fast");
         break;
+    case 4:
+        arguments.append("540bw");
+        break;
+    case 5:
+        arguments.append("540col");
+        break;
     }
 
     if (ui->check_warp_speed->checkState() == Qt::Checked) {

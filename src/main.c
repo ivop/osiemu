@@ -96,6 +96,11 @@ static void usage(void) {
 "    -V/--smooth-video          enable anti-aliased scaling\n"
 "    -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630\n"
 );
+    fprintf(stderr,
+"    -d/--frame-rate rate       display rate: 60     %.6lf Hz (default)\n"
+"                                             540bw  %.6lf Hz\n"
+"                                             540col %.6lf Hz\n",
+    FPS_60HZ, FPS_540_BW, FPS_540_COL);
 
     fprintf(stderr,
 "    -s/--saturation            color saturation [0.0-1.0], default: %.2lf\n",
@@ -150,6 +155,7 @@ static struct option long_options[] = {
     { "tape-baseclock", required_argument,  0, 'B' },
     { "font",           required_argument,  0, 'c' },
     { "color-mode",     required_argument,  0, 'C' },
+    { "frame-rate",     required_argument,  0, 'd' },
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
     { "floppy2",        required_argument,  0, 'g' },
@@ -190,7 +196,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:f:F:g:G:hH:ij:J:k:K:L:m:M:qrR:s:St:T:vVwxy:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:f:F:g:G:hH:ij:J:k:K:L:m:M:qrR:s:St:T:vVwxy:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -322,6 +328,18 @@ int main_program(int argc, char **argv) {
                 control_6xx_enable = true;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
+                return 1;
+            }
+            break;
+        case 'd':
+            if (!strcmp(optarg, "60")) {
+                fps = FPS_60HZ;
+            } else if (!strcmp(optarg, "540bw")) {
+                fps = FPS_540_BW;
+            } else if (!strcmp(optarg, "540col")) {
+                fps = FPS_540_COL;
+            } else {
+                fprintf(stderr, "error: unknown frame rate\n");
                 return 1;
             }
             break;

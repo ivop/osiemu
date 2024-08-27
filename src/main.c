@@ -77,9 +77,12 @@ static void usage(void) {
 "    -K/--cpu-speed speed       select speed: quarter    %.6lf MHz (default)\n"
 "                                             half       %.6lf MHz\n"
 "                                             510c-slow  %.6lf MHz\n"
-"                                             510c-fast  %.6lf MHz\n",
+"                                             510c-fast  %.6lf MHz\n"
+"                                             540bw      %.6lf MHz\n"
+"                                             540col     %.6lf MHz\n",
     CPU_CLOCK_QUARTER / 1000000.0, CPU_CLOCK_HALF / 1000000.0,
-    CPU_CLOCK_510C_SLOW / 1000000.0, CPU_CLOCK_510C_FAST / 1000000.0);
+    CPU_CLOCK_510C_SLOW / 1000000.0, CPU_CLOCK_510C_FAST / 1000000.0,
+    CPU_CLOCK_540B_BW / 1000000.0, CPU_CLOCK_540B_COL / 1000000.0);
 
     fprintf(stderr, 
 "\n"
@@ -238,6 +241,10 @@ int main_program(int argc, char **argv) {
                 cpu_clock = CPU_CLOCK_510C_SLOW;
             } else if (!strcmp(optarg, "510c-fast")) {
                 cpu_clock = CPU_CLOCK_510C_FAST;
+            } else if (!strcmp(optarg, "540bw")) {
+                cpu_clock = CPU_CLOCK_540B_BW;
+            } else if (!strcmp(optarg, "540col")) {
+                cpu_clock = CPU_CLOCK_540B_COL;
             } else {
                 cpu_clock = strtol(optarg, NULL, 10);
             }

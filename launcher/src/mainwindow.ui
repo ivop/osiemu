@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>817</width>
-    <height>837</height>
+    <width>933</width>
+    <height>845</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -582,6 +582,32 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
+         <widget class="QLabel" name="label_37">
+          <property name="text">
+           <string>Frame rate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_frame_rate">
+          <item>
+           <property name="text">
+            <string>Default (60 Hz)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Model 540B Black &amp; White (59.967041 Hz)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Model 540B Color (61.442057 Hz)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="check_scanlines">
           <property name="text">
            <string>Visible Scan Lines</string>
@@ -1104,6 +1130,19 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">

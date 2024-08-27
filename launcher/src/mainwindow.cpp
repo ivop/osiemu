@@ -97,6 +97,19 @@ void MainWindow::on_button_launch_clicked() {
         arguments.append("--smooth-video");
     }
 
+    arguments.append("--frame-rate");
+    switch (ui->combo_frame_rate->currentIndex()) {
+    default:
+        arguments.append("60");
+        break;
+    case 1:
+        arguments.append("540bw");
+        break;
+    case 2:
+        arguments.append("540col");
+        break;
+    }
+
     // Keyboard
 
     if (ui->combo_keyboard->currentIndex() == 0) {
@@ -358,6 +371,7 @@ void MainWindow::on_button_save_settings_clicked() {
     out << ui->check_enable_graph_font->checkState();
     out << ui->check_start_fullscreen->checkState();
     out << ui->check_pixels->checkState();
+    out << (quint8) ui->combo_frame_rate->currentIndex();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -463,6 +477,7 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> tcs; ui->check_enable_graph_font->setCheckState(tcs);
     in >> tcs; ui->check_start_fullscreen->setCheckState(tcs);
     in >> tcs; ui->check_pixels->setCheckState(tcs);
+    in >> t8; ui->combo_frame_rate->setCurrentIndex(t8);
 
     error = file.error();
     errorstring = file.errorString();

@@ -24,19 +24,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::on_button_launch_clicked() {
-    QString program;
-    QStringList arguments;
-
-    this->hide();
-
-    // Program
-
-    QString tmp = "osiemu";
-
-    tmp = ui->line_program->text();
-    if (!tmp.isEmpty()) program = tmp;
-
+void MainWindow::generate_arguments(QStringList &arguments) {
     // Video
 
     if (!ui->combo_video_mode->currentIndex()) {
@@ -242,12 +230,67 @@ void MainWindow::on_button_launch_clicked() {
         arguments.append("--switches");
         arguments.append(switches.chopped(1));
     }
+}
+
+void MainWindow::on_button_launch_clicked() {
+    QString program = ui->line_program->text();
+    QStringList arguments;
+
+    this->hide();
+
+    generate_arguments(arguments);
 
     auto *console = new ConsoleWindow(this, program, arguments);
     console->exec();
 
     this->show();
     delete(console);
+}
+
+void MainWindow::on_button_export_as_config_clicked() {
+    QStringList arguments;
+
+    generate_arguments(arguments);
+
+    QMessageBox msg;
+
+    QString filename = QFileDialog::getSaveFileName(this, "Export configuratian as...", "", "Configurations (*.config);;All Files (*.*)");
+    if (filename.isEmpty()) return;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        msg.setText("Failed to open " + filename + "\n\n" + file.errorString());
+        msg.exec();
+        return;
+    }
+
+    QTextStream out(&file);
+
+    bool first = true;
+
+    for (const auto &i : qAsConst(arguments)) {
+        // if( price1.at(0).toAscii() == '0')
+        if (i.at(0).toLatin1() == '-' && i.at(1).toLatin1() == '-') {
+            if (!first) {
+                out << "\n";
+            }
+            out << i.toUtf8();
+            first = false;
+        } else {
+            out << " " << i.toUtf8();
+        }
+    }
+    out << "\n";
+
+    auto error = file.error();
+    auto errorstring = file.errorString();
+
+    file.close();
+
+    if (error != file.NoError) {
+        msg.setText("Failed to save " + filename + "\n\n" + errorstring);
+        msg.exec();
+    }
 }
 
 void MainWindow::browse_all(QLineEdit *line, QString filter) {
@@ -490,3 +533,4 @@ error_out:
         msg.exec();
     }
 }
+

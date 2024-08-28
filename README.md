@@ -111,6 +111,8 @@ options:
                                              half       1.966080 MHz
                                              510c-slow  1.000000 MHz
                                              510c-fast  2.000000 MHz
+                                             540bw      0.982500 MHz
+                                             540col     1.006667 MHz
 
     -v/--disable-video         disable video RAM (default: enabled)
     -m/--video-mode mode       forced modes:   64x32 (default)
@@ -124,6 +126,9 @@ options:
     -z/--zoom factor           increase display size by factor (2, 3, or 4)
     -V/--smooth-video          enable anti-aliased scaling
     -C/--color-mode mode       mode: monochrome (default), 440b, 540b, 630
+    -d/--frame-rate rate       display rate: 60     60.000000 Hz (default)
+                                             540bw  59.967041 Hz
+                                             540col 61.442057 Hz
     -s/--saturation            color saturation [0.0-1.0], default: 0.75
     -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)
     -S/--scanlines             emulate visual scanlines (zoom >= 2 only)

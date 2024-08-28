@@ -230,6 +230,13 @@ void MainWindow::generate_arguments(QStringList &arguments) {
         arguments.append("--switches");
         arguments.append(switches.chopped(1));
     }
+
+    // RAMTOP
+
+    if (ui->check_force_ramtop->checkState() == Qt::Checked) {
+        arguments.append("--force-ramtop");
+        arguments.append(ui->combo_force_ramtop->currentText().split(QRegExp("\\s+")).at(0));
+    }
 }
 
 void MainWindow::on_button_launch_clicked() {
@@ -415,6 +422,8 @@ void MainWindow::on_button_save_settings_clicked() {
     out << ui->check_start_fullscreen->checkState();
     out << ui->check_pixels->checkState();
     out << (quint8) ui->combo_frame_rate->currentIndex();
+    out << ui->check_force_ramtop->checkState();
+    out << (quint8) ui->combo_force_ramtop->currentIndex();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -521,6 +530,8 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> tcs; ui->check_start_fullscreen->setCheckState(tcs);
     in >> tcs; ui->check_pixels->setCheckState(tcs);
     in >> t8; ui->combo_frame_rate->setCurrentIndex(t8);
+    in >> tcs; ui->check_force_ramtop->setCheckState(tcs);
+    in >> t8; ui->combo_force_ramtop->setCurrentIndex(t8);
 
     error = file.error();
     errorstring = file.errorString();

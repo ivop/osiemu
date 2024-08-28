@@ -1099,6 +1099,95 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="check_force_ramtop">
+          <property name="text">
+           <string>Force RAMTOP to:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_force_ramtop">
+          <property name="currentIndex">
+           <number>12</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>0x03ff (1kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x07ff (2kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x0bff (3kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x0fff (4kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x1fff (8kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x2fff (12kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x3fff (16kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x4fff (20kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x5fff (24kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x6fff (28kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x7fff (32kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x8fff (36kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0x9fff (40kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0xafff (44kB)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>0xbfff (48kB)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_12">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

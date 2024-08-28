@@ -36,9 +36,11 @@ Ohio Scientific Instruments, Inc. Emulator
 * Bit-level floppy emulation, Model 470/505, up to four single sided 5¼" or 8" drives
 * Hardware accelerated display
   * full resolution 512x256
-  * optional 2x zoom
+  * configurable frame rate
+  * optional 2x, 3x, or 4x zoom
   * optional TV aspect ratio 16:9 or 4:3
   * optional anti-aliasing
+  * optional scan lines or dots
 * Sound modes:
   * Model 542B/C keyboard tone generator and 8-bit DAC
   * Superboard II/Model 600/C1P keyboard 8-bit DAC

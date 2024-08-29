@@ -16,6 +16,7 @@
 ;
 ; Cleanup/readability by Ivo van Poorten, August 2024
 ; Assemble with Mad-Assembler
+; Works without BASIC as it accesses ACIA @ $fc00 directly
 ;
 ; ----------------------------------------------------------------------------
 
@@ -90,6 +91,8 @@ valid_digit:
 
 ; ----------------------------------------------------------------------------
 
+; Entry point when only ROM @ $ff00
+
 RESET:
     lda #$03            ; Master Reset
     sta ACIA_CONTROL
@@ -103,6 +106,10 @@ RESET:
 
     sta ACIA_CONTROL
     cld
+
+; Entry point from 65AB
+
+    .error * != $fe40
 
 restart:
     sei                 ; disable IRQ

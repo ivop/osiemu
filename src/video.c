@@ -365,10 +365,12 @@ void screen_update(void) {
 
         floppy_activity--;
     }
-    if (tape_running) {
+    if (tape_activity) {
         dst_rect_64x64.x = w - 96;
         dst_rect_64x64.y = h - 96;
         SDL_RenderCopy(renderer, tape_icon, &src_rect_64x64, &dst_rect_64x64);
+
+        tape_activity--;
     }
 
     SDL_RenderPresent(renderer);

@@ -28,9 +28,9 @@ static int bits_per_byte;               // inluding start, parity, stop
 static int bits_remaining;
 static int baud_timer;
 static int baud_div;
-static int activity;
+int tape_activity;
 
-bool tape_running = false;
+static bool tape_running = false;
 static bool reading = false;
 static bool writing = false;
 
@@ -170,8 +170,7 @@ void tape_tick(double ticks) {
                 bits_remaining = bits_per_byte;
             }
         }
-        activity--;
-        if (activity < 0) {
+        if (tape_activity <= 0) {
             printf("tape: no activity, stopping\n");
             tape_running = false;
         }
@@ -180,7 +179,7 @@ void tape_tick(double ticks) {
 }
 
 uint8_t tape_read(uint16_t address) {
-    activity = 300;
+    tape_activity = 25;
     switch (address & 1) {
     case 0:                     // status register
         if (!tape_running) {
@@ -201,7 +200,7 @@ uint8_t tape_read(uint16_t address) {
 }
 
 void tape_write(uint16_t address, uint8_t value) {
-    activity = 300;
+    tape_activity = 25;
     switch (address & 1) {
     case 0:                     // control register
         control = value;

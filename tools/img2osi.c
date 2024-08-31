@@ -5,16 +5,19 @@
  * BSD-2 License.
  *
  * Input:
- *      Raw disk image, 40 tracks, 16 sectors per track, 128 bytes per track
- *      2048 bytes per track
+ *      - Raw disk image, 40 tracks, 16 sectors per track, 128 bytes per sector
+ *        2048 bytes per track, 81920 bytes per disk (80kB)
+ *      - Raw disk image, 77 tracks, 24 sectors per track, 128 bytes per sector
+ *        3072 bytes per track, 236544 bytes per disk (231kB)
  *
  * Output:
  *      OSI Disk Stream format
  *
- *      Track 0, special case, load at $2200, 2048 bytes
- *      Rest: OS65D track marker plus 1 sector of 2048 bytes (8 pages)
- *
- * Use case: CP/M-65 port with deblocking
+ *      Track 0: special case, load at $2200, 2048 bytes
+ *      All other tracks: OS65D track marker plus 1 sector of either 2048
+ *      bytes (8 pages) or 3072 bytes (12 pages).
+ * 
+ * Use case: CP/M-65 port
  *      Always read and write full track to simplify writing sectors and
  *      avoid hard to maintain code to write a 128 byte sector somewhere in
  *      the middle of a track and support different CPU speeds at the same
@@ -37,6 +40,9 @@ static FILE *inp, *outp;
 static uint8_t *trkbuf;
 static unsigned int ntracks;
 static unsigned int trksize;
+static unsigned int delay1;
+static unsigned int delay2;
+static unsigned int npages;
 static int opos;
 static uint8_t obit;
 
@@ -81,8 +87,9 @@ int main(int argc, char **argv) {
     long insize = ftell(inp);
     fseek(inp, 0, SEEK_SET);
 
-    if (insize != 81920) {
-        fprintf(stderr, "error: wrong input file size, expected 81920 bytes\n");
+    if (insize != 81920 && insize != 236544) {
+        fprintf(stderr, "error: wrong input file size, expected 81920 "
+                        " or 236544 bytes\n");
         return 1;
     }
 
@@ -94,9 +101,22 @@ int main(int argc, char **argv) {
 
     oh.version = 1;
     oh.offset  = 1;
-    oh.type = TYPE_525_SS;
-    ntracks = 40;
-    trksize = 0x0d00;
+
+    if (insize == 81920) {
+        ntracks = 40;
+        trksize = 0x0d00;
+        delay1  = 200;
+        delay2  = 32;
+        npages  = 8;
+        oh.type = TYPE_525_SS;
+    } else {
+        ntracks = 77;
+        trksize = 0x1500;
+        delay1  = 100;
+        delay2  = 32;
+        npages  = 12;
+        oh.type = TYPE_8_SS;
+    }
 
     memcpy(oh.id, "OSIDISKBITSTREAM", 16);
     fwrite(&oh, sizeof(oh), 1, outp);
@@ -117,7 +137,7 @@ int main(int argc, char **argv) {
         obit = 0x80;
 
         if (!i) {                           // track 0
-            for (int j=0; j<248*8; j++)
+            for (int j=0; j<delay1*8; j++)
                 put_bit(1);
 
             put_byte_8E1(0x22);             // MSB load address
@@ -126,9 +146,11 @@ int main(int argc, char **argv) {
 
             for (int j=0; j<2048; j++)
                 put_byte_8E1(fgetc(inp));
+            if (npages > 8)
+                fseek(inp, (npages-8) * 256, SEEK_CUR);
 
         } else {                            // track 1-39
-            for (int j=0; j<248*8; j++)
+            for (int j=0; j<delay1*8; j++)
                 put_bit(1);
 
             put_byte_8E1(0x43);             // track
@@ -136,14 +158,14 @@ int main(int argc, char **argv) {
             put_byte_8E1(toBCD(i));         // track number in BCD
             put_byte_8E1(0x58);             // end
 
-            for (int j=0; j<32*8; j++)
+            for (int j=0; j<delay2*8; j++)
                 put_bit(1);
 
             put_byte_8E1(0x76);             // sector marker
             put_byte_8E1(0x01);             // sector number
-            put_byte_8E1(0x08);             // sector size in pages
+            put_byte_8E1(npages);           // sector size in pages
 
-            for (int j=0; j<2048; j++)
+            for (int j=0; j<npages*256; j++)
                 put_byte_8E1(fgetc(inp));
 
             put_byte_8E1(0x47);             // end

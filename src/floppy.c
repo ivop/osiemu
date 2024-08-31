@@ -523,14 +523,15 @@ static void floppy_one_emulation_cycle(void) {
         drives[curdrive].pos = drives[curdrive].bit = 0;   // reset to start
     }
 
+    if (!drives[curdrive].f) {      // no floppy loaded
+        hole = false;
+        return;
+    }
+
     if (bits_counter < bits_per_hole) {
         hole = true;
     } else {
         hole = false;
-    }
-
-    if (!drives[curdrive].f) {      // no floppy loaded
-        return;
     }
 
     if (seek_counter) {     // do nothing during track-to-track seek

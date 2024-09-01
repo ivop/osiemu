@@ -92,3 +92,15 @@ void ToolsWindow::on_button_drive2_mount_clicked() {
 void ToolsWindow::on_button_drive3_mount_clicked() {
     mountDisk("3");
 }
+
+void ToolsWindow::on_button_list_tapes_clicked() {
+    command = "tapes";
+    this->close();
+}
+
+
+void ToolsWindow::on_button_list_drives_clicked(){
+    command = "drives";
+    this->close();
+}
+

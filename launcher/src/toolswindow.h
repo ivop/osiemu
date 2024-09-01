@@ -25,18 +25,14 @@ private slots:
     void on_button_drive1_unmount_clicked();
     void on_button_drive2_unmount_clicked();
     void on_button_drive3_unmount_clicked();
-
     void on_button_input_insert_clicked();
-
     void on_button_output_insert_clicked();
-
     void on_button_drive0_mount_clicked();
-
     void on_button_drive1_mount_clicked();
-
     void on_button_drive2_mount_clicked();
-
     void on_button_drive3_mount_clicked();
+    void on_button_list_tapes_clicked();
+    void on_button_list_drives_clicked();
 
 private:
     Ui::ToolsWindow *ui;

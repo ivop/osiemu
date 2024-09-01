@@ -274,7 +274,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
     bits_per_seek = bitrate / 1000 * seek_time;
     bits_per_revolution = bitrate / (rpm / 60.0);
 
-    printf("floppy: type %s\n", disk_type ? "8\" SS" : "5\" SS");
+    printf("floppy: type %s\n", disk_type ? "8\" SS" : "5.25\" SS");
     printf("floppy: number of tracks: %d\n", ntracks);
     printf("floppy: bit interval %.2lf ticks\n", interval);
     printf("floppy: bits per index hole: %d (%.2lf ms)\n", bits_per_hole,

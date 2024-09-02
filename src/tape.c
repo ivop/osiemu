@@ -213,7 +213,6 @@ void tape_write(uint16_t address, uint8_t value) {
         bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
         break;
     case 1:                     // transmit register
-        // check empty?
         TDR = value;
         clrbit(status, STATUS_TDRE_MASK);   // not empty
         break;

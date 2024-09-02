@@ -25,14 +25,11 @@ static FILE *outputf;
 static double timer;
 static double ticks_per_clock;
 static int bits_per_byte;               // inluding start, parity, stop
-static int bits_remaining;
+static int rx_bits_remaining;
+static int tx_bits_remaining;
 static int baud_timer;
 static int baud_div;
 int tape_activity;
-
-static bool tape_running = false;
-static bool reading = false;
-static bool writing = false;
 
 static uint8_t control;
 static uint8_t status;
@@ -131,63 +128,53 @@ void tape_tick(double ticks) {
 
     timer -= ticks_per_clock;
 
-    if (!tape_running) return;
-
     baud_timer--;
 
     if (baud_timer) return;
 
     baud_timer = baud_div;
 
-    bits_remaining--;
-
-    if (bits_remaining <= 0) {
-        bits_remaining = 0;
-        if (reading && inputf) {
-            // receiving...
-            int v = fgetc(inputf);
-            if (v < 0) {                           // end-of-file
-                setbit(status, STATUS_FE_MASK);
-            } else {
-                clrbit(status, STATUS_FE_MASK);
-                RDR = v;
-                if (getbit(status, STATUS_RDRF_MASK)) {
-                    setbit(status, STATUS_OVRN_MASK);
+    if (rx_bits_remaining) {
+        rx_bits_remaining--;
+    } else {
+        if (inputf) {
+            if (!getbit(status, STATUS_RDRF_MASK)) {
+                int v = fgetc(inputf);
+                if (v < 0) {                           // end-of-file
+                    setbit(status, STATUS_FE_MASK);
                 } else {
-                    clrbit(status, STATUS_OVRN_MASK);
+                    clrbit(status, STATUS_FE_MASK);
+                    RDR = v;
+                    if (getbit(status, STATUS_RDRF_MASK)) {
+                        setbit(status, STATUS_OVRN_MASK);
+                    } else {
+                        clrbit(status, STATUS_OVRN_MASK);
+                    }
+                    setbit(status, STATUS_RDRF_MASK);
                 }
-                setbit(status, STATUS_RDRF_MASK);
+                rx_bits_remaining = bits_per_byte - 1;
             }
-            bits_remaining = bits_per_byte;
         }
-        if (writing && outputf) {
+    }
+
+    if (tx_bits_remaining) {
+        tx_bits_remaining--;
+    } else {
+        if (outputf) {
             // transmitting...
             if (!(status & STATUS_TDRE_MASK)) {
                 fputc(TDR, outputf);
                 setbit(status, STATUS_TDRE_MASK);
-                bits_remaining = bits_per_byte;
-            } else {
-                bits_remaining = bits_per_byte;
+                tx_bits_remaining = bits_per_byte - 1;
             }
         }
-        if (tape_activity <= 0) {
-            printf("tape: no activity, stopping\n");
-            tape_running = false;
-        }
     }
-
 }
 
 uint8_t tape_read(uint16_t address) {
     tape_activity = 25;
     switch (address & 1) {
     case 0:                     // status register
-        if (!tape_running) {
-            printf("tape: reading status, activate tape\n");
-            tape_running = true;
-            printf("tape: assume reading\n");
-            reading = true;     // assume reading, unless TDR is written
-        }
         return status;
         break;
     case 1:                     // receive register
@@ -219,7 +206,6 @@ void tape_write(uint16_t address, uint8_t value) {
             break;
         case 3:
             printf("tape: master reset\n");
-            tape_running = 0;
             status = 0;
             setbit(status, STATUS_TDRE_MASK);   // empty
             break;
@@ -227,15 +213,9 @@ void tape_write(uint16_t address, uint8_t value) {
         bits_per_byte = word_select_times[(control & CONTROL_WS_MASK) >> 2];
         break;
     case 1:                     // transmit register
-        if (tape_running) {
-            if (!writing) {
-                printf("tape: switch to writing\n");
-                reading = false;
-                writing = true;     // switch to writing
-            }
-            TDR = value;
-            clrbit(status, STATUS_TDRE_MASK);   // not empty
-        }
+        // check empty?
+        TDR = value;
+        clrbit(status, STATUS_TDRE_MASK);   // not empty
         break;
     }
 }

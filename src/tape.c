@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "portability.h"
 #include "tape.h"
 #include "acia.h"
@@ -20,8 +24,8 @@ double tape_baseclock = 4800.0;
 char *tape_input_filename;
 char *tape_output_filename;
 
-static FILE *inputf;
-static FILE *outputf;
+static int inputfd = -1;
+static int outputfd = -1;
 static double timer;
 static double ticks_per_clock;
 static int bits_per_byte;               // inluding start, parity, stop
@@ -48,51 +52,49 @@ static int word_select_times[8] = {
 };
 
 void tape_eject_input(void) {
-    if (!inputf) {
+    if (inputfd < 0) {
         puts("tape: input already empty");
         return;
     }
-    fclose(inputf);
+    close(inputfd);
     free(tape_input_filename);
     tape_input_filename = NULL;
-    inputf = NULL;
+    inputfd = -1;
     puts("tape: input ejected");
 }
 
 void tape_eject_output(void) {
-    if (!outputf) {
+    if (outputfd < 0) {
         puts("tape: output already empty");
         return;
     }
     printf("tape: closing %s\n", tape_output_filename);
-    fclose(outputf);
+    close(outputfd);
     free(tape_output_filename);
     tape_output_filename = NULL;
-    outputf = NULL;
+    outputfd = -1;
     puts("tape: output ejected");
 }
 
 bool tape_insert_input(char *filename) {
-    if (inputf) tape_eject_input();
-    if (!(inputf = fopen(filename, "rb"))) {
+    if (inputfd >= 0) tape_eject_input();
+    if ((inputfd = open(filename, O_NONBLOCK | O_RDONLY)) < 0) {
         fprintf(stderr, "tape: input: cannot open %s\n", filename);
         return false;
     }
     printf("tape: input: %s\n", filename);
     tape_input_filename = filename;
-    setbuf(inputf, NULL);
     return true;
 }
 
 bool tape_insert_output(char *filename) {
-    if (outputf) tape_eject_output();
-    if (!(outputf = fopen(filename, "wb"))) {
+    if (outputfd >= 0) tape_eject_output();
+    if ((outputfd = open(filename, O_NONBLOCK | O_WRONLY | O_CREAT, 0666)) < 0) {
         fprintf(stderr, "tape: output: cannot open %s\n", filename);
         return false;
     }
     printf("tape: output: %s\n", filename);
     tape_output_filename = filename;
-    setbuf(outputf, NULL);
     return true;
 }
 
@@ -111,17 +113,21 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
 }
 
 void tape_rewind_input(void) {
-    if (inputf) {
+    if (inputfd >= 0) {
         puts("tape: rewinding input tape");
-        fseek(inputf, 0, SEEK_SET);
+        lseek(inputfd, 0, SEEK_SET);
+    } else {
+        puts("tape: there is no input tape to rewind");
     }
 }
 
 void tape_rewind_output(void) {
-    if (outputf) {
+    if (outputfd >= 0) {
         puts("tape: rewinding output tape");
-        fclose(outputf);
-        outputf = fopen(tape_output_filename, "wb");
+        close(outputfd);
+        outputfd = open(tape_output_filename, O_NONBLOCK | O_WRONLY | O_CREAT, 0666);
+    } else {
+        puts("tape: there is no output tape to rewind");
     }
 }
 
@@ -140,12 +146,14 @@ void tape_tick(double ticks) {
     if (rx_bits_remaining) {
         rx_bits_remaining--;
     } else {
-        if (inputf) {
+        if (inputfd >= 0) {
+            // we cheat a little, we only fill RDR if the previous byte
+            // has been read
             if (!getbit(status, STATUS_RDRF_MASK)) {
-                int v = fgetc(inputf);
-                if (v >= 0) {
+                uint8_t c;
+                if (read(inputfd, &c, 1) == 1) {
                     clrbit(status, STATUS_FE_MASK);
-                    RDR = v;
+                    RDR = c;
                     if (getbit(status, STATUS_RDRF_MASK)) {
                         setbit(status, STATUS_OVRN_MASK);
                     } else {
@@ -161,13 +169,13 @@ void tape_tick(double ticks) {
     if (tx_bits_remaining) {
         tx_bits_remaining--;
     } else {
-        if (outputf) {
+        if (outputfd) {
             // transmitting...
             if (!(status & STATUS_TDRE_MASK)) {
-                fputc(TDR, outputf);
-                fflush(outputf);
-                setbit(status, STATUS_TDRE_MASK);
-                tx_bits_remaining = bits_per_byte - 1;
+                if (write(outputfd, &TDR, 1) == 1) {
+                    setbit(status, STATUS_TDRE_MASK);
+                    tx_bits_remaining = bits_per_byte - 1;
+                }
             }
         }
     }

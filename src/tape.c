@@ -80,6 +80,7 @@ bool tape_insert_input(char *filename) {
     }
     printf("tape: input: %s\n", filename);
     tape_input_filename = filename;
+    setbuf(inputf, NULL);
     return true;
 }
 
@@ -91,6 +92,7 @@ bool tape_insert_output(char *filename) {
     }
     printf("tape: output: %s\n", filename);
     tape_output_filename = filename;
+    setbuf(outputf, NULL);
     return true;
 }
 
@@ -140,9 +142,7 @@ void tape_tick(double ticks) {
         if (inputf) {
             if (!getbit(status, STATUS_RDRF_MASK)) {
                 int v = fgetc(inputf);
-                if (v < 0) {                           // end-of-file
-                    setbit(status, STATUS_FE_MASK);
-                } else {
+                if (v >= 0) {
                     clrbit(status, STATUS_FE_MASK);
                     RDR = v;
                     if (getbit(status, STATUS_RDRF_MASK)) {
@@ -151,8 +151,8 @@ void tape_tick(double ticks) {
                         clrbit(status, STATUS_OVRN_MASK);
                     }
                     setbit(status, STATUS_RDRF_MASK);
+                    rx_bits_remaining = bits_per_byte - 1;
                 }
-                rx_bits_remaining = bits_per_byte - 1;
             }
         }
     }
@@ -164,6 +164,7 @@ void tape_tick(double ticks) {
             // transmitting...
             if (!(status & STATUS_TDRE_MASK)) {
                 fputc(TDR, outputf);
+                fflush(outputf);
                 setbit(status, STATUS_TDRE_MASK);
                 tx_bits_remaining = bits_per_byte - 1;
             }

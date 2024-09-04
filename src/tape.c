@@ -33,6 +33,7 @@ static int rx_bits_remaining;
 static int tx_bits_remaining;
 static int baud_timer;
 static int baud_div;
+static bool started;
 int tape_activity;
 
 static uint8_t control;
@@ -109,7 +110,6 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     ticks_per_clock = cpu_clock / tape_baseclock;
     bits_per_byte = 11;
     baud_timer = 1;
-    setbit(status, STATUS_RDRF_MASK);
     return true;
 }
 
@@ -143,6 +143,8 @@ void tape_tick(double ticks) {
     if (baud_timer) return;
 
     baud_timer = baud_div;
+
+    if (!started) return;
 
     if (rx_bits_remaining) {
         rx_bits_remaining--;
@@ -184,6 +186,7 @@ void tape_tick(double ticks) {
 
 uint8_t tape_read(uint16_t address) {
     tape_activity = 25;
+    started = true;
     switch (address & 1) {
     case 0:                     // status register
         return status;

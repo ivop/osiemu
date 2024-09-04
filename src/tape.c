@@ -109,6 +109,7 @@ bool tape_init(char *input_file, char *output_file, double cpu_clock) {
     ticks_per_clock = cpu_clock / tape_baseclock;
     bits_per_byte = 11;
     baud_timer = 1;
+    setbit(status, STATUS_RDRF_MASK);
     return true;
 }
 

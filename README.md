@@ -11,6 +11,7 @@ Ohio Scientific Instruments, Inc. Emulator
 6. [Build instructions](#build-instructions)
 7. [Disk images](#disk-images)
 8. [GUI launcher](#gui-launcher)
+9. [Notes](#notes)
 
 ## Features
 
@@ -244,6 +245,20 @@ forces a build against Qt 6.7.2 and use the clang compiler.
 It has been tested with Qt 5.15.x and Qt 6.5.x and up.
 On Windows, contrary to the main ```osiemu``` binary that has to be built with Cygwin, the launcher binary has to be built with MinGW.
 Preferably the version that is distributed with Qt itself.
+
+## Notes
+
+* The polled keyboards were limitted and had only 45 keys. Not all ASCII characters can be typed.
+  Especially in raw mode, it behaves kind of weird, like CAPS affecting the number keys.
+  This was by design and is normal. Cooked keyboard mode (the default) overcomes some of these quircks in emulation.
+  For games you might need to switch to raw mode though, as they might do their own keyboard scan for certain combinations.
+* The original ROMs did not implement backspace, even though there was a RUB key on the keyboard.
+  If you want backspace, use one of the cegmon ROMs.
+* Error messages in BASIC have all kind of strange characters in them. That's normal and not a bug.
+* It's possible to create a configuration that did not exist, doesn't make sense, or would not even be possible with real hardware.
+  Just don't do that ;) See the sample configurations for sensible setups.
+* Floppy disk emulation is enabled by specifying at least one floppy drive. The type is determined by the first floppy.
+  You cannot mix 5.25" and 8" disk images. It's either four times 5.25" or four times 8".
 
 ## Future additions?
 

@@ -72,6 +72,7 @@ static SDL_Texture *digits;
 static SDL_Texture *background;         // single character "font"
 static SDL_Texture *scanlines;
 static SDL_Texture *pixels;
+static SDL_Texture *nosignal;
 
 static SDL_Rect src_rect_64x64 = {  0,  0, 64, 64 };
 static SDL_Rect dst_rect_64x64 = { 16, 16, 64, 64 };
@@ -317,22 +318,30 @@ void screen_update(void) {
     int w, h;
     SDL_GetRendererOutputSize(renderer, &w, &h);
 
-    blit_screenmem(font);
-
     SDL_SetRenderTarget(renderer, NULL);
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, screen, NULL, NULL );
 
-    if (hires_mode && hires_visible) {
-        SDL_RenderCopy(renderer, hires_screen, NULL, NULL);
-    }
+    if (video_enabled) {
+        blit_screenmem(font);
 
-    if (scanlines_enable) {
-        SDL_RenderCopy(renderer, scanlines, NULL, NULL);
-    }
-    if (pixels_enable) {
-        SDL_RenderCopy(renderer, pixels, NULL, NULL);
+        SDL_SetRenderTarget(renderer, NULL);
+        SDL_RenderCopy(renderer, screen, NULL, NULL );
+
+        if (hires_mode && hires_visible) {
+            SDL_RenderCopy(renderer, hires_screen, NULL, NULL);
+        }
+
+        if (scanlines_enable) {
+            SDL_RenderCopy(renderer, scanlines, NULL, NULL);
+        }
+        if (pixels_enable) {
+            SDL_RenderCopy(renderer, pixels, NULL, NULL);
+        }
+    } else {
+        SDL_Rect src_rect = {  0,  0, 138, 7 };
+        SDL_Rect dst_rect = { 16, 16, 153, 23 };
+        SDL_RenderCopy(renderer, nosignal, &src_rect, &dst_rect);
     }
 
     // On-Screen-Display
@@ -525,6 +534,9 @@ bool screen_init(double cpu_clock, double fps) {
     if (!(digits = load_texture("icons/digits.png"))) {
         return false;
     }
+    if (!(nosignal = load_texture("icons/nosignal.png"))) {
+        return false;
+    }
 
     SDL_SetTextureColorMod(tape_icon,   OSD_COLOR);
     SDL_SetTextureColorMod(drive1_icon, OSD_COLOR);
@@ -532,6 +544,7 @@ bool screen_init(double cpu_clock, double fps) {
     SDL_SetTextureColorMod(drive3_icon, OSD_COLOR);
     SDL_SetTextureColorMod(drive4_icon, OSD_COLOR);
     SDL_SetTextureColorMod(digits,      OSD_COLOR);
+    SDL_SetTextureColorMod(nosignal,    0x00, 0xff, 0x00);
 
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                          SDL_TEXTUREACCESS_TARGET,

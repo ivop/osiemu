@@ -259,7 +259,31 @@ Preferably the version that is distributed with Qt itself.
   Just don't do that ;) See the sample configurations for sensible setups.
 * Floppy disk emulation is enabled by specifying at least one floppy drive. The type is determined by the first floppy.
   You cannot mix 5.25" and 8" disk images. It's either four times 5.25" or four times 8".
-
+* To emulate a serial-only system like the C3, you can disable video completely (--disable-video) and use the tape I/O ACIA as serial input and output.
+  You can specify a real serial port (e.g. /dev/ttyUSB0), a pair of named pipes (mkfifo), or one end of two connected pseudo-terminals.
+  
+  Example:
+  ```
+  $ socat -d -d pty,rawer,echo=0 pty,rawer,echo=0
+  2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/9
+  2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/10
+  2024/09/06 01:02:38 socat[936204] N starting data transfer loop with FDs [5,5] and [7,7]
+  ```
+  In another window:
+  ```
+  $ minicom -D /dev/pts/9 -b 9600
+  ```
+  And in yet another window:
+  ```
+  $ ./osiemu --disable-video \
+             --kernel kernel/syn-c3-serial-hdm.rom \
+             --tape-location fc00 \
+             --tape-baseclock 153600 \
+             --tape-input /dev/pts/10 \
+             --tape-output /dev/pts/10 \
+             --floppy0 some-floppy.os8
+  ```
+  
 ## Future additions?
 
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)

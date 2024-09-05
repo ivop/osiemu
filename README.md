@@ -253,7 +253,7 @@ Preferably the version that is distributed with Qt itself.
   This was by design and is normal. Cooked keyboard mode (the default) overcomes some of these quircks in emulation.
   For games you might need to switch to raw mode though, as they might do their own keyboard scan for certain combinations.
 * The original ROMs did not implement backspace, even though there was a RUB key on the keyboard.
-  If you want backspace, use one of the cegmon ROMs.
+  If you want backspace in BASIC, use one of the cegmon ROMs.
 * Error messages in BASIC have all kind of strange characters in them. That's normal and not a bug.
 * It's possible to create a configuration that did not exist, doesn't make sense, or would not even be possible with real hardware.
   Just don't do that ;) See the sample configurations for sensible setups.

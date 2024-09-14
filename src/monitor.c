@@ -25,8 +25,6 @@
 #include "tape.h"
 #include "floppy.h"
 
-static struct distabitem *distab = distabNMOS6502;
-
 // ----------------------------------------------------------------------------
 
 static void dump(void) {
@@ -99,13 +97,13 @@ static void regs(void) {
 static void do_setcpu(char *cputype) {
     printf("CPU type set to ");
     if (!strcmp(cputype, "undef")) {
-        distab = distabNMOS6502UNDEF;
+        disasm_set_cpu(CPU_TYPE_NMOS6502_UNDEF);
         puts("NMOS w/ undefined opcodes");
     } else if (!strcmp(cputype, "cmos")) {
-        distab = distabCMOS65C02;
+        disasm_set_cpu(CPU_TYPE_CMOS6502);
         puts("CMOS");
     } else {
-        distab = distabNMOS6502;
+        disasm_set_cpu(CPU_TYPE_NMOS6502);
         puts("NMOS");
     }
 }
@@ -129,45 +127,8 @@ static void unasm(void) {
         loc = strtol(p, NULL, 16);
     }
 
-    int lines = 0;
-    while (lines < 23) {
-        printf("%04x: ", loc);
-
-        int opcode = read6502(loc++);
-        printf("%02x ", opcode);
-
-        int mode = distab[opcode].mode;
-
-        int n = isizes[mode];
-        int operand = 0, operand2 = 0;
-        
-        if (n > 1) {
-            operand = read6502(loc++);
-            printf("%02x ", operand);
-
-            if (n > 2) {
-                int t = read6502(loc++);
-                operand |= t << 8;
-                printf("%02x ", t);
-            } else {
-                printf("   ");
-            }
-        } else {
-            printf("      ");
-        }
-
-        if (mode == MODE_REL) {
-            operand += loc - (operand & 0x80 ? 0x100 : 0);
-        } else if (mode == MODE_ZP_REL) {
-            operand2 = operand >> 8;
-            operand &= 0xff;
-            operand2 += loc - (operand2 & 0x80 ? 0x100 : 0);
-        }
-
-        printf("    %s ", distab[opcode].inst);
-        printf(fmts[mode], operand, operand2);
-        putchar('\n');
-        lines++;
+    for (int lines = 0; lines < 23; lines++) {
+        puts(disasm_get_string(&loc));
     }
 }
 

@@ -11,7 +11,7 @@ LFLAGS = -flto=auto
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lm
 
 FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \
-        cooked.c floppy.c monitor.c hslrgb.c sound.c control.c
+        cooked.c floppy.c monitor.c hslrgb.c sound.c control.c disasm.c
 
 SRC_FILES = $(FILES:%.c=src/%.c)
 OBJ_FILES = $(SRC_FILES:%.c=%.o)

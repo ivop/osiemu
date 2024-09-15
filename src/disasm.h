@@ -8,3 +8,4 @@ enum cpu_type {
 
 void disasm_set_cpu(enum cpu_type type);
 char *disasm_get_string(uint16_t *address);
+char *Ptostring(uint8_t status);

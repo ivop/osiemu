@@ -81,16 +81,8 @@ err_out:
 
 static void regs(void) {
     uint8_t status = getP();
-    printf("PC=%04x A=%02x X=%02x Y=%02x SP=%04x P=", PC, A, X, Y, SP+0x0100);
-    putchar(status & 0x80 ? 'N' : '-');
-    putchar(status & 0x40 ? 'V' : '-');
-    putchar(status & 0x20 ? '1' : '-');
-    putchar(status & 0x10 ? 'B' : '-');
-    putchar(status & 0x08 ? 'D' : '-');
-    putchar(status & 0x04 ? 'I' : '-');
-    putchar(status & 0x02 ? 'Z' : '-');
-    putchar(status & 0x01 ? 'C' : '-');
-    putchar('\n');
+    printf("PC=%04x A=%02x X=%02x Y=%02x SP=%04x P=%s\n", PC, A, X, Y,
+            SP+0x0100, Ptostring(status));
 }
 
 // ----------------------------------------------------------------------------

@@ -1017,3 +1017,16 @@ char *disasm_get_string(uint16_t *address) {
     *address = loc;
     return buf;
 }
+
+char *Ptostring(uint8_t status) {
+    static char buf[9];
+    snprintf(buf, 9, "%c%c%c%c%c%c%c%c", status & 0x80 ? 'N' : '-',
+                                         status & 0x40 ? 'V' : '-',
+                                         status & 0x20 ? '1' : '-',
+                                         status & 0x10 ? 'B' : '-',
+                                         status & 0x08 ? 'D' : '-',
+                                         status & 0x04 ? 'I' : '-',
+                                         status & 0x02 ? 'Z' : '-',
+                                         status & 0x01 ? 'C' : '-');
+    return buf;
+}

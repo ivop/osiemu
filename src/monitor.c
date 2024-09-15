@@ -24,6 +24,7 @@
 #include "disasm.h"
 #include "tape.h"
 #include "floppy.h"
+#include "trace.h"
 
 // ----------------------------------------------------------------------------
 
@@ -508,6 +509,30 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+static void trace(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        trace_status();
+        return;
+    }
+
+    if (!strcmp(p, "on")) {
+        trace_on();
+    } else if (!strcmp(p, "off")) {
+        trace_off();
+    } else if (!strcmp(p, "save")) {
+        p = strtok(NULL, "\t\n\r");
+        trace_save(p);
+    } else if (!strcmp(p, "clear")) {
+        trace_init();
+    } else {
+        puts("usage: trace on | off | clear | save [file]");
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 static void help(void);
 
 static struct command {
@@ -543,6 +568,7 @@ static struct command {
     { "swap",   swap,   "numx numy",   "swap drives numx and numy" },
     { "unmount",unmount,"num",         "unmount drive" },
     { "mount",  xmount, "num file",    "mount file to drive num" },
+    { "trace",  trace,  "on|off|clear|save", "CPU tracing" },
     { "", NULL, "", "" }
 };
 

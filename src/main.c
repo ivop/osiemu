@@ -29,6 +29,7 @@
 #include "floppy.h"
 #include "sound.h"
 #include "control.h"
+#include "trace.h"
 #include "../version.h"
 
 // ----------------------------------------------------------------------------
@@ -554,6 +555,9 @@ int main_program(int argc, char **argv) {
     if (switch_graph_font) screen_swap_fonts();
     if (switch_fullscreen) screen_toggle_fullscreen();
 
+    trace_init();
+    trace_status();
+
     while (1) {
         fflush(stdout);
         fflush(stderr);
@@ -633,7 +637,9 @@ int main_program(int argc, char **argv) {
                 target += elapsed;
                 screen_unhide();
             }
-            double ticks = step6502();
+            static double ticks;
+            trace_tick(ticks);
+            ticks = step6502();
             cpu_ticks += ticks;
             tape_tick(ticks);
             keyboard_tick(ticks);

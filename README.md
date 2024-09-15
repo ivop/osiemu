@@ -85,14 +85,14 @@ Ohio Scientific Instruments, Inc. Emulator
 | setsp | val           | set SP to value |
 | setp | val            | set P to value |
 | tapes |               | list current tape files |
-| eject | input\|output | eject input or output tape |
-| insert | input\|output file | insert input or output tape |
-| rewind | input\|output | rewind input or output tape |
+| eject | input \| output | eject input or output tape |
+| insert | input \| output file | insert input or output tape |
+| rewind | input \| output | rewind input or output tape |
 | drives |              | list mounted floppies |
 | swap | numx numy      | swap drives numx and numy |
 | unmount | num         | unmount drive |
 | mount | num file      | mount file to drive num |
-| trace | on\|off\|clear\|save | CPU tracing |
+| trace | on \| off \| clear \| save [file] | CPU tracing |
 
 
 ## Command line options

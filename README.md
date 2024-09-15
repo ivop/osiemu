@@ -92,6 +92,7 @@ Ohio Scientific Instruments, Inc. Emulator
 | swap | numx numy      | swap drives numx and numy |
 | unmount | num         | unmount drive |
 | mount | num file      | mount file to drive num |
+| trace | on\|off\|clear\|save | CPU tracing |
 
 
 ## Command line options

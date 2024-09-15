@@ -89,13 +89,13 @@ void trace_save(char *filename) {
     }
     for (long i = 0; i < idx; i++) {
         char buf[64];
-        snprintf(buf, 64, "%12.0f: A=%02x X=%02x Y=%02x SP=%02x P=%02x PC=",
+        snprintf(buf, 64, "%12.0f: A=%02x X=%02x Y=%02x SP=%02x P=%s PC=",
                 trace_log[i].tick,
                 trace_log[i].a,
                 trace_log[i].x,
                 trace_log[i].y,
                 trace_log[i].sp,
-                trace_log[i].p);
+                Ptostring(trace_log[i].p));
         fputs(buf, f);
         fputs(trace_log[i].dis, f);
         fputs("\r\n", f);

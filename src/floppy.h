@@ -27,6 +27,7 @@ extern struct drive drives[4];
 
 extern bool floppy_enable;
 extern int floppy_activity;
+extern unsigned int floppy_debug;
 
 bool floppy_init(char *drive0_filename, char *drive1_filename,
                  char *drive2_filename, char *drive3_filename,

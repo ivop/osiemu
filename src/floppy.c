@@ -24,6 +24,7 @@
 // ----------------------------------------------------------------------------
 
 bool floppy_enable;
+unsigned int floppy_debug;
 
 struct port {
     uint8_t input_mask;
@@ -468,7 +469,7 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
         case 2:
             break;
         case 3:
-//            puts("floppy: master reset");
+            if (floppy_debug) puts("floppy: master reset");
             status = 0;
             setbit(status, STATUS_TDRE_MASK);   // empty
             acia_receive_state = STATE_WAIT_FOR_STARTBIT;
@@ -480,7 +481,7 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
         ndatabits    = word_select[ws].ndatabits;
         parity_type  = word_select[ws].parity;
         two_stopbits = word_select[ws].two_stopbits;
-//        printf("floppy: select %s\n", word_select[ws].name);
+        if (floppy_debug) printf("floppy: select %s\n", word_select[ws].name);
         break;
     case 1:                 // transmit register
         TDR = value;

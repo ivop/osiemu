@@ -146,6 +146,8 @@ static void usage(void) {
 "                                 nobasic     disable BASIC ROM (8kB extra RAM)\n"
 "                                 fullscreen  start fullscreen\n"
 "\n"
+"    -D/--debug flag,...        enable debug messages: floppy\n"
+"\n"
 "    -h/--help                  show usage information\n"
 );
 }
@@ -160,6 +162,7 @@ static struct option long_options[] = {
     { "font",           required_argument,  0, 'c' },
     { "color-mode",     required_argument,  0, 'C' },
     { "frame-rate",     required_argument,  0, 'd' },
+    { "debug",          required_argument,  0, 'D' },
     { "floppy0",        required_argument,  0, 'f' },
     { "floppy1",        required_argument,  0, 'F' },
     { "floppy2",        required_argument,  0, 'g' },
@@ -200,7 +203,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:f:F:g:G:hH:ij:J:k:K:L:m:M:qrR:s:St:T:vVwxy:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:qrR:s:St:T:vVwxy:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -474,6 +477,20 @@ int main_program(int argc, char **argv) {
                     return 1;
                 }
                 sw = strtok(NULL, ",\r\n");
+            }
+            }
+            break;
+        case 'D': {
+            char *w = strtok(optarg, ",\r\n");
+            while (w) {
+                if (!strcmp(w, "floppy")) {
+                    floppy_debug++;
+                    printf("debug: floppy, level %d\n", floppy_debug);
+                } else {
+                    fprintf(stderr, "unrecognized debug type '%s'\n", w);
+                    return 1;
+                }
+                w = strtok(NULL, ",\r\n");
             }
             }
             break;

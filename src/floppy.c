@@ -388,6 +388,13 @@ static void act_on_portb_output_value(uint8_t prev_value) {
     drive_01_23  =   value & DRIVE_01_23_MASK;
     head_on_disk = !(value & HEAD_NOT_ON_DISK_MASK);
 
+    if (floppy_debug > 1) {
+        printf("floppy: write = %sabled, erase = %sabled, head = %s\n",
+                                    write_enable ? "en" : "dis",
+                                    erase_enable ? "en" : "dis",
+                                    head_on_disk ? "lowered" : "lifted");
+    }
+
     determine_current_drive();
 
     bool move_prev = prev_value & MOVE_HEAD_MASK;
@@ -398,9 +405,15 @@ static void act_on_portb_output_value(uint8_t prev_value) {
             if (drives[curdrive].curtrk < ntracks-1) {
                 drives[curdrive].curtrk++;
             }
+            if (floppy_debug) {
+                printf("floppy: seek in, track %d\n", drives[curdrive].curtrk);
+            }
         } else {
             if (drives[curdrive].curtrk > 0) {
                 drives[curdrive].curtrk--;
+            }
+            if (floppy_debug) {
+                printf("floppy: seek out, track %d\n", drives[curdrive].curtrk);
             }
         }
         seek_counter = seek_time;

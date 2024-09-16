@@ -5,6 +5,9 @@
 #define CONTROL_TX_CTRL     0x60        // transmit control
 #define CONTROL_RX_IRQE     0x80        // receive interrupt enable
 
+#define WS_SHIFT        2
+#define TXCTRL_SHIFT    5
+
 #define STATUS_RDRF_MASK    0x01        // Rx data register full
 #define STATUS_TDRE_MASK    0x02        // Tx data register empty
 #define STATUS_nDCD_MASK    0x04        // /DCD Data Carrier Detect
@@ -13,7 +16,7 @@
 #define STATUS_OVRN_MASK    0x20        // Rx Overrun
 #define STATUS_PE_MASK      0x40        // Rx Parity Error
 #define STATUS_IRQ_MASK     0x80        // /IRQ, if pin output is low, bit is 1
-                                        // clear by read of RDR
+                                        // clear by read of RDR or write to TDR
 
 #define setbit(v,msk)   (v) |= (msk)
 #define clrbit(v,msk)   (v) &= ~(msk)

@@ -112,6 +112,10 @@ static enum parity_e parity_type;
 static bool parity_calc;
 static bool two_stopbits;
 
+static bool nRTS;
+static bool txirq_enabled;
+static bool rxirq_enabled;
+
 // ----------------------------------------------------------------------------
 
 #define DATA_DIRECTION_ACCESS   0x04        // bit 2, 0 active(!)
@@ -447,6 +451,7 @@ uint8_t floppy_acia_read(uint8_t address) {
     case 1:                 // receive register
         clrbit(status, STATUS_RDRF_MASK);
         clrbit(status, STATUS_OVRN_MASK);
+        clrbit(status, STATUS_IRQ_MASK);    // cleared on read of RDR
         return RDR;
         break;
     }
@@ -474,18 +479,47 @@ void floppy_acia_write(uint16_t address, uint8_t value) {
             setbit(status, STATUS_TDRE_MASK);   // empty
             acia_receive_state = STATE_WAIT_FOR_STARTBIT;
             acia_transmit_state = STATE_IDLE_OR_WRITE_STARTBIT;
+            rxirq_enabled = false;
+            txirq_enabled = false;
+            nRTS = false;
             return;
             break;
         }
-        ws = (control & CONTROL_WS_MASK) >> 2;
+        ws = (control & CONTROL_WS_MASK) >> WS_SHIFT;
         ndatabits    = word_select[ws].ndatabits;
         parity_type  = word_select[ws].parity;
         two_stopbits = word_select[ws].two_stopbits;
-        if (floppy_debug) printf("floppy: select %s\n", word_select[ws].name);
+
+        if (!!(control & CONTROL_RX_IRQE)) rxirq_enabled = true;
+
+        switch ((control & CONTROL_TX_CTRL) >> TXCTRL_SHIFT) {
+        case 3:
+            // transmit break level omitted
+        case 0:
+            nRTS = false;
+            txirq_enabled = false;
+            break;
+        case 1:
+            nRTS = false;
+            txirq_enabled = true;
+            break;
+        case 2:
+            nRTS = true;
+            txirq_enabled = false;
+            break;
+        }
+        if (floppy_debug) {
+            printf("floppy: select %s\n", word_select[ws].name);
+            printf("floppy: txctrl: /RTS = %s, txirq = %sabled\n",
+                                            nRTS ? "high" : "low",
+                                            txirq_enabled ? "en" : "dis");
+            printf("floppy: rxirq = %sabled\n", rxirq_enabled ? "en" : "dis");
+        }
         break;
     case 1:                 // transmit register
         TDR = value;
         clrbit(status, STATUS_TDRE_MASK);       // not empty
+        clrbit(status, STATUS_IRQ_MASK);        // cleared on write to TDR
         break;
     }
 }
@@ -604,6 +638,8 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             clrbit(status, STATUS_OVRN_MASK);
         }
         setbit(status, STATUS_RDRF_MASK);       // new byte available
+        if (rxirq_enabled)
+            setbit(status, STATUS_IRQ_MASK);
         break;
     }   // end of switch rx state
 
@@ -617,6 +653,8 @@ copy_byte_to_rdr:   // copy byte to RDR and set RDRF
             tx_curdatabit = parity_calc = 0;
             tx_databyte = TDR;                              // consume byte
             setbit(status, STATUS_TDRE_MASK);               // empty again
+            if (txirq_enabled)
+                setbit(status, STATUS_IRQ_MASK);
             acia_transmit_state = STATE_WRITE_DATABITS;
             tx_bit = 0;                                     // startbit
         }

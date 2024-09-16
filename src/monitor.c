@@ -555,6 +555,32 @@ err_usage:
 
 // ----------------------------------------------------------------------------
 
+void stack(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        trace_stack_status();
+        goto err_usage;
+    }
+
+    if (!strcmp(p, "on")) {
+        trace_stack_on();
+    } else if (!strcmp(p, "off")) {
+        trace_stack_off();
+    } else if (!strcmp(p, "show")) {
+        trace_stack_show();
+    } else {
+err_usage:
+        puts("usage: stack on | off | show");
+    }
+}
+
+void bt(void) {
+    trace_stack_show();
+}
+
+// ----------------------------------------------------------------------------
+
 static void help(void);
 
 static struct command {
@@ -592,6 +618,8 @@ static struct command {
     { "mount",  xmount, "num file",    "mount file to drive num" },
     { "trace",  trace,  "on|off|clear|save", "CPU tracing" },
     { "hm",     hm, "on|off|clr|save|img", "memory heatmap (r/w)" },
+    { "stack",  stack,  "on|off|show",  "stack tracing" },
+    { "bt",     bt,     "",             "backtrace (needs stack on)" },
     { "", NULL, "", "" }
 };
 

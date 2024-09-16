@@ -5,3 +5,9 @@ void trace_on(void);
 void trace_off(void);
 bool trace_status(void);
 void trace_save(char *filename);
+
+void trace_stack_on(void);
+void trace_stack_off(void);
+bool trace_stack_status(void);
+void trace_stack_tick(void);
+void trace_stack_show(void);

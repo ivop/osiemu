@@ -656,6 +656,7 @@ int main_program(int argc, char **argv) {
             }
             static double ticks;
             trace_tick(ticks);
+            trace_stack_tick();
             ticks = step6502();
             cpu_ticks += ticks;
             tape_tick(ticks);

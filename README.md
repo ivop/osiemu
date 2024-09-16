@@ -93,6 +93,7 @@ Ohio Scientific Instruments, Inc. Emulator
 | unmount | num         | unmount drive |
 | mount | num file      | mount file to drive num |
 | trace | on \| off \| clear \| save [file] | CPU tracing |
+| hm | on \| off \| clr \| save [file] \| img [file] | memory heatmap (r/w) |
 
 
 ## Command line options

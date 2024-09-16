@@ -539,7 +539,7 @@ void hm(void) {
         heatmap_enable();
     } else if (!strcmp(p, "off")) {
         heatmap_disable();
-    } else if (!strcmp(p, "clr")) {
+    } else if (!strcmp(p, "clr") || !strcmp(p, "clear")) {
         heatmap_init();
     } else if (!strcmp(p, "save")) {
         p = strtok(NULL, "\t\n\r");
@@ -549,7 +549,7 @@ void hm(void) {
         heatmap_image(p);
     } else {
 err_usage:
-        puts("usage: hm on | off | clr | save [file] | img [file]");
+        puts("usage: hm on | off | clear | save [file] | img [file]");
     }
 }
 
@@ -591,7 +591,7 @@ static struct command {
     { "unmount",unmount,"num",         "unmount drive" },
     { "mount",  xmount, "num file",    "mount file to drive num" },
     { "trace",  trace,  "on|off|clear|save", "CPU tracing" },
-    { "hm",     hm, "on|off|clr|save|img", "heatmap?" },
+    { "hm",     hm, "on|off|clr|save|img", "memory heatmap (r/w)" },
     { "", NULL, "", "" }
 };
 

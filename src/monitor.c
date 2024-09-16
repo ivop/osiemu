@@ -25,6 +25,7 @@
 #include "tape.h"
 #include "floppy.h"
 #include "trace.h"
+#include "heatmap.h"
 
 // ----------------------------------------------------------------------------
 
@@ -506,7 +507,7 @@ static void trace(void) {
 
     if (!p) {
         trace_status();
-        return;
+        goto err_usage;
     }
 
     if (!strcmp(p, "on")) {
@@ -519,7 +520,36 @@ static void trace(void) {
     } else if (!strcmp(p, "clear")) {
         trace_init();
     } else {
+err_usage:
         puts("usage: trace on | off | clear | save [file]");
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void hm(void) {
+    char *p = strtok(NULL, " \t\n\r");
+
+    if (!p) {
+        heatmap_status();
+        goto err_usage;
+    }
+
+    if (!strcmp(p, "on")) {
+        heatmap_enable();
+    } else if (!strcmp(p, "off")) {
+        heatmap_disable();
+    } else if (!strcmp(p, "clr")) {
+        heatmap_init();
+    } else if (!strcmp(p, "save")) {
+        p = strtok(NULL, "\t\n\r");
+        heatmap_save(p);
+    } else if (!strcmp(p, "img")) {
+        p = strtok(NULL, "\t\n\r");
+        heatmap_image(p);
+    } else {
+err_usage:
+        puts("usage: hm on | off | clr | save [file] | img [file]");
     }
 }
 
@@ -561,6 +591,7 @@ static struct command {
     { "unmount",unmount,"num",         "unmount drive" },
     { "mount",  xmount, "num file",    "mount file to drive num" },
     { "trace",  trace,  "on|off|clear|save", "CPU tracing" },
+    { "hm",     hm, "on|off|clr|save|img", "heatmap?" },
     { "", NULL, "", "" }
 };
 

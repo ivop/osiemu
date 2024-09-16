@@ -20,6 +20,7 @@
 #include "floppy.h"
 #include "control.h"
 #include "sound.h"
+#include "heatmap.h"
 
 // ----------------------------------------------------------------------------
 
@@ -79,6 +80,7 @@ static uint16_t kernel_bottom;
 // ----------------------------------------------------------------------------
 
 uint8_t read6502(uint16_t address) {
+    heatmap_read(address);
     if (address <= mmu_ram_top) {
         return RAM[address];
     }
@@ -135,6 +137,7 @@ uint8_t read6502(uint16_t address) {
 }
 
 void write6502(uint16_t address, uint8_t value) {
+    heatmap_write(address);
     if (address <= mmu_ram_top) {
         RAM[address] = value;
         return;

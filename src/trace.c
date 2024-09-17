@@ -39,6 +39,7 @@ enum stack_item_type {
     TYPE_PHY
 };
 
+unsigned int stack_debug;
 static bool trace_stack;
 static enum stack_item_type stack_items[256];
 static uint16_t stack_pcs[256];
@@ -146,6 +147,10 @@ void trace_stack_tick(void) {
         stack_items[sp-1] = TYPE_LSB;
         stack_pcs[sp]   = PC;
         stack_pcs[sp-1] = PC;
+        if (stack_debug) {
+            uint16_t a = (read6502(PC+2)<<8) | read6502(PC+1);
+            printf("stack: %04x: jsr $%04x\n", PC, a);
+        }
         break;
     case 0x48:          // PHA
         stack_items[sp] = TYPE_PHA;
@@ -162,6 +167,12 @@ void trace_stack_tick(void) {
     case 0x5a:          // PHY
         stack_items[sp] = TYPE_PHY;
         stack_pcs[sp]   = PC;
+        break;
+    case 0x60:          // RTS
+        if (stack_debug) {
+            uint16_t a = (read6502(0x0102+SP)<<8) | read6502(0x0101+SP);
+            printf("stack: rts (back to $%04x)\n", a+1);
+        }
         break;
     }
 }

@@ -486,6 +486,9 @@ int main_program(int argc, char **argv) {
                 if (!strcmp(w, "floppy")) {
                     floppy_debug++;
                     printf("debug: floppy, level %d\n", floppy_debug);
+                } else if (!strcmp(w, "stack")) {
+                    stack_debug++;
+                    printf("debug: floppy, level %d\n", stack_debug);
                 } else {
                     fprintf(stderr, "unrecognized debug type '%s'\n", w);
                     return 1;

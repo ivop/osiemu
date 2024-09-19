@@ -24,6 +24,7 @@ static void generate_gradient(void) {
         gradient[768+i][0] = gradient[1024+i][0] = 255;
         gradient[256+i][2] = gradient[768+i][1] = 255 - i;
     }
+    gradient[0][0] = gradient[0][1] = gradient[0][2] = 0;
 }
 
 void heatmap_init(void) {

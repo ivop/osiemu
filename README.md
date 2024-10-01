@@ -288,6 +288,8 @@ Preferably the version that is distributed with Qt itself.
   
 ## Future additions?
 
+* Binary release
+* CP/M-65 sample disk images
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

@@ -168,6 +168,8 @@ options:
                                  nobasic     disable BASIC ROM (8kB extra RAM)
                                  fullscreen  start fullscreen
 
+    -D/--debug flag,...        enable debug messages: floppy
+
     -h/--help                  show usage information
 ```
 

@@ -1,0 +1,16 @@
+name: C/C++ CI
+run-name: ${{github.actor}} is testing out GitHub Actions
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: clone submodules
+      run: git submodule update --init --recursive
+    - name: install packages
+      run: sudo apt update && sudo apt install libsdl2-dev libsdl2-image-dev libqt5core5a libqt5gui5 libqt5widgets5 qt5-qmake qtbase5-dev
+    - name: make osiemu
+      run: make -j`nproc` release
+    - name: make osiemu-launcher
+      run: make -j`nproc` osiemu-launcher

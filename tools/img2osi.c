@@ -16,7 +16,7 @@
  *      Track 0: special case, load at $2200, 2048 bytes
  *      All other tracks: OS65D track marker plus 1 sector of either 2048
  *      bytes (8 pages) or 3072 bytes (12 pages).
- * 
+ *
  * Use case: CP/M-65 port
  *      Always read and write full track to simplify writing sectors and
  *      avoid hard to maintain code to write a 128 byte sector somewhere in

@@ -1,5 +1,5 @@
 # osiemu
-Ohio Scientific Instruments, Inc. Emulator
+Ohio Scientific Instruments, Inc. Emulator for Linux and Windows
 
 ![screenshot]( screenshots/osiemu.png )  
 

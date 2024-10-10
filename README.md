@@ -243,7 +243,7 @@ you can specify it on the command line.
 For example:
 
 ```
-make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CXX=/path/to/clang
+make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CXX=/path/to/clang++
 ```
 
 forces a build against Qt 6.7.2 and use the clang compiler.

@@ -1,5 +1,5 @@
 # osiemu
-Ohio Scientific Instruments, Inc. Emulator
+Ohio Scientific Instruments, Inc. Emulator for Linux and Windows
 
 ![screenshot]( screenshots/osiemu.png )  
 
@@ -11,7 +11,8 @@ Ohio Scientific Instruments, Inc. Emulator
 6. [Build instructions](#build-instructions)
 7. [Disk images](#disk-images)
 8. [GUI launcher](#gui-launcher)
-9. [Notes](#notes)
+9. [CP/M-65](#cpm-65)
+10. [Notes](#notes)
 
 ## Features
 
@@ -242,13 +243,21 @@ you can specify it on the command line.
 For example:
 
 ```
-make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CXX=/path/to/clang
+make -j8 osiemu-launcher QMAKE=/path/to/Qt/6.7.2/gcc_64/bin/qmake6 CXX=/path/to/clang++
 ```
 
 forces a build against Qt 6.7.2 and use the clang compiler.
 It has been tested with Qt 5.15.x and Qt 6.5.x and up.
 On Windows, contrary to the main ```osiemu``` binary that has to be built with Cygwin, the launcher binary has to be built with MinGW.
 Preferably the version that is distributed with Qt itself.
+
+## CP/M-65
+
+The _cpm65_ directory contains several disk images of the Ohio Scientific port of CP/M-65.
+Alongside you'll find .settings files for the GUI launcher, and .config files that can be used from the command line.
+For more information on what CP/M65 exactly is, how to use it, and possibly newer disk images, see the [CP/M-65 website](https://github.com/davidgiven/cpm65).
+If you want to try out the serial systems version, you'll need to make sure the serial tape input and output settings point to the right (virtual) device.
+As an example, they now point to /dev/pts/3.
 
 ## Notes
 
@@ -275,14 +284,14 @@ Preferably the version that is distributed with Qt itself.
   ```
   In another window:
   ```
-  $ minicom -D /dev/pts/9 -b 9600
+  $ minicom -D /dev/pts/9 -b 19200
   ```
   And in yet another window:
   ```
   $ ./osiemu --disable-video \
              --kernel kernel/syn-c3-serial-hdm.rom \
              --tape-location fc00 \
-             --tape-baseclock 153600 \
+             --tape-baseclock 19200 \
              --tape-input /dev/pts/10 \
              --tape-output /dev/pts/10 \
              --floppy0 some-floppy.os8

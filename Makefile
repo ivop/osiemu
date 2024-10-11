@@ -6,8 +6,8 @@ else
 endif
 WARN ?= -W -Wall -Wextra -pedantic
 CFLAGS = -flto=auto $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
-		-fsigned-char
-LFLAGS = -flto=auto
+		-fsigned-char $(EXTRA_CFLAGS)
+LFLAGS = -flto=auto $(EXTRA_LFLAGS)
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lm
 
 FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \

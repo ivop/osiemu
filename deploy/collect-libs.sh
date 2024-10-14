@@ -16,5 +16,5 @@ if [ ! -d "$2" ] ; then
 fi
 
 for i in `ldd "$1" | grep = | cut -d'>' -f2 | cut -d'(' -f1` ; do
-    cp -L "$i" "$2"
+    cp -vL "$i" "$2"
 done

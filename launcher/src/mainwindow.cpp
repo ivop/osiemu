@@ -235,7 +235,7 @@ void MainWindow::generate_arguments(QStringList &arguments) {
 
     if (ui->check_force_ramtop->checkState() == Qt::Checked) {
         arguments.append("--force-ramtop");
-        arguments.append(ui->combo_force_ramtop->currentText().split(QRegExp("\\s+")).at(0));
+        arguments.append(ui->combo_force_ramtop->currentText().split(' ').at(0));
     }
 }
 

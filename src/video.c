@@ -681,7 +681,11 @@ void screen_toggle_fullscreen(void) {
     fullscreen = !fullscreen;
 
     if (fullscreen) {
+#ifdef _WIN32
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+#else
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
     } else {
         SDL_SetWindowFullscreen(window, 0);
     }

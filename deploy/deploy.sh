@@ -41,10 +41,13 @@ mkdir -p "$COLLECT/lib"
 LINUXDEPLOYQT=/linuxdeployqt/build/tools/linuxdeployqt/linuxdeployqt
 
 cd "$COLLECT"
-"$LINUXDEPLOYQT" osiemu -bundle-non-qt-libs
+"$LINUXDEPLOYQT" osiemu -bundle-non-qt-libs \
+                        -no-translations \
+                        -no-copy-copyright-files
 "$LINUXDEPLOYQT" osiemu-launcher -bundle-non-qt-libs \
                                  -no-translations \
                                  -no-copy-copyright-files
+rm -f AppRun
 
 printf "\nFORCING RPATH\n\n"
 

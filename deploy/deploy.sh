@@ -25,10 +25,8 @@ printf "Target directory: $COLLECT\n\n"
 rm -rf "$COLLECT"
 mkdir -p "$COLLECT"
 
-cp -v osiemu "$COLLECT/osiemu.bin"
-cp -v osiemu-launcher "$COLLECT/osiemu-launcher.bin"
-cp -v "$DEPLOY/osiemu.sh" "$COLLECT/osiemu"
-cp -v "$DEPLOY/osiemu-launcher.sh" "$COLLECT/osiemu-launcher"
+cp -v osiemu "$COLLECT"
+cp -v osiemu-launcher "$COLLECT"
 
 cp -va basic config cpm65 kernel disks fonts icons launcher/settings "$COLLECT"
 mkdir -p "$COLLECT/tapes" "$COLLECT/tests"
@@ -39,8 +37,13 @@ printf "\nCOLLECTING SHARED OBJECTS\n\n"
 
 mkdir -p "$COLLECT/lib"
 
-"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu.bin" "$COLLECT/lib"
-"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu-launcher.bin" "$COLLECT/lib"
+"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu" "$COLLECT/lib"
+"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu-launcher" "$COLLECT/lib"
+
+printf "\nFORCING RPATH\n\n"
+
+patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$COLLECT/osiemu"
+patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$COLLECT/osiemu-launcher"
 
 printf "\nCREATING TARBALLS\n\n"
 

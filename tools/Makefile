@@ -12,7 +12,7 @@ all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas img2osi
 %: %.c
 	$(CC) -O3 -s -o $@ $<
 
-%.bas: %.txt
+%.bas: %.txt txt2bas
 	./txt2bas < $< > $@
 
 clean:

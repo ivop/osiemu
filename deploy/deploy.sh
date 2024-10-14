@@ -37,8 +37,14 @@ printf "\nCOLLECTING SHARED OBJECTS\n\n"
 
 mkdir -p "$COLLECT/lib"
 
-"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu" "$COLLECT/lib"
-"$DEPLOY/collect-libs.sh" "$COLLECT/osiemu-launcher" "$COLLECT/lib"
+# Path inside docker containter
+LINUXDEPLOYQT=/linuxdeployqt/build/tools/linuxdeployqt/linuxdeployqt
+
+cd "$COLLECT"
+"$LINUXDEPLOYQT" osiemu -bundle-non-qt-libs
+"$LINUXDEPLOYQT" osiemu-launcher -bundle-non-qt-libs \
+                                 -no-translations \
+                                 -no-copy-copyright-files
 
 printf "\nFORCING RPATH\n\n"
 
@@ -47,6 +53,7 @@ patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$COLLECT/osiemu-launcher"
 
 printf "\nCREATING TARBALLS\n\n"
 
+cd "$BASE"
 tar cvzf osiemu-$VERSION.tar.gz -C "$DEPLOY" "$(basename "$COLLECT")"
 tar cvjf osiemu-$VERSION.tar.bz2 -C "$DEPLOY" "$(basename "$COLLECT")"
 tar cvJf osiemu-$VERSION.tar.xz -C "$DEPLOY" "$(basename "$COLLECT")"

@@ -15,10 +15,10 @@ if [ ! -d "$2" ] ; then
     exit 1
 fi
 
-for i in `ldd "$1" | grep = | cut -d'>' -f2 | cut -d'(' -f1` ; do
+for i in `ldd "$1" | grep = | cut -d'>' -f2 | cut -d'(' -f1 | grep -vi windows` ; do
     cp -vL "$i" "$2"
 done
 
-for i in `cat excludelist.txt` ; do
+for i in `cat deploy/excludelist.txt` ; do
     rm -f "$2/$i"
 done

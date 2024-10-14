@@ -18,3 +18,7 @@ fi
 for i in `ldd "$1" | grep = | cut -d'>' -f2 | cut -d'(' -f1` ; do
     cp -vL "$i" "$2"
 done
+
+for i in `cat excludelist.txt` ; do
+    rm -f "$2/$i"
+done

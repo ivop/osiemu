@@ -43,7 +43,7 @@ osiemu-launcher.exe: launcher/build/release/launcher.exe
 	cp $< $@
 
 clean:
-	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz
+	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz *.zip
 	+make -C launcher clean
 
 .depend: $(SRC_FILES)

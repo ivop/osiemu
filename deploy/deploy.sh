@@ -32,6 +32,7 @@ cp -va basic config cpm65 kernel disks fonts icons launcher/settings "$COLLECT"
 mkdir -p "$COLLECT/tapes" "$COLLECT/tests"
 cp -va tapes/*.lod tapes/*.bas "$COLLECT/tapes"
 cp -va tests/*.lod "$COLLECT/tests"
+cp -va LICENSE "$COLLECT"
 
 printf "\nCOLLECTING SHARED OBJECTS\n\n"
 

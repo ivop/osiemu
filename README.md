@@ -1,6 +1,8 @@
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator for Linux and Windows
 
+Binary releases for Linux and Windows are [here](https://github.com/ivop/osiemu/releases).
+
 ![screenshot]( screenshots/osiemu.png )  
 
 1. [Features](#features)

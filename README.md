@@ -215,7 +215,7 @@ make -j8 release SDL2CONFIG=/path/to/sdl2-config CC=/path/to/my/compiler
 
 ### Windows
 
-Use Cygwin64. MinGW64 doesn't work because it is missing mmap and getline.
+Use Cygwin64. MinGW64 doesn't work because it is missing mmap, O_NONBLOCK, and getline.
 
 ## Disk images
 

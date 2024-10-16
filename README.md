@@ -135,6 +135,7 @@ options:
     -d/--frame-rate rate       display rate: 60     60.000000 Hz (default)
                                              540bw  59.967041 Hz
                                              540col 61.442057 Hz
+                                             (unknown is treated as float)
     -s/--saturation            color saturation [0.0-1.0], default: 0.75
     -H/--hires-mode mode       mode: none, 440b (128x128), 541 (256x256)
     -S/--scanlines             emulate visual scanlines (zoom >= 2 only)

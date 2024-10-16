@@ -103,7 +103,8 @@ static void usage(void) {
     fprintf(stderr,
 "    -d/--frame-rate rate       display rate: 60     %.6lf Hz (default)\n"
 "                                             540bw  %.6lf Hz\n"
-"                                             540col %.6lf Hz\n",
+"                                             540col %.6lf Hz\n"
+"                                             (unknown is treated as float)\n",
     FPS_60HZ, FPS_540_BW, FPS_540_COL);
 
     fprintf(stderr,
@@ -350,8 +351,12 @@ int main_program(int argc, char **argv) {
             } else if (!strcmp(optarg, "540col")) {
                 fps = FPS_540_COL;
             } else {
-                fprintf(stderr, "error: unknown frame rate\n");
-                return 1;
+                printf("warning: unknown frame rate, trying as float\n");
+                fps = strtod(optarg, NULL);
+                if (fps == 0.0) {
+                    fprintf(stderr, "error: invalid frame rate\n");
+                    return 1;
+                }
             }
             break;
         case 's':
@@ -578,13 +583,21 @@ int main_program(int argc, char **argv) {
     trace_init();
     trace_status();
 
+    bool skipframe = false;
+    unsigned int skipframe_severity = 0;
+
     while (1) {
         fflush(stdout);
         fflush(stderr);
 
         target += sdl_ticks_per_frame;
 
-        screen_update();
+        if (skipframe) {
+            skipframe = false;
+        } else {
+            if (skipframe_severity) skipframe_severity--;
+            screen_update();
+        }
 
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -672,13 +685,21 @@ int main_program(int argc, char **argv) {
         cpu_target += ticks_per_frame;
 
         if (!warp_speed) {
-            while (SDL_GetTicks() < target) {
+            if (SDL_GetTicks() >= target) {
+                skipframe = true;
+                skipframe_severity++;
+                if (skipframe_severity > 2) {
+                    printf("warning: system too slow, skipping frames\n");
+                }
+            } else {
+                while (SDL_GetTicks() < target) {
 #ifndef DONT_USE_NANOSLEEP
-                struct timespec wait = { 0, 100000 };   // 0.1ms
-                nanosleep(&wait,NULL);
+                    struct timespec wait = { 0, 100000 };   // 0.1ms
+                    nanosleep(&wait,NULL);
 #else
-                SDL_Delay(1);                           // 1ms, less accurate
+                    SDL_Delay(1);                           // 1ms, less accurate
 #endif
+                }
             }
         }
     }

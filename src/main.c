@@ -706,8 +706,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char *lineptr;
-    size_t n;
+    char *lineptr = NULL;
+    size_t n = 0;
 
     int myargc = 0;
     char **myargv = NULL;

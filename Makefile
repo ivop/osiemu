@@ -1,20 +1,11 @@
-OS=$(uname -s)
-
 SDL2CONFIG ?= sdl2-config
-
 ifeq ($(MAKECMDGOALS),release)
 	DEBUG = -O3
 else
 	DEBUG = -Og -g3
 endif
 WARN ?= -W -Wall -Wextra -pedantic
-
-ifeq ($(OS),Darwin)
-	LTO=-flto
-else
-	LTO=-flto=auto
-endif
-
+LTO=-flto
 CFLAGS = $(LTO) $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
 		-fsigned-char $(EXTRA_CFLAGS)
 LFLAGS = $(LTO) $(EXTRA_LFLAGS)

@@ -1,5 +1,5 @@
 # osiemu
-Ohio Scientific Instruments, Inc. Emulator for Linux and Windows
+Ohio Scientific Instruments, Inc. Emulator for Linux, Windows, and macOS
 
 Binary releases for Linux and Windows are [here](https://github.com/ivop/osiemu/releases).
 
@@ -202,10 +202,16 @@ More examples are in the _config_ directory.
 
 ## Build instructions
 
+### Prerequisites
+
+To build from source you need to install the development packages of libSDL2 and libSDL2_image.
+The exact name depends on your Linux distribution, Cygwin, or homebrew.
+For example, on Ubuntu 22.04 they are called libsdl2-dev, and libsdl2-image-dev.
+
 ### Linux
 
 ```
-git clone --recurse-submodules https://github.com/ivop/osiemu
+git clone --depth=1 --recurse-submodules https://github.com/ivop/osiemu
 cd osiemu
 make release
 ```
@@ -219,6 +225,10 @@ make -j8 release SDL2CONFIG=/path/to/sdl2-config CC=/path/to/my/compiler
 ### Windows
 
 Use Cygwin64. MinGW64 doesn't work because it is missing mmap, O_NONBLOCK, and getline.
+
+### macOS
+
+Has been tested to run with libSDL2 and libSDL2_image from homebrew on Catalina x86_64.
 
 ## Disk images
 
@@ -302,8 +312,7 @@ As an example, they now point to /dev/pts/3.
   
 ## Future additions?
 
-* Binary release
-* CP/M-65 sample disk images
+* macOS release
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

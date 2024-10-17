@@ -1,13 +1,23 @@
+OS=$(uname -s)
+
 SDL2CONFIG ?= sdl2-config
+
 ifeq ($(MAKECMDGOALS),release)
 	DEBUG = -O3
 else
 	DEBUG = -Og -g3
 endif
 WARN ?= -W -Wall -Wextra -pedantic
-CFLAGS = -flto=auto $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
+
+ifeq ($(OS),Darwin)
+	LTO=-flto
+else
+	LTO=-flto=auto
+endif
+
+CFLAGS = $(LTO) $(WARN) $$($(SDL2CONFIG) --cflags) $(DEBUG) $(DEFINES)\
 		-fsigned-char $(EXTRA_CFLAGS)
-LFLAGS = -flto=auto $(EXTRA_LFLAGS)
+LFLAGS = $(LTO) $(EXTRA_LFLAGS)
 LIBS = $$($(SDL2CONFIG) --libs) -lSDL2_image -lm
 
 FILES = main.c mmu.c keyboard.c video.c fake6502/fake6502.c tape.c \

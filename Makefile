@@ -43,6 +43,12 @@ launcher/build/release/launcher.exe:
 osiemu-launcher.exe: launcher/build/release/launcher.exe
 	cp $< $@
 
+launcher/build/launcher.app/Contents/MacOS/launcher:
+	+make -C launcher
+
+osiemu-launcher.app: launcher/build/launcher.app/Contents/MacOS/launcher
+	cp $< $@
+
 clean:
 	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz *.zip
 	+make -C launcher clean

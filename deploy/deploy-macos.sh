@@ -88,7 +88,7 @@ rm -rf "$COLLECT/lib/Contents/MacOS"
 printf "*** fix rpath\n"
 
 install_name_tool -delete_rpath "@executable_path/../Frameworks" osiemu-launcher.app
-install_name_tool -add_rpath "@executable_path/Contents/Frameworks" osiemu-launcher.app
+install_name_tool -add_rpath "@executable_path/lib/Contents/Frameworks" osiemu-launcher.app
 cp osiemu-launcher.app "$COLLECT/osiemu-launcher"
 
 #printf "*** copy qt.conf\n"

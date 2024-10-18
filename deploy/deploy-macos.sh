@@ -35,30 +35,39 @@ printf "Target directory: $COLLECT\n\n"
 rm -rf "$COLLECT"
 mkdir -p "$COLLECT"
 
-cp -v osiemu "$COLLECT"
-cp -v osiemu-launcher.app "$COLLECT/osiemu-launcher"
+printf "*** run macdeployqt on launcher\n"
 
-cp -va basic config cpm65 kernel disks fonts icons launcher/settings "$COLLECT"
-mkdir -p "$COLLECT/tapes" "$COLLECT/tests"
-cp -va tapes/*.lod tapes/*.bas "$COLLECT/tapes"
-cp -va tests/*.lod "$COLLECT/tests"
+"$PATH_TO_QT_BIN/macdeployqt" "launcher/build/launcher.app"
+
+printf "*** copy deployed app\n"
+
+cp -a "launcher/build/launcher.app/Contents" "$COLLECT"
+
+printf "*** copy osiemu\n"
+
+MACOSDIR="$COLLECT/Contents/MacOS"
+
+cp -v osiemu "$MACOSDIR"
+
+cp -va basic config cpm65 kernel disks fonts icons launcher/settings "$MACOSDIR"
+mkdir -p "$MACOSDIR/tapes" "$MACOSDIR/tests"
+cp -va tapes/*.lod tapes/*.bas "$MACOSDIR/tapes"
+cp -va tests/*.lod "$MACOSDIR/tests"
 cp -va LICENSE "$COLLECT"
 
-printf "\nCOLLECTING SHARED OBJECTS\n\n"
-
-mkdir -p "$COLLECT/lib"
+mkdir -p "$MACOSDIR/lib"
 
 printf "*** copy osiemu dependencies\n"
 
-for i in $(deploy/collect-libs-macos.py "$COLLECT/osiemu" "$MACPORTS/lib") ; do
-    cp -aL "$i" "$COLLECT/lib"
+for i in $(deploy/collect-libs-macos.py "$MACOSDIR/osiemu" "$MACPORTS/lib") ; do
+    cp -aL "$i" "$MACOSDIR/lib"
 done
 
 printf "*** fix references in osiemu\n"
 
-for i in $(otool -L "$COLLECT/osiemu" | grep "$MACPORTS" | awk '{ print $1 }') ; do
+for i in $(otool -L "$MACOSDIR/osiemu" | grep "$MACPORTS" | awk '{ print $1 }') ; do
     j=$(basename "$i")
-    install_name_tool -change "$i" "@executable_path/lib/x$j" "$COLLECT/osiemu"
+    install_name_tool -change "$i" "@executable_path/lib/x$j" "$MACOSDIR/osiemu"
 done
 
 printf "*** fix references in libraries\n"
@@ -66,41 +75,19 @@ printf "*** fix references in libraries\n"
 # add x prefix to avoid confusion if MacPorts is
 # installed, too, on the target machine
 
-for i in "$COLLECT/lib"/* ; do
+for i in "$MACOSDIR/lib"/* ; do
     for j in $(otool -L "$i" | grep "$MACPORTS" | awk '{ print $1 }') ; do
         k=$(basename "$j")
         install_name_tool -change "$j" "@loader_path/x$k" "$i"
     done
     k=$(basename "$i")
     install_name_tool -id "@loader_path/x$k" "$i"
-    ( cd "$COLLECT/lib"; mv "$k" "x$k" )
+    ( cd "$MACOSDIR/lib"; mv "$k" "x$k" )
 done
 
-printf "*** run macdeployqt\n"
-
-"$PATH_TO_QT_BIN/macdeployqt" "launcher/build/launcher.app"
-
-printf "*** copy deployed app\n"
-
-cp -a "launcher/build/launcher.app/Contents" "$COLLECT/lib"
-rm -rf "$COLLECT/lib/Contents/MacOS"
-
-printf "*** fix rpath\n"
-
-install_name_tool -delete_rpath "@executable_path/../Frameworks" osiemu-launcher.app
-install_name_tool -add_rpath "@executable_path/lib/Contents/Frameworks" osiemu-launcher.app
-cp osiemu-launcher.app "$COLLECT/osiemu-launcher"
-
-#printf "*** copy qt.conf\n"
-#cp "$DEPLOY/qt.conf" "$COLLECT"
-
-exit 0
-
-printf "\nCREATING TARBALLS\n\n"
+printf "\nCREATING DMG IMAGE\n\n"
 
 cd "$BASE"
-tar cvzf osiemu-$VERSION.tar.gz -C "$DEPLOY" "$(basename "$COLLECT")"
-tar cvjf osiemu-$VERSION.tar.bz2 -C "$DEPLOY" "$(basename "$COLLECT")"
-tar cvJf osiemu-$VERSION.tar.xz -C "$DEPLOY" "$(basename "$COLLECT")"
+hdiutil create osiemu-$VERSION.dmg -ov -volname "osiemu-$VERSION" -fs HFS+ -srcfolder "$COLLECT"
 
 rm -rf "$COLLECT"

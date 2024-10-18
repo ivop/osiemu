@@ -17,7 +17,7 @@ DATE=$(date "+%Y%m%d")
 VERSION=$(grep VERSION_STRING version.h | cut -d\" -f2 | cut -d' ' -f2)
 BASE=$(pwd)
 DEPLOY="$BASE/deploy"
-COLLECT="$DEPLOY/osiemu-$VERSION"
+COLLECT="$DEPLOY/osiemu-$VERSION/Osiemu.app"
 
 printf "\nBUILDING OSIEMU\n\n"
 printf "version: $VERSION\n\n"
@@ -32,7 +32,7 @@ make -j`sysctl -n hw.ncpu` osiemu-launcher.app QMAKE="$PATH_TO_QT_BIN/qmake"
 printf "\nCOLLECTING FILES FOR DISTRIBUTION\n\n"
 printf "Target directory: $COLLECT\n\n"
 
-rm -rf "$COLLECT"
+rm -rf "$DEPLOY/osiemu-$VERSION"
 mkdir -p "$COLLECT"
 
 printf "*** run macdeployqt on launcher\n"
@@ -87,7 +87,9 @@ done
 
 printf "\nCREATING DMG IMAGE\n\n"
 
+ln -s /Applications "$DEPLOY/osiemu-$VERSION/Applications"
 cd "$BASE"
-hdiutil create osiemu-$VERSION.dmg -ov -volname "osiemu-$VERSION" -fs HFS+ -srcfolder "$COLLECT"
+hdiutil create tmp.dmg -ov -volname "osiemu-$VERSION" -fs HFS+ -srcfolder "$DEPLOY/osiemu-$VERSION"
+hdiutil convert -format ULMO -o osiemu-$VERSION.dmg tmp.dmg
 
-rm -rf "$COLLECT"
+rm -rf "$DEPLOY/osiemu-$VERSION" tmp.dmg

@@ -737,6 +737,10 @@ int main(int argc, char **argv) {
 
     while (getline(&lineptr, &n, f) >= 0) {
         char *p = strtok(lineptr, " =\r\n");
+        if (!p) {
+            fprintf(stderr, "error: invalid .config file\n");
+            return 1;
+        }
         if (p[0] == '-') {
             add_arg(strdup(p));
         } else {

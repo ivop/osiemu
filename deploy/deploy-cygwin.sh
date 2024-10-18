@@ -2,7 +2,7 @@
 
 # RUN ME FROM THE ROOT DIRECTORY OF THE POJECT, LIKE:
 #
-# deploy/build.sh
+# deploy/deploy-cygwin.sh
 
 set -e
 

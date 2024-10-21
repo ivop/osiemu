@@ -667,9 +667,10 @@ int main_program(int argc, char **argv) {
                 screen_hide();
                 double remember = SDL_GetTicks();
                 if (!monitor()) goto exit_out;
+                screen_unhide();
+                screen_update();
                 double elapsed = SDL_GetTicks() - remember;
                 target += elapsed;
-                screen_unhide();
             }
             static double ticks;
             trace_tick(ticks);

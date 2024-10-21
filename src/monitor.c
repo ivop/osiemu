@@ -38,7 +38,7 @@ static void dump(void) {
     }
 
     for (int y=0; y<16; y++) {
-        printf("%04x: ", loc + y*16);
+        printf("%04x: ", (uint16_t)(loc + y*16));
         for (int x=0; x<16; x++) {
             printf("%02x ", read6502(loc+y*16+x));
         }

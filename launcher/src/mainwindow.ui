@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>933</width>
-    <height>845</height>
+    <height>847</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -516,7 +516,12 @@
           </item>
           <item>
            <property name="text">
-            <string>Model 630 (8 colors dark + light)</string>
+            <string>Model 630 (8 colors + inverse video)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>RGBI Board (8 colors dark + light)</string>
            </property>
           </item>
          </widget>

@@ -13,7 +13,8 @@ enum color_modes {
     COLORS_MONOCHROME,
     COLORS_440B,
     COLORS_540B,
-    COLORS_630
+    COLORS_630,
+    COLORS_630_RGBI
 };
 
 enum hires_modes {

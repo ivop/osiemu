@@ -57,6 +57,9 @@ void MainWindow::generate_arguments(QStringList &arguments) {
     case 3:
         arguments.append("630");
         break;
+    case 4:
+        arguments.append("630-rgbi");
+        break;
     }
 
     arguments.append("--saturation");

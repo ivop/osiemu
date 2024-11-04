@@ -111,7 +111,7 @@ static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
 
 static uint8_t Hz_tick_540b;
 
-static double angles_630[8] = {
+static double angles_630_rgbi[8] = {
       0.0,  // dummy
       0.0,  // red      (360)
     120.0,  // green
@@ -122,9 +122,9 @@ static double angles_630[8] = {
       0.0   // dummy
 };
 
-static int colors_630[16][3];  // 8 dim/bright pairs, maps directly to bits 3-0
+static int colors_630_rgbi[16][3];  // 8 dim/bright pairs, maps to bits 3-0
 
-static double *angles_440b = angles_630; // white + three identical colors
+static double *angles_440b = angles_630_rgbi; // white + three identical colors
 
 enum hires_modes hires_mode = HIRES_NONE;
 
@@ -150,7 +150,8 @@ const char * const color_modes_name[] = {
     [COLORS_MONOCHROME] = "monochrome",
     [COLORS_440B]       = "440b",
     [COLORS_540B]       = "540b",
-    [COLORS_630]        = "630"
+    [COLORS_630]        = "630",
+    [COLORS_630_RGBI]   = "630-rgbi"
 };
 
 const char * const hires_modes_name[] = {
@@ -206,6 +207,10 @@ do_monochrome:
     case COLORS_540B:
         if (!(control_5xx & CONTROL_540B_COLOR_ON))
             goto do_monochrome;
+        /* fallthrough */
+    case COLORS_630:
+        if (!(control_6xx & CONTROL_630_COLOR_ON))
+            goto do_monochrome;
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {
                 int v = COLOR[x+y*osi_stride];
@@ -225,7 +230,7 @@ do_monochrome:
             }
         }
         break;
-    case COLORS_630:
+    case COLORS_630_RGBI:
         if (!(control_6xx & CONTROL_630_COLOR_ON))
             goto do_monochrome;
         SDL_RenderClear(renderer);
@@ -233,9 +238,9 @@ do_monochrome:
             for (int x = 0; x < osi_width; x++) {
                 int c = COLOR[x+y*osi_stride] & 0x0f;
 
-                SDL_SetTextureColorMod(font, colors_630[c][0],
-                                             colors_630[c][1],
-                                             colors_630[c][2]);
+                SDL_SetTextureColorMod(font, colors_630_rgbi[c][0],
+                                             colors_630_rgbi[c][1],
+                                             colors_630_rgbi[c][2]);
 
                 blit_char(font, x, y, SCREEN[x+y*osi_stride]);
             }
@@ -440,9 +445,9 @@ static void init_colors_540b(void) {
 
 // ----------------------------------------------------------------------------
 
-// See doc/osi630-colors.txt for details
+// See doc/osi630-rgbi.txt for details
 
-static void init_colors_630(void) {
+static void init_colors_630_rgbi(void) {
     int R, G, B;
 
     for (int i=0; i<16; i++) {
@@ -454,12 +459,12 @@ static void init_colors_630(void) {
         } else if (j == 7) {    // grey/white
             hsl_to_rgb(0.0, 0.0, k ? 1.0 : 0.5, &R, &G, &B);
         } else {                // colors
-            hsl_to_rgb(angles_630[j], saturation, k ? 0.50 : 0.25, &R, &G, &B);
+            hsl_to_rgb(angles_630_rgbi[j], saturation, k ? 0.50 : 0.25, &R, &G, &B);
         }
 
-        colors_630[i][0] = R;
-        colors_630[i][1] = G;
-        colors_630[i][2] = B;
+        colors_630_rgbi[i][0] = R;
+        colors_630_rgbi[i][1] = G;
+        colors_630_rgbi[i][2] = B;
     }
 }
 
@@ -587,7 +592,7 @@ bool screen_init(double cpu_clock, double fps) {
         init_hires_bytes();
     }
 
-    if (color_mode == COLORS_540B) {
+    if (color_mode == COLORS_540B || color_mode == COLORS_630) {
         init_colors_540b();
         background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                                  SDL_TEXTUREACCESS_TARGET,
@@ -600,8 +605,8 @@ bool screen_init(double cpu_clock, double fps) {
         SDL_SetRenderTarget(renderer, background);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
-    } else if (color_mode == COLORS_630) {
-        init_colors_630();
+    } else if (color_mode == COLORS_630_RGBI) {
+        init_colors_630_rgbi();
     } else if (color_mode == COLORS_440B) {
         init_colors_440b();
     }

@@ -32,7 +32,8 @@ Binary releases for Linux and Windows are [here](https://github.com/ivop/osiemu/
   * Monochrome white, green, amber, or bluish
   * Model 440B, 6-bit ASCII, 4 colors
   * Model 540B, 8 colors, inverse video
-  * Model 630 Color Video Expander, 16 colors RGB, 8 dimmed, 8 bright
+  * Model 630 Color Video Expander, 8 colors, inverse video
+  * 2019 RGBI Board with 630 interface, 16 colors RGBI, 8 dimmed, 8 bright
 * High resolution overlays:
   * Model 440B, 128x128
   * Model 541, 256x256, High Resolution Graphics Expander

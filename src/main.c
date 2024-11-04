@@ -338,6 +338,12 @@ int main_program(int argc, char **argv) {
                 color_ram_bottom  = 0xd400;
                 color_ram_top     = 0xd7ff;
                 control_6xx_enable = true;
+            } else if (!strcmp(optarg, "630-rgbi")) {
+                color_mode = COLORS_630_RGBI;
+                color_ram_enabled = true;
+                color_ram_bottom  = 0xd400;
+                color_ram_top     = 0xd7ff;
+                control_6xx_enable = true;
             } else {
                 fprintf(stderr, "error: unknown color mode: %s\n", optarg);
                 return 1;

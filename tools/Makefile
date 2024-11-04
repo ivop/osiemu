@@ -1,4 +1,5 @@
 CC ?= cc
+CFLAGS = -O3 -static
 MADS ?= mads
 
 all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas img2osi
@@ -10,7 +11,7 @@ all: xex2lod test.lod hfe2osi osi2hfe mirrorbytes txt2bas hello.bas img2osi
 	$(MADS) -o:$@ $<
 
 %: %.c
-	$(CC) -O3 -s -o $@ $<
+	$(CC) $(CFLAGS) -s -o $@ $<
 
 %.bas: %.txt txt2bas
 	./txt2bas < $< > $@

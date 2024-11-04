@@ -317,9 +317,8 @@ As an example, they now point to /dev/pts/3.
   
 ## Future additions?
 
-* Add invert CAPS-lock option (cooked and raw)
 * Add osi2hfe and hfe2osi tools to binary distribution
-* Add 5.25" 80 tracks (8" bitrate) and 3.25" 80 tracks (8" bitrate) support
+* Add support for non-standard floppy formats, like 5.25" 80 tracks SD and DD, and 3.5" 80 tracks SD and DD.
 
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard

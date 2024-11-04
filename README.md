@@ -1,7 +1,9 @@
+[![C/C++ CI](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml)
+
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator for Linux, Windows, and macOS
 
-Binary releases for Linux and Windows are [here](https://github.com/ivop/osiemu/releases).
+Binary releases for Linux, Windows, and macOS are [here](https://github.com/ivop/osiemu/releases).
 
 ![screenshot]( screenshots/osiemu.png )  
 

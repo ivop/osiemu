@@ -50,13 +50,14 @@ osiemu-launcher.app: launcher/build/launcher.app/Contents/MacOS/launcher
 	cp $< $@
 
 clean:
-	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) .depend */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz *.zip osiemu-launcher.app *.dmg
+	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz *.zip osiemu-launcher.app *.dmg
 	+make -C launcher clean
 
-.depend: $(SRC_FILES)
-	rm -f $@
-	$(CC) $(CFLAGS) -MM $^ > .depend
+depend:
+	rm -f .depend
+	+make .depend
 
-ifneq ($(MAKECMDGOALS),clean)
-include .depend
-endif
+.depend:
+	$(CC) -MM $(SRC_FILES) > .depend
+
+-include .depend

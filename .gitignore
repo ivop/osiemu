@@ -6,7 +6,6 @@ osiemu
 osiemu-launcher
 osiemu.exe
 osiemu-launcher.exe
-.depend
 tools/xex2lod
 tools/*.lod
 tools/hfe2osi

@@ -1,0 +1,23 @@
+main.o: src/main.c src/fake6502/fake6502.h src/monitor.h src/mmu.h \
+ src/keyboard.h src/video.h src/tape.h src/floppy.h src/sound.h \
+ src/control.h src/trace.h src/../version.h
+mmu.o: src/mmu.c src/fake6502/fake6502.h src/mmu.h src/keyboard.h \
+ src/video.h src/tape.h src/floppy.h src/control.h src/sound.h \
+ src/heatmap.h
+keyboard.o: src/keyboard.c src/portability.h src/fake6502/fake6502.h \
+ src/keyboard.h src/cooked.h
+video.o: src/video.c src/video.h src/tape.h src/floppy.h src/hslrgb.h \
+ src/portability.h src/control.h
+fake6502.o: src/fake6502/fake6502.c src/fake6502/fake6502.h
+tape.o: src/tape.c src/portability.h src/tape.h src/acia.h
+cooked.o: src/cooked.c
+floppy.o: src/floppy.c src/portability.h src/floppy.h src/acia.h
+monitor.o: src/monitor.c src/fake6502/fake6502.h src/monitor.h \
+ src/video.h src/disasm.h src/tape.h src/floppy.h src/trace.h \
+ src/heatmap.h
+hslrgb.o: src/hslrgb.c
+sound.o: src/sound.c src/portability.h src/sound.h src/control.h
+control.o: src/control.c src/control.h src/portability.h src/video.h
+disasm.o: src/disasm.c src/disasm.h src/fake6502/fake6502.h
+trace.o: src/trace.c src/fake6502/fake6502.h src/disasm.h src/trace.h
+heatmap.o: src/heatmap.c src/heatmap.h

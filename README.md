@@ -145,6 +145,7 @@ options:
     -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01
     -r/--raw-keyboard          enable raw keyboard mode
     -i/--invert-keyboard       invert keyboard matrix signals (model 542)
+    -n/--inverse-caps          invert CAPS
 
     -j/--joystick1 index       specify joystick 1
     -J/--joystick2 index       specify joystick 2

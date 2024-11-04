@@ -119,6 +119,7 @@ static void usage(void) {
 "    -A/--ascii-keyboard        enable ASCII keyboard at 0xdf01\n"
 "    -r/--raw-keyboard          enable raw keyboard mode\n"
 "    -i/--invert-keyboard       invert keyboard matrix signals (model 542)\n"
+"    -n/--inverse-caps          invert CAPS\n"
 "\n"
 "    -j/--joystick1 index       specify joystick 1\n"
 "    -J/--joystick2 index       specify joystick 2\n"
@@ -178,6 +179,7 @@ static struct option long_options[] = {
     { "tape-location",  required_argument,  0, 'L' },
     { "video-mode",     required_argument,  0, 'm' },
     { "mono-color",     required_argument,  0, 'M' },
+    { "inverse-caps",   no_argument,        0, 'n' },
     { "graph-font",     required_argument,  0, 'q' },
     { "raw-keyboard",   no_argument,        0, 'r' },
     { "force-ramtop",   required_argument,  0, 'R' },
@@ -204,7 +206,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:qrR:s:St:T:vVwxy:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxy:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -424,6 +426,9 @@ int main_program(int argc, char **argv) {
         case 'A':
             keyboard_ascii_enable = true;
             break;
+        case 'n':
+            keyboard_inverse_caps = true;
+            break;
         case 'j':
             keyboard_joysticks[0] = atoi(optarg);
             break;
@@ -551,6 +556,7 @@ int main_program(int argc, char **argv) {
     printf("matrix keyboard mode: %s\n", keyboard_cooked ? "cooked" : "raw");
     printf("matrix signals: %s\n", keyboard_inverted ? "model 600" : "model 542");
     printf("ascii keyboard: %s\n", keyboard_ascii_enable ? "enabled" : "disabled");
+    printf("caps lock: %s\n", keyboard_inverse_caps ? "inverted" : "normal");
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         fprintf(stderr, "error: SDL init failed\n");

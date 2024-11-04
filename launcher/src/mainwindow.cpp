@@ -9,7 +9,8 @@
 static const char *const magic = "OSIEMU-LAUNCHER!";
 
 enum file_format_version {
-    FILE_FORMAT_1 = 0
+    FILE_FORMAT_1 = 0,
+    FILE_FORMAT_2
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -111,6 +112,9 @@ void MainWindow::generate_arguments(QStringList &arguments) {
     }
     if (ui->check_ascii_keyboard->checkState() == Qt::Checked) {
         arguments.append("--ascii-keyboard");
+    }
+    if (ui->check_invert_caps->checkState() == Qt::Checked) {
+        arguments.append("--inverse-caps");
     }
 
     // Joysticks
@@ -373,7 +377,7 @@ void MainWindow::on_button_save_settings_clicked() {
 
     out.writeRawData(magic, 16);
 
-    out << (quint8) FILE_FORMAT_1;
+    out << (quint8) FILE_FORMAT_2;
 
     // serialize all settings
     // be careful when adding new settings, always add them at the end
@@ -427,6 +431,7 @@ void MainWindow::on_button_save_settings_clicked() {
     out << (quint8) ui->combo_frame_rate->currentIndex();
     out << ui->check_force_ramtop->checkState();
     out << (quint8) ui->combo_force_ramtop->currentIndex();
+    out << ui->check_ascii_keyboard->checkState();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -478,7 +483,7 @@ void MainWindow::on_button_load_settings_clicked() {
     // In the future, use switch statement to call loaders for older version.
     // Saving will always save the latest version
 
-    if (file_format != FILE_FORMAT_1) {
+    if (file_format > FILE_FORMAT_2) {
         error = QFile::OpenError;
         errorstring = "This settings file is from a newer version of osiemu-launcher!";
         goto error_out;
@@ -536,6 +541,10 @@ void MainWindow::on_button_load_settings_clicked() {
     in >> tcs; ui->check_force_ramtop->setCheckState(tcs);
     in >> t8; ui->combo_force_ramtop->setCurrentIndex(t8);
 
+    if (file_format > FILE_FORMAT_1) {  // v2 or higher
+        in >> tcs; ui->check_invert_caps->setCheckState(tcs);
+    }
+
     error = file.error();
     errorstring = file.errorString();
 
@@ -547,4 +556,3 @@ error_out:
         msg.exec();
     }
 }
-

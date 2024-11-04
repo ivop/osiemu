@@ -22,6 +22,7 @@
 bool keyboard_inverted = true;
 bool keyboard_cooked = true;
 bool keyboard_ascii_enable = false;
+bool keyboard_inverse_caps = true;
 
 int keyboard_joysticks[2] = { -1, -1 };
 static uint8_t joystick_values[2];
@@ -63,6 +64,8 @@ static char fake_input[2] = " ";
 
 static void clear_matrix(void) {
     memset(keyboard_osi_matrix, keyboard_inverted ? 0xff : 0, 8);
+    if (keyboard_inverse_caps && !keyboard_cooked)
+        keyboard_osi_matrix[0] ^= 1 << 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -190,6 +193,11 @@ void keyboard_text_input(char *text) {
     }
 
     unsigned char key = text[0] & 0x7f;
+
+    if (keyboard_inverse_caps) {
+        if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))
+            key ^= 0x20;
+    }
 
     if (keyboard_ascii_enable) {
         ascii_value = key | 0x80;

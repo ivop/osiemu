@@ -6,6 +6,7 @@
 extern bool keyboard_inverted;
 extern bool keyboard_cooked;
 extern bool keyboard_ascii_enable;
+extern bool keyboard_inverse_caps;
 extern int keyboard_joysticks[2];
 
 bool keyboard_init(double cpu_clock);

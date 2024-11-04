@@ -1,4 +1,9 @@
-600/630 Schematics:
+2019 RGBI color board
+
+http://cbmsteve.ca/osi-600d-colour/index.html
+
+Connects to 600 J75 connector, interface is similar to 630 but with different
+colors / meaning of CD0-CD3 bits.
 
 select mode     0x01    0 = 32x32, 1=64x16
 enable colors   0x02    0 = disabled, 1=enabled
@@ -10,7 +15,7 @@ bit 1   red                 CD1
 bit 2   green               CD2
 bit 3   blue                CD3
 
-Three color delays CD1-CD3 are mixed as follows:
+Three color bits CD1-CD3 are mixed as follows:
 
                                         BGR
 0/1     = black, grey                   000     saturation 0

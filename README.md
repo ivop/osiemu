@@ -313,7 +313,10 @@ As an example, they now point to /dev/pts/3.
   
 ## Future additions?
 
-* macOS release
+* Add invert CAPS-lock option (cooked and raw)
+* Add osi2hfe and hfe2osi tools to binary distribution
+* Add 5.25" 80 tracks (8" bitrate) and 3.25" 80 tracks (8" bitrate) support
+
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard
 * Harddisk: Model 590/592/594/596/598 Winchester, Shugart, and Okidata, CD-74 74MB, CD-36 36MB, CD-28 28MB, CD-23 23MB, or CD-7 7MB hard drives.

@@ -213,9 +213,11 @@ For example, on Ubuntu 22.04 they are called libsdl2-dev, and libsdl2-image-dev.
 ```
 git clone --depth=1 --recurse-submodules https://github.com/ivop/osiemu
 cd osiemu
+git checkout Release-0.9.1
 make release
 ```
 
+If you skip the checkout, you'll end up with the next release cycle version which might not be what you want. Use ```git tag``` to see all tagged versions.
 ```make``` without any arguments will build a debug version (no optimizations, and level 3 debug info).  
 You can override the sdl2-config utility used by setting the SDL2CONFIG variable on the command line, i.e.  
 ```

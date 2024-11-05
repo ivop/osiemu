@@ -235,7 +235,7 @@ Use Cygwin64. MinGW64 doesn't work because it is missing mmap, O_NONBLOCK, and g
 ### macOS
 
 For macOS 12 (Monterey) and later, homebrew should work. For earlier versions, use MacPorts.
-Has been tested to be full working on Big Sur with MacPorts.
+Has been tested to be fully working on Big Sur with MacPorts.
 
 ## Disk images
 

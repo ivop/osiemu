@@ -57,10 +57,17 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="line_console"/>
+      <widget class="QLineEdit" name="line_console">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="button_send">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Send</string>
        </property>
@@ -68,6 +75,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="button_tools">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Tools</string>
        </property>
@@ -75,6 +85,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="button_continue">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Continue</string>
        </property>

@@ -24,8 +24,9 @@ private slots:
     void errorOccurred(QProcess::ProcessError error);
 
     void on_button_tools_clicked();
-
     void on_button_continue_clicked();
+    void enable_console_input();
+    void disable_console_input();
 
 private:
     Ui::ConsoleWindow *ui;

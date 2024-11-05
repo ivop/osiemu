@@ -41,9 +41,27 @@ ConsoleWindow::~ConsoleWindow()
 void ConsoleWindow::processStarted() {
 }
 
+void ConsoleWindow::enable_console_input() {
+    ui->button_continue->setEnabled(true);
+    ui->button_send->setEnabled(true);
+    ui->button_tools->setEnabled(true);
+    ui->line_console->setEnabled(true);
+}
+
+void ConsoleWindow::disable_console_input() {
+    ui->button_continue->setEnabled(false);
+    ui->button_send->setEnabled(false);
+    ui->button_tools->setEnabled(false);
+    ui->line_console->setEnabled(false);
+}
+
 void ConsoleWindow::readyReadStandardOutput() {
     while (process->canReadLine()) {
-        ui->text_console->append(process->readLine().trimmed());
+        auto line = process->readLine().trimmed();
+        if (line == "MONITOR") {
+            enable_console_input();
+        }
+        ui->text_console->append(line);
     }
     if (process->bytesAvailable()) {
         ui->text_console->append(process->readAllStandardOutput().trimmed());
@@ -82,9 +100,13 @@ void ConsoleWindow::errorOccurred(QProcess::ProcessError error) {
 
 void ConsoleWindow::on_button_send_clicked() {
     ui->text_console->append(ui->line_console->text());
-    process->write(ui->line_console->text().toLocal8Bit());
+    auto command = ui->line_console->text().toLocal8Bit().trimmed();
+    process->write(command);
     process->write("\n");
     ui->line_console->clear();
+    if (command.startsWith("cont")) {
+        disable_console_input();
+    }
 }
 
 void ConsoleWindow::on_button_tools_clicked() {
@@ -99,5 +121,6 @@ void ConsoleWindow::on_button_tools_clicked() {
 void ConsoleWindow::on_button_continue_clicked() {
     ui->text_console->append("cont");
     process->write("cont\n");
+    disable_console_input();
 }
 

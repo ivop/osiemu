@@ -22,7 +22,7 @@
 bool keyboard_inverted = true;
 bool keyboard_cooked = true;
 bool keyboard_ascii_enable = false;
-bool keyboard_inverse_caps = true;
+bool keyboard_inverse_caps = false;
 
 int keyboard_joysticks[2] = { -1, -1 };
 static uint8_t joystick_values[2];

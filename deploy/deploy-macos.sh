@@ -25,6 +25,12 @@ printf "version: $VERSION\n\n"
 make clean
 make -j`sysctl -n hw.ncpu` release
 
+printf "\nBUILDING COMMAND LINE TOOLS\n\n"
+
+make -C tools clean
+# broken macOS does not support static linking, hence the CFLAGS override
+make -C tools CFLAGS=-O3 osi2hfe hfe2osi
+
 printf "\nBUILDING OSIEMU-LAUNCHER\n\n"
 
 make -j`sysctl -n hw.ncpu` osiemu-launcher.app QMAKE="$PATH_TO_QT_BIN/qmake"
@@ -84,6 +90,9 @@ for i in "$MACOSDIR/lib"/* ; do
     install_name_tool -id "@loader_path/x$k" "$i"
     ( cd "$MACOSDIR/lib"; mv "$k" "x$k" )
 done
+
+printf "*** copying command line tools\n"
+cp -v "$BASE/tools/osi2hfe" "$BASE/tools/hfe2osi" "$MACOSDIR"
 
 printf "\nCREATING DMG IMAGE\n\n"
 

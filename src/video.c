@@ -209,7 +209,7 @@ do_monochrome:
             goto do_monochrome;
         /* fallthrough */
     case COLORS_630:
-        if (!(control_6xx & CONTROL_630_COLOR_ON))
+        if (color_mode == COLORS_630 && !(control_6xx & CONTROL_630_COLOR_ON))
             goto do_monochrome;
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {

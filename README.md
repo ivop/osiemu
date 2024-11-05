@@ -235,7 +235,7 @@ Use Cygwin64. MinGW64 doesn't work because it is missing mmap, O_NONBLOCK, and g
 ### macOS
 
 For macOS 12 (Monterey) and later, homebrew should work. For earlier versions, use MacPorts.
-Has been tested to be full working on Big Sur with MacPorts.
+Has been tested to be fully working on Big Sur with MacPorts.
 
 ## Disk images
 
@@ -275,7 +275,7 @@ Preferably the version that is distributed with Qt itself.
 
 The _cpm65_ directory contains several disk images of the Ohio Scientific port of CP/M-65.
 Alongside you'll find .settings files for the GUI launcher, and .config files that can be used from the command line.
-For more information on what CP/M65 exactly is, how to use it, and possibly newer disk images, see the [CP/M-65 website](https://github.com/davidgiven/cpm65).
+For more information on what CP/M-65 exactly is, how to use it, and possibly newer disk images, see the [CP/M-65 website](https://github.com/davidgiven/cpm65).
 If you want to try out the serial systems version, you'll need to make sure the serial tape input and output settings point to the right (virtual) device.
 As an example, they now point to /dev/pts/3.
 

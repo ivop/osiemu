@@ -19,6 +19,11 @@ make clean
 make -j`nproc` release
 make -j`nproc` osiemu-launcher
 
+printf "\nBUILDING COMMAND LINE TOOLS\n\n"
+
+make -C tools clean
+make -C tools osi2hfe hfe2osi
+
 printf "\nCOLLECTING FILES FOR DISTRIBUTION\n\n"
 printf "Target directory: $COLLECT\n\n"
 
@@ -27,6 +32,8 @@ mkdir -p "$COLLECT"
 
 cp -v osiemu "$COLLECT"
 cp -v osiemu-launcher "$COLLECT"
+cp -v tools/osi2hfe "$COLLECT"
+cp -v tools/hfe2osi "$COLLECT"
 
 cp -va basic config cpm65 kernel disks fonts icons launcher/settings "$COLLECT"
 mkdir -p "$COLLECT/tapes" "$COLLECT/tests"

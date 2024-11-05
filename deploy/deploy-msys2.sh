@@ -30,3 +30,11 @@ printf "\nCOLLECTING DLLs\n\n"
 "$DEPLOY/collect-libs.sh" "$COLLECT/osiemu-launcher.exe" "$COLLECT"
 cd "$COLLECT"
 windeployqt --no-translations --no-system-d3d-compiler --no-virtualkeyboard --no-webkit2 osiemu-launcher.exe
+
+printf "\nBUILDING COMMAND LINE TOOLS\n\n"
+
+cd "$BASE/tools"
+make osi2hfe hfe2osi
+
+printf "\nADDING COMMAND LINE TOOLS TO DEPLOYMENT\n\n"
+cp osi2hfe.exe hfe2osi.exe "$COLLECT"

@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 struct picfileformatheader {
-    uint8_t  id[8];
+    char  id[8];
     uint8_t  version;
     uint8_t  ntracks;
     uint8_t  nsides;

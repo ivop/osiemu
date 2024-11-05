@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 struct osibitstream {
-    uint8_t id[16];
+    char id[16];
     uint8_t version;
     uint8_t type;
     uint8_t offset;

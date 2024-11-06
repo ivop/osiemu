@@ -1,0 +1,93 @@
+OSI 630 Color Expander
+
+32x32 or 64x16 @ $d000
+color ram      @ $d400
+control        @ $d800
+
+select mode     0x01    0 = 32x32, 1=64x16
+enable colors   0x02    0 = disabled, 1=enabled
+
+color ram bits
+
+bit 0   CD0     invert
+bit 1   CD1     R
+bit 2   CD2     G
+bit 3   CD3     B
+
+See ../logisim/OSI630.circ for logisim simulation.
+
+OSI schematics wrongly uses the AND symbol for the U2H ports. U2H is an LS10
+which is a quad 3-input NAND.
+The final stage shows U2G and U3I as NAND gates, but they are actually
+open collector (LS03 vs LS00).
+
+CD0 is latched and XOR'd with the incomming pixels, its output is eventually
+displayed on screen, effectively being an inverse video bit.
+
+CD1-CD3 are the RGB color.
+
+For each of the three colors, the final stage looks like this:
+
+                                  +5V
+                                   |
+                                   /
+                                   \ 470 ohm
+                                   /
+                                   \ 
+                                   /
+                          R_bl     |                      DISPLAY
+TOP open collector -----/\/\/\/----+------ output    input --/\/\/\/---GND
+                                   |                          75 ohm
+BOTTOM open collector --/\/\/\/----+
+                        150 ohm
+
+R_bl is R5,R7, and R12.
+
+
+Outputs of combinatorial logic:
+
+(the RGB column is CD1 CD2 CD3, 0 means pulled low, - means floating)
+
+RGB | Pixel | TOP R | BOT R | TOP G | BOT G | TOP B | BOT B | Color
+----+-------+-------+-------+-------+-------+-------+-------+----------
+000 | 0     | 0     | 0     | 0     | 0     | 0     | 0     | 0 background
+000 | 1     | -     | -     | -     | -     | -     | -     | 0 foreground
+    |       |       |       |       |       |       |       |
+100 | 0     | -     | 0     | 0     | 0     | 0     | 0     | 1 background
+100 | 1     | -     | -     | 0     | 0     | 0     | 0     | 1 foreground
+    |       |       |       |       |       |       |       |
+010 | 0     | 0     | 0     | -     | 0     | 0     | 0     | 2 background
+010 | 1     | 0     | 0     | -     | -     | 0     | 0     | 2 foreground
+    |       |       |       |       |       |       |       |
+110 | 0     | -     | 0     | -     | 0     | 0     | 0     | 3 background
+110 | 1     | -     | -     | -     | -     | 0     | 0     | 3 foreground
+    |       |       |       |       |       |       |       |
+001 | 0     | 0     | 0     | 0     | 0     | -     | 0     | 4 background
+001 | 1     | 0     | 0     | 0     | 0     | -     | -     | 4 foreground
+    |       |       |       |       |       |       |       |
+101 | 0     | -     | 0     | 0     | 0     | -     | 0     | 5 background
+101 | 1     | -     | -     | 0     | 0     | -     | -     | 5 foreground
+    |       |       |       |       |       |       |       |
+011 | 0     | 0     | 0     | -     | 0     | -     | 0     | 6 background
+011 | 1     | 0     | 0     | -     | -     | -     | -     | 6 foreground
+    |       |       |       |       |       |       |       |
+111 | 0     | -     | 0     | -     | 0     | -     | 0     | 7 background
+111 | 1     | -     | -     | -     | -     | -     | -     | 7 foreground
+
+
+Note how 000 is a special case where the background color pulls all lines low
+and the foreground color lets them all float. Without the special case, 000
+would have no foreground color.
+
+For all other colors the rules are:
+
+Background color:
+    If color bit is 0, top output pulls low, bottom output pulls low
+    If color bit is 1, top output is floating, bottom output pulls low (*)
+
+Foreground color:
+    If color bit is 0, top output pulls low, bottom output pulls low
+    If color bit is 1, top output is floating, bottom output is floating.
+
+(*) hence the background is not completely black, even if R_bl is 0 ohm
+

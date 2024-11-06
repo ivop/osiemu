@@ -8,7 +8,7 @@
 
 // test 0.01 (bridge), 20, 47, 75
 
-#define R_top       75.0
+#define R_top       20.0
 #define R_bottom    150.0
 #define R_pullup    470.0
 #define R_load      75.0

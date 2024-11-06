@@ -104,12 +104,18 @@ static double propagation_delay = 30.0;
 
 static int mapping_74ls151[7] = { 0, 2, 3, 5, 6, 4, 1 };
 
-static double lightness[2] = { 0.10, 0.60 };
+static double lightness[2] = { 0.10, 0.60 };    // contrast and luminance
 double saturation = 0.75;
 
-static int colors_540b[2][8][3];    // [dim|bright][8 colors][3 rgb values]
+static int colors_540b[2][8][3];    // [backg|foreg][8 colors][3 rgb values]
 
 static uint8_t Hz_tick_540b;
+
+// 630
+
+static int colors_630[2][8][3];    // [backg|foreg][8 colors][3 rgb values]
+
+// RGBI Board with 630 interface
 
 static double angles_630_rgbi[8] = {
       0.0,  // dummy
@@ -123,6 +129,8 @@ static double angles_630_rgbi[8] = {
 };
 
 static int colors_630_rgbi[16][3];  // 8 dim/bright pairs, maps to bits 3-0
+
+// 440
 
 static double *angles_440b = angles_630_rgbi; // white + three identical colors
 
@@ -170,6 +178,8 @@ static void blit_char(SDL_Texture *font, int x, int y, unsigned char c) {
 }
 
 static void blit_screenmem(SDL_Texture *font) {
+    int (*colors)[8][3] = colors_540b;
+
     if (!video_enabled) return;
 
     SDL_SetRenderTarget(renderer, screen);
@@ -209,23 +219,26 @@ do_monochrome:
             goto do_monochrome;
         /* fallthrough */
     case COLORS_630:
-        if (color_mode == COLORS_630 && !(control_6xx & CONTROL_630_COLOR_ON))
-            goto do_monochrome;
+        if (color_mode == COLORS_630) {
+            if (!(control_6xx & CONTROL_630_COLOR_ON))
+                goto do_monochrome;
+            colors = colors_630;    // different palette
+        }
         for (int y = 0; y < osi_height; y++) {
             for (int x = 0; x < osi_width; x++) {
                 int v = COLOR[x+y*osi_stride];
                 int c = (v >> 1) & 7;
                 bool i = v & 1;
 
-                SDL_SetTextureColorMod(background, colors_540b[i][c][0],
-                                                   colors_540b[i][c][1],
-                                                   colors_540b[i][c][2]);
+                SDL_SetTextureColorMod(background, colors[i][c][0],
+                                                   colors[i][c][1],
+                                                   colors[i][c][2]);
                 blit_char(background, x, y, 0);
 
                 i ^= 1;
-                SDL_SetTextureColorMod(font, colors_540b[i][c][0],
-                                             colors_540b[i][c][1],
-                                             colors_540b[i][c][2]);
+                SDL_SetTextureColorMod(font, colors[i][c][0],
+                                             colors[i][c][1],
+                                             colors[i][c][2]);
                 blit_char(font, x, y, SCREEN[x+y*osi_stride]);
             }
         }
@@ -425,7 +438,7 @@ static void init_colors_540b(void) {
     }
 
     int R, G, B;
-    for (int i=0; i<=1; i++) {          // dim, bright
+    for (int i=0; i<=1; i++) {          // dim, bright (background/foreground)
         for (int j=0; j<=6; j++) {      // angles
             double angle = clock_delay_angles[mapping_74ls151[j]];
             hsl_to_rgb(angle, saturation, lightness[i], &R, &G, &B);
@@ -440,6 +453,64 @@ static void init_colors_540b(void) {
         colors_540b[i][7][0] = R;       // dark grey / light grey
         colors_540b[i][7][1] = G;
         colors_540b[i][7][2] = B;
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+// See doc/osi630.txt for details
+
+#define R_top       20.0
+#define R_bottom    150.0
+#define R_pullup    470.0
+#define R_load      75.0
+
+#define Vcc         5.0
+#define V_out_max   0.700
+
+static double calculate_V(double R_pulldown) {
+    return R_pulldown / (R_pullup + R_pulldown) * Vcc;
+}
+
+static double luminance_shift(double V) {
+    V -= 0.300;                             // hardcoded constant for now
+    return V < 0.0 ? 0.0 : V;
+}
+
+static double contrast_stretch(double V) {
+    V *= 1.80;                              // hardcoded constant for now
+    return V > V_out_max ? V_out_max : V;
+}
+
+static void init_colors_630(void) {
+    double V_00 = calculate_V(1.0 / (1.0/R_top + 1.0/R_bottom + 1.0/R_load));
+    double V_x0 = calculate_V(1.0 / (            1.0/R_bottom + 1.0/R_load));
+    double V_xx = calculate_V(                                      R_load );
+
+    V_00 = contrast_stretch(luminance_shift(V_00));
+    V_x0 = contrast_stretch(luminance_shift(V_x0));
+    V_xx = contrast_stretch(luminance_shift(V_xx));
+
+    uint8_t H_00 = V_00 / V_out_max * 0xff;
+    uint8_t H_x0 = V_x0 / V_out_max * 0xff;
+    uint8_t H_xx = V_xx / V_out_max * 0xff;
+
+    for (unsigned int i=0; i<=7; i++) {
+        if (!i) {                           // 000 special case
+            for (unsigned int j=0; j<=2; j++) {
+                colors_630[0][i][j] = H_00;     // background
+                colors_630[1][i][j] = H_xx;     // foreground;
+            }
+            continue;
+        }
+        for (unsigned int j=0; j<=2; j++) {
+            if (i & (1<<j)) {
+                colors_630[0][i][j] = H_x0;
+                colors_630[1][i][j] = H_xx;
+            } else {
+                colors_630[0][i][j] = colors_630[1][i][j] = H_00;
+            }
+        }
     }
 }
 
@@ -593,7 +664,10 @@ bool screen_init(double cpu_clock, double fps) {
     }
 
     if (color_mode == COLORS_540B || color_mode == COLORS_630) {
-        init_colors_540b();
+        if (color_mode == COLORS_540B)
+            init_colors_540b();
+        else
+            init_colors_630();
         background = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
                                                  SDL_TEXTUREACCESS_TARGET,
                                                  8, 8);

@@ -84,17 +84,23 @@ int main(int argc, char **argv) {
     memset(&ph, 0xff, sizeof(ph));
 
     if (oh.type == TYPE_525_SS) {
-        puts("input: 5.25\", 40 tracks, single sided");
+        puts("input: 5.25\", 40 tracks, 125kbps, 300rpm, single sided");
         ph.ntracks = ntracks = 40;
-        ph.bitrate = 250;
+        ph.bitrate = 250;       // clocked output is twice the input
         ph.rpm = 300;
         trksize = 0x0d00;
     } else if (oh.type == TYPE_8_SS) {
-        puts("input: 8\", 77 tracks, single sided");
+        puts("input: 8\", 77 tracks, 250kbps, 360rpm, single sided");
         ph.ntracks = ntracks = 77;
-        ph.bitrate = 500;
+        ph.bitrate = 500;       // clocked output is twice the input
         ph.rpm = 360;
         trksize = 0x1500;
+    } else if (oh.type == TYPE_80_SD_SS_300) {
+        puts("input: 5.25\" or 3.5\", 80 tracks, 125kbps, 300rpm, single sided");
+        ph.ntracks = ntracks = 80;
+        ph.bitrate = 250;
+        ph.rpm = 300;
+        trksize = 0x0d00;
     } else {
         fprintf(stderr, "error: osi: unknown type %d\n", oh.type);
         return 1;
@@ -176,4 +182,5 @@ int main(int argc, char **argv) {
     fclose(inp);
     fclose(outp);
     free(track);
+    puts("conversion done.");
 }

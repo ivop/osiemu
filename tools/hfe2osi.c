@@ -101,6 +101,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    printf("hfe version: %d\n", ph.version);
     printf("number of tracks: %d\n", ph.ntracks);
     printf("number of sides: %d\n", ph.nsides);
     printf("bitrate: %d\n", ph.bitrate);
@@ -124,6 +125,11 @@ int main(int argc, char **argv) {
         oh.type = TYPE_8_SS;
         ntracks = 77;
         trksize = 0x1500;
+    } else if (ph.ntracks == 80 && ph.nsides == 2 && ph.bitrate == 250 && ph.rpm == 300) {
+        printf("detected 5.25\" or 3.5\", 80 tracks, 125kbps\n");
+        oh.type = TYPE_80_SD_SS_300;
+        ntracks = 80;
+        trksize = 0x0d00;
     } else {
         printf("unknown format detected\n");
         return 1;
@@ -184,4 +190,5 @@ int main(int argc, char **argv) {
 
     fclose(inp);
     fclose(outp);
+    puts("conversion done.");
 }

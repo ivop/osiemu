@@ -35,7 +35,7 @@ File format:
 "OSIDISKBITSTREAM"      16 bytes ID
 
 0x01    Version
-0x00    Type
+0x00    Type (see next section)
 0x01    File offset to first track in 256 byte blocks
 
 0xff    Reserved until start of first track
@@ -68,6 +68,17 @@ Datastream is stored, starting at MSB of byte, so:
 This is inverse compared to how the HFE files store a bitstream, but my way
 makes it easier to be read by a human (i.e. reading and decoding the hexdump
 visually). Computationally there's no difference.
+
+
+TYPES
+=====
+        |       |       |       | osi   | hfe   |
+type    | size  | trks  | rpm   | kbps  | kbps  | note(s)
+--------+-------+-------+-------+-------+-------+----------------------
+0       | 5.25" | 40    | 300   | 125   | 250   |
+1       | 8"    | 77    | 360   | 250   | 500   |
+2       | 5.25" | 80    | 300   | 125   | 250   |
+        | 3.5"  |  "    |  "    |  "    |  "    | identical to 5.25"
 
 
 CHARACTERISTICS

@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -99,12 +100,29 @@ bool tape_insert_output(char *filename) {
     return true;
 }
 
-bool tape_init(char *input_file, char *output_file, double cpu_clock) {
-    if (input_file) {
-        if (!tape_insert_input(input_file)) return false;
+static bool tape_insert_both(char *filename) {
+    if (inputfd >= 0) tape_eject_input();
+    if (outputfd >= 0) tape_eject_output();
+    puts("tape: input and output are identical");
+    if ((inputfd = open(filename, O_NONBLOCK | O_RDWR, 0666)) < 0) {
+        fprintf(stderr, "tape: i/o: cannot open %s\n", filename);
+        return false;
     }
-    if (output_file) {
-        if (!tape_insert_output(output_file)) return false;
+    outputfd = inputfd;
+    tape_input_filename = tape_output_filename = filename;
+    return true;
+}
+
+bool tape_init(char *input_file, char *output_file, double cpu_clock) {
+    if (!strcmp(input_file, output_file)) {
+        if (!tape_insert_both(input_file)) return false;
+    } else {
+        if (input_file) {
+            if (!tape_insert_input(input_file)) return false;
+        }
+        if (output_file) {
+            if (!tape_insert_output(output_file)) return false;
+        }
     }
 
     ticks_per_clock = cpu_clock / tape_baseclock;

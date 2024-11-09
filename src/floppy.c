@@ -298,6 +298,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
 
     printf("floppy: type %s\n", floppy_type_names[disk_type]);
     printf("floppy: number of tracks: %d\n", ntracks);
+    printf("floppy: bitrate: %.0f\n", bitrate);
     printf("floppy: bit interval %.2lf ticks\n", interval);
     printf("floppy: bits per index hole: %d (%.2lf ms)\n", bits_per_hole,
                                                            hole_length);

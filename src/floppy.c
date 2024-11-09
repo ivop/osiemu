@@ -73,6 +73,12 @@ static bool head_on_disk;
 
 int floppy_activity;
 
+static char *floppy_type_names[3] = {
+    "5.25\" SS",
+    "8\" SS",
+    "5.25\" or 3.5\" SS"
+};
+
 // ACIA
 
 static uint8_t control;
@@ -272,6 +278,17 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
         hole_length = 3.0;          // see doc/disk-format.txt
         seek_time = 3.0;
         break;
+    case TYPE_80_SD_SS_300:
+        ntracks = 80;
+        trksize = 0x0d00;
+        rpm = 300;
+        bitrate = 125000.0;
+        hole_length = 1.0;
+        seek_time = 3.0;
+        break;
+    default:
+        fprintf(stderr, "floppy: unknown disk format\n");
+        return false;
     }
 
     interval = cpu_clock / bitrate;
@@ -279,7 +296,7 @@ bool floppy_init(char *drive0_filename, char *drive1_filename,
     bits_per_seek = bitrate / 1000 * seek_time;
     bits_per_revolution = bitrate / (rpm / 60.0);
 
-    printf("floppy: type %s\n", disk_type ? "8\" SS" : "5.25\" SS");
+    printf("floppy: type %s\n", floppy_type_names[disk_type]);
     printf("floppy: number of tracks: %d\n", ntracks);
     printf("floppy: bit interval %.2lf ticks\n", interval);
     printf("floppy: bits per index hole: %d (%.2lf ms)\n", bits_per_hole,

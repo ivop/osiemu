@@ -146,7 +146,7 @@ uint8_t read6502(uint16_t address) {
     if (address >= kernel_bottom) {
         return KERNEL[address - 0xf000];
     }
-    if (address >= tape_location && address <= tape_location+3) {
+    if (address >= tape_location && address <= tape_location+0xff) {
         return tape_read(address);
     }
     if (mmu_xram_f000_enabled) {
@@ -228,7 +228,7 @@ void write6502(uint16_t address, uint8_t value) {
         }
         return;
     }
-    if (address >= tape_location && address <= tape_location+3) {
+    if (address >= tape_location && address <= tape_location+0xff) {
         tape_write(address, value);
         return;
     }

@@ -24,14 +24,21 @@
 
 // ----------------------------------------------------------------------------
 
-static uint8_t RAM[0xc000];  // Maximum of 48kB RAM
-uint8_t BASIC[0x2000];       // 8kB BASIC ROM
-uint8_t KERNEL[0x1000];      // 4kB Kernel ROM
+static uint8_t RAM[0xc000];         // Maximum of 48kB RAM
+static uint8_t RAM_d000[0x1000];    // eXtra RAM (Model 555, $d000-$dfff)
+static uint8_t RAM_e000[0x1000];    // eXtra RAM (Model 555, $e000-$efff)
+static uint8_t RAM_f000[0x1000];    // eXtra RAM (unofficial, $f000-$ffff)
 
 bool mmu_basic_enabled = true;
 uint16_t mmu_ram_top = 0x9fff;
-uint16_t tape_location = 0xf000;
+bool mmu_xram_d000_enabled;
+bool mmu_xram_e000_enabled;
+bool mmu_xram_f000_enabled;
 
+uint8_t BASIC[0x2000];              // 8kB BASIC ROM
+uint8_t KERNEL[0x1000];             // 4kB Kernel ROM
+
+uint16_t tape_location = 0xf000;
 static uint16_t kernel_bottom;
 
 // ----------------------------------------------------------------------------
@@ -123,6 +130,16 @@ uint8_t read6502(uint16_t address) {
     if (keyboard_ascii_enable && address == 0xdf01) {
         return keyboard_ascii_read();
     }
+    if (mmu_xram_d000_enabled) {
+        if (address >= 0xd000 && address <= 0xdfff) {
+            return RAM_e000[address & 0x0fff];
+        }
+    }
+    if (mmu_xram_e000_enabled) {
+        if (address >= 0xe000 && address <= 0xefff) {
+            return RAM_e000[address & 0x0fff];
+        }
+    }
     if ((address & 0xff00) == 0xdf00) {
         return keyboard_read();
     }
@@ -131,6 +148,11 @@ uint8_t read6502(uint16_t address) {
     }
     if (address >= tape_location && address <= tape_location+3) {
         return tape_read(address);
+    }
+    if (mmu_xram_f000_enabled) {
+        if (address >= 0xf000 /* && address <= 0xffff */) {
+            return RAM_f000[address & 0x0fff];
+        }
     }
 //    printf("mmu: unmapped read from $%04x (PC=$%04x)\n", address, PC);
     return 0xff;
@@ -176,6 +198,18 @@ void write6502(uint16_t address, uint8_t value) {
             }
         }
     }
+    if (mmu_xram_d000_enabled) {
+        if (address >= 0xd000 && address <= 0xdfff) {
+            RAM_d000[address & 0x0fff] = value;
+            return;
+        }
+    }
+    if (mmu_xram_e000_enabled) {
+        if (address >= 0xe000 && address <= 0xefff) {
+            RAM_e000[address & 0x0fff] = value;
+            return;
+        }
+    }
     if (control_6xx_enable && address == 0xd800) {
         control_6xx_write(address, value);
         return;
@@ -197,6 +231,12 @@ void write6502(uint16_t address, uint8_t value) {
     if (address >= tape_location && address <= tape_location+3) {
         tape_write(address, value);
         return;
+    }
+    if (mmu_xram_f000_enabled) {
+        if (address >= 0xf000 /* && address <= 0xffff */) {
+            RAM_f000[address & 0x0fff] = value;
+            return;
+        }
     }
 //    printf("mmu: unmapped write to $%04x ($%02x) (PC=$%04x)\n",
 //                                                    address, value, PC);

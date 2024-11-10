@@ -135,6 +135,12 @@ static void usage(void) {
 "    -G/--floppy3 file          specify floppy3 file (default: none)\n"
 "\n"
 "    -R/--force-ramtop hex      force RAM top to location hex\n"
+"    -X/--extra-ram flag,...    enable Model 555 eXtra RAM bank(s):\n"
+"                                   d0  enable $d000-$dfff\n"
+"                                   e0  enable $e000-$efff\n"
+"                                   f0  enable $f000-$ffff (unofficial)\n"
+"                               note: RAM has lowest priority in conflicts with\n"
+"                                     video cards, ACIA, or kernel ROM\n"
 "\n"
 "    -y/--sound-mode mode       mode: none, 542b (DAC+tone), 600 (DAC)\n"
 "    -Y/--sound-bufsize size    set sound buffer size (32-2048, default: 256)\n"
@@ -191,6 +197,7 @@ static struct option long_options[] = {
     { "smooth-video",   no_argument,        0, 'V' },
     { "warp-speed",     no_argument,        0, 'w' },
     { "pixels",         no_argument,        0, 'x' },
+    { "extra-ram",      required_argument,  0, 'X' },
     { "sound-mode",     required_argument,  0, 'y' },
     { "sound-bufsize",  required_argument,  0, 'Y' },
     { "zoom",           required_argument,  0, 'z' },
@@ -206,7 +213,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxy:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxX:y:Y:zZ:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -513,6 +520,26 @@ int main_program(int argc, char **argv) {
             }
             }
             break;
+        case 'X': {
+            char *w = strtok(optarg, ",\r\n");
+            while (w) {
+                if (!strcmp(w, "d0")) {
+                    mmu_xram_d000_enabled = true;
+                    puts("xram: $d000-$dfff enabled");
+                } else if (!strcmp(w, "e0")) {
+                    mmu_xram_e000_enabled = true;
+                    puts("xram: $e000-$efff enabled");
+                } else if (!strcmp(w, "f0")) {
+                    mmu_xram_f000_enabled = true;
+                    puts("xram: $f000-$ffff enabled");
+                } else {
+                    fprintf(stderr, "unrecognized xram option '%s'\n", w);
+                    return 1;
+                }
+                w = strtok(NULL, ",\r\n");
+            }
+            }
+            break;
         case 'h':
             usage();
             return 1;
@@ -557,6 +584,16 @@ int main_program(int argc, char **argv) {
     printf("matrix signals: %s\n", keyboard_inverted ? "model 600" : "model 542");
     printf("ascii keyboard: %s\n", keyboard_ascii_enable ? "enabled" : "disabled");
     printf("caps lock: %s\n", keyboard_inverse_caps ? "inverted" : "normal");
+
+    if (mmu_xram_d000_enabled && video_enabled) {
+        puts("warning: xram conflicts with video RAM");
+    }
+    if (mmu_xram_e000_enabled && color_mode == COLORS_540B) {
+        puts("warning: xram conflicts with color RAM");
+    }
+    if (mmu_xram_e000_enabled && hires_mode == HIRES_440B) {
+        puts("warning: xram conflicts with HiRes RAM");
+    }
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         fprintf(stderr, "error: SDL init failed\n");

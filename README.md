@@ -23,6 +23,7 @@ Binary releases for Linux, Windows, and macOS are [here](https://github.com/ivop
 * NMOS 6502 CPU
 * Selectable CPU speed, including "warp speed"
 * 40kB RAM, or 48kB RAM without BASIC (Model 522)
+* Model 555 extra RAM at $d000 (4kB) and/or $e000 (4kB) for video-less systems
 * 8kB BASIC ROM
 * Up to 4kB OS/Monitor ROM
 * Polled keyboard, Model 542 or Model 600 mode, raw or cooked
@@ -163,6 +164,12 @@ options:
     -G/--floppy3 file          specify floppy3 file (default: none)
 
     -R/--force-ramtop hex      force RAM top to location hex
+    -X/--extra-ram flag,...    enable Model 555 eXtra RAM bank(s):
+                                   d0  enable $d000-$dfff
+                                   e0  enable $e000-$efff
+                                   f0  enable $f000-$ffff (unofficial)
+                               note: RAM has lowest priority in conflicts with
+                                     video cards, ACIA, or kernel ROM
 
     -y/--sound-mode mode       mode: none, 542b (DAC+tone), 600 (DAC)
     -Y/--sound-bufsize size    set sound buffer size (32-2048, default: 256)

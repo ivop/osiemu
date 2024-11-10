@@ -53,7 +53,7 @@ Binary releases for Linux, Windows, and macOS are [here](https://github.com/ivop
   * Model 542B/C keyboard tone generator and 8-bit DAC
   * Superboard II/Model 600/C1P keyboard 8-bit DAC
 * On-Screen Display during peripheral access
-* Built-in monitor, dump/change memory contents, registers, set breakpoints, disassembler
+* Built-in monitor, dump/change memory contents, registers, set breakpoints, CPU and stack tracing, disassembler, heatmap, manage tapes and drives
 
 ## Keybindings
 
@@ -101,6 +101,8 @@ Binary releases for Linux, Windows, and macOS are [here](https://github.com/ivop
 | mount | num file      | mount file to drive num |
 | trace | on \| off \| clear \| save [file] | CPU tracing |
 | hm | on \| off \| clr \| save [file] \| img [file] | memory heatmap (r/w) |
+| stack | on \| off \| show | stack tracing |
+| bt |                  | backtrace (needs stack on) |
 
 
 ## Command line options

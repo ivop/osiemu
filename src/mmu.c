@@ -24,7 +24,7 @@
 
 // ----------------------------------------------------------------------------
 
-uint8_t RAM[0xc000];         // Maximum of 48kB RAM
+static uint8_t RAM[0xc000];  // Maximum of 48kB RAM
 uint8_t BASIC[0x2000];       // 8kB BASIC ROM
 uint8_t KERNEL[0x1000];      // 4kB Kernel ROM
 

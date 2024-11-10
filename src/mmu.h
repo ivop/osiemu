@@ -1,10 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-extern uint8_t RAM[0xc000];
 extern uint8_t BASIC[0x2000];
-extern uint8_t SCREEN[0x0800];
-extern uint8_t COLOR[0x0800];
 extern uint8_t KERNEL[0x1000];
 
 extern uint16_t mmu_ram_top;

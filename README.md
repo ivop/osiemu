@@ -41,7 +41,7 @@ Binary releases for Linux, Windows, and macOS are [here](https://github.com/ivop
   * Model 440B, 128x128
   * Model 541, 256x256, High Resolution Graphics Expander
 * Serial tape ACIA with selectable baudrate and memory location
-* Bit-level floppy emulation, Model 470/505, up to four single sided 5¼" or 8" drives
+* Bit-level floppy emulation, Model 470/505/610, up to four single sided 5¼" (40 or 80 tracks) or 8" (77 tracks) drives
 * Hardware accelerated display
   * full resolution 512x256
   * configurable frame rate
@@ -302,31 +302,37 @@ As an example, they now point to /dev/pts/3.
 * To emulate a serial-only system like the C3, you can disable video completely (--disable-video) and use the tape I/O ACIA as serial input and output.
   You can specify a real serial port (e.g. /dev/ttyUSB0), a pair of named pipes (mkfifo), or one end of two connected pseudo-terminals.
   
-  Example:
-  ```
-  $ socat -d -d pty,rawer,echo=0 pty,rawer,echo=0
-  2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/9
-  2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/10
-  2024/09/06 01:02:38 socat[936204] N starting data transfer loop with FDs [5,5] and [7,7]
-  ```
-  In another window:
-  ```
-  $ minicom -D /dev/pts/9 -b 19200
-  ```
-  And in yet another window:
-  ```
-  $ ./osiemu --disable-video \
-             --kernel kernel/syn-c3-serial-hdm.rom \
-             --tape-location fc00 \
-             --tape-baseclock 19200 \
-             --tape-input /dev/pts/10 \
-             --tape-output /dev/pts/10 \
-             --floppy0 some-floppy.os8
-  ```
-  
-## Future additions?
+Linux example:
+```
+$ socat -d -d pty,rawer,echo=0 pty,rawer,echo=0
+2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/9
+2024/09/06 01:02:38 socat[936204] N PTY is /dev/pts/10
+2024/09/06 01:02:38 socat[936204] N starting data transfer loop with FDs [5,5] and [7,7]
+```
+In another window:
+```
+$ minicom -D /dev/pts/9 -b 19200
+```
+And in yet another window:
+```
+$ ./osiemu --disable-video \
+           --kernel kernel/syn-c3-serial-hdm.rom \
+           --tape-location fc00 \
+           --tape-baseclock 19200 \
+           --tape-input /dev/pts/10 \
+           --tape-output /dev/pts/10 \
+           --floppy0 some-floppy.os8
+```
 
-* Add support for non-standard floppy formats, like 5.25" 80 tracks SD and DD, and 3.5" 80 tracks SD and DD.
+On Windows, you can do the same if you install Cygwin64. The device names will be slightly different though. socat will tell you which devices it created.
+
+If you don't want to install Cygwin64, you can also use [com0com](https://com0com.sourceforge.net/) to create a pair of virtual COM: ports and connect them with a virtual null-modem.
+For example, you create a pair called COM6: and COM7:.
+Now connect PuTTY (or any other serial terminal program) to COM6 and connect the tape-input and tape-output of osiemu to /dev/ttyS6,
+which is COM7: because ttyS serial devices start counting at 0 and Windows COM: ports start at 1, so you have to subtract 1 to get the ttyS name.
+
+
+## Future additions?
 
 * Sound: 1-bit ACIA RTS DAC (which model? where is the software?)
 * Sound: SN76489AN and/or AY-3-8910 daughterboard

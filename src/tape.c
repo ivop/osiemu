@@ -114,7 +114,7 @@ static bool tape_insert_both(char *filename) {
 }
 
 bool tape_init(char *input_file, char *output_file, double cpu_clock) {
-    if (!strcmp(input_file, output_file)) {
+    if (input_file && output_file && !strcmp(input_file, output_file)) {
         if (!tape_insert_both(input_file)) return false;
     } else {
         if (input_file) {

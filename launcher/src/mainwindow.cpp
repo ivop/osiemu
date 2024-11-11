@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <algorithm>
 
 static const char *const magic = "OSIEMU-LAUNCHER!";
 
@@ -244,6 +245,16 @@ void MainWindow::generate_arguments(QStringList &arguments) {
         arguments.append("--force-ramtop");
         arguments.append(ui->combo_force_ramtop->currentText().split(' ').at(0));
     }
+
+    // XRAM
+
+    QString xram[7] = { "d0", "e0", "d0,e0", "f0", "d0,f0", "e0,f0", "d0,e0,f0" };
+
+    if (ui->check_enable_xram->checkState() == Qt::Checked) {
+        arguments.append("--extra-ram");
+        int i = std::clamp(ui->combo_xram->currentIndex(), 0, 6);
+        arguments.append(xram[i]);
+    }
 }
 
 void MainWindow::on_button_launch_clicked() {
@@ -283,7 +294,6 @@ void MainWindow::on_button_export_as_config_clicked() {
     bool first = true;
 
     for (const auto &i : qAsConst(arguments)) {
-        // if( price1.at(0).toAscii() == '0')
         if (i.at(0).toLatin1() == '-' && i.at(1).toLatin1() == '-') {
             if (!first) {
                 out << "\n";
@@ -383,6 +393,7 @@ void MainWindow::on_button_save_settings_clicked() {
     // be careful when adding new settings, always add them at the end
     // even if that does not reflect how they are shown!
 
+    // FILE_FORMAT_1
     out << ui->line_program->text();
     out << ui->line_kernel->text();
     out << ui->line_basic->text();
@@ -431,7 +442,11 @@ void MainWindow::on_button_save_settings_clicked() {
     out << (quint8) ui->combo_frame_rate->currentIndex();
     out << ui->check_force_ramtop->checkState();
     out << (quint8) ui->combo_force_ramtop->currentIndex();
-    out << ui->check_ascii_keyboard->checkState();
+
+    // FILE_FORMAT_2
+    out << ui->check_invert_caps->checkState();
+    out << ui->check_enable_xram->checkState();
+    out << (quint8) ui->combo_xram->currentIndex();
 
     auto error = file.error();
     auto errorstring = file.errorString();
@@ -479,9 +494,6 @@ void MainWindow::on_button_load_settings_clicked() {
 
     quint8 file_format;
     in >> file_format;
-
-    // In the future, use switch statement to call loaders for older version.
-    // Saving will always save the latest version
 
     if (file_format > FILE_FORMAT_2) {
         error = QFile::OpenError;
@@ -543,6 +555,8 @@ void MainWindow::on_button_load_settings_clicked() {
 
     if (file_format > FILE_FORMAT_1) {  // v2 or higher
         in >> tcs; ui->check_invert_caps->setCheckState(tcs);
+        in >> tcs; ui->check_enable_xram->setCheckState(tcs);
+        in >> t8; ui->combo_xram->setCurrentIndex(t8);
     }
 
     error = file.error();

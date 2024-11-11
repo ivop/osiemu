@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>933</width>
-    <height>847</height>
+    <width>951</width>
+    <height>846</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
@@ -1111,6 +1114,41 @@
          </widget>
         </item>
         <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_34">
+        <property name="font">
+         <font>
+          <pointsize>2</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
          <widget class="QCheckBox" name="check_force_ramtop">
           <property name="text">
            <string>Force RAMTOP to:</string>
@@ -1200,7 +1238,53 @@
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_12">
+         <widget class="QCheckBox" name="check_enable_xram">
+          <property name="text">
+           <string>Enable XRAM</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_xram">
+          <item>
+           <property name="text">
+            <string>$d000-$dfff (Model 555)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$e000-$efff (Model 555)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$d000-$efff (Model 555)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$f000-$ffff (unofficial)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$d000-$dfff, $f000-$ffff (Model 555 + unofficial)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$e000-$ffff (Model 555 + unofficial)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>$d000-$ffff (Model 555 + unofficial)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_13">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -1215,7 +1299,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label_34">
+       <widget class="QLabel" name="label_38">
         <property name="font">
          <font>
           <pointsize>2</pointsize>

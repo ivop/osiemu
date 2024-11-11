@@ -101,6 +101,12 @@ void MainWindow::generate_arguments(QStringList &arguments) {
     case 2:
         arguments.append("540col");
         break;
+    case 3:
+        arguments.append("30.0");
+        break;
+    case 4:
+        arguments.append("12.0");
+        break;
     }
 
     // Keyboard

@@ -613,6 +613,16 @@
             <string>Model 540B Color (61.442057 Hz)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Slow Host (30 Hz)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Very Slow Host (12 Hz)</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>

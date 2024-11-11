@@ -61,12 +61,18 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>Press F8 in emulation window to enter console/monitor mode</string>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="button_send">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Press F8 in emulation window to enter console/monitor mode</string>
        </property>
        <property name="text">
         <string>Send</string>
@@ -78,6 +84,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>Press F8 in emulation window to enter console/monitor mode</string>
+       </property>
        <property name="text">
         <string>Tools</string>
        </property>
@@ -87,6 +96,9 @@
       <widget class="QPushButton" name="button_continue">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Press F8 in emulation window to enter console/monitor mode</string>
        </property>
        <property name="text">
         <string>Continue</string>

@@ -1,4 +1,6 @@
 [![C/C++ CI](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml)
+![GitHub Release](https://img.shields.io/github/v/release/ivop/osiemu)
+![GitHub License](https://img.shields.io/github/license/ivop/osiemu)
 
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator for Linux, Windows, and macOS

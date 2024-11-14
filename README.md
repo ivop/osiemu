@@ -226,7 +226,7 @@ For example, on Ubuntu 22.04 they are called libsdl2-dev, and libsdl2-image-dev.
 ```
 git clone --depth=1 --recurse-submodules https://github.com/ivop/osiemu
 cd osiemu
-git checkout Release-0.9.1
+git checkout Release-0.9.2
 make release
 ```
 

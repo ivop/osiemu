@@ -1,0 +1,27 @@
+Full serial based UK101 clone. ROM is patched CEGMON.
+Uses standard UK101 BASIC (md5sum: 229529e6126de5bd56f45e8a55e46f15)
+Set tape baseclock to 4000000/13 = 307692.31
+
+./osiemu --disable-video \
+         --force-ramtop 7fff \
+         --kernel archive/kernel/micro-uk101-monitor.rom \
+         --basic archive/basic/basic-uk101.rom \
+         --tape-input /dev/pts/8 \
+         --tape-output /dev/pts/8 \
+         --tape-baseclock 307692.3
+
+Serial output:
+
+Micro UK101 C/W/M? 
+MEMORY SIZE? 
+TERMINAL WIDTH?
+
+ 31999 BYTES FREE
+
+C O M P U K I T  U K 1 0 1
+
+Personal Computer
+
+8K Basic Copyright1979
+OK
+

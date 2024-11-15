@@ -1,4 +1,6 @@
 [![C/C++ CI](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ivop/osiemu/actions/workflows/c-cpp.yml)
+![GitHub Release](https://img.shields.io/github/v/release/ivop/osiemu)
+![GitHub License](https://img.shields.io/github/license/ivop/osiemu)
 
 # osiemu
 Ohio Scientific Instruments, Inc. Emulator for Linux, Windows, and macOS
@@ -226,7 +228,7 @@ For example, on Ubuntu 22.04 they are called libsdl2-dev, and libsdl2-image-dev.
 ```
 git clone --depth=1 --recurse-submodules https://github.com/ivop/osiemu
 cd osiemu
-git checkout Release-0.9.1
+git checkout Release-0.9.2
 make release
 ```
 

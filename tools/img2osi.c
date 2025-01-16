@@ -21,7 +21,7 @@
  *      Always read and write full track to simplify writing sectors and
  *      avoid hard to maintain code to write a 128 byte sector somewhere in
  *      the middle of a track and support different CPU speeds at the same
- *      time. This format also can be copied by OS65D disk copier, and a 
+ *      time. This format also can be copied by OS65D disk copier, and a
  *      custom 128 bytes-per-sector format would not.
  */
 

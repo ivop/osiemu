@@ -155,7 +155,7 @@ uint8_t read6502(uint16_t address) {
         }
     }
 //    printf("mmu: unmapped read from $%04x (PC=$%04x)\n", address, PC);
-    return 0xff;
+    return address >> 8;
 }
 
 void write6502(uint16_t address, uint8_t value) {

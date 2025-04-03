@@ -292,7 +292,7 @@ As an example, they now point to /dev/pts/3.
 
 ## Notes
 
-* The polled keyboards were limitted and had only 45 keys. Not all ASCII characters can be typed.
+* The polled keyboards were limitted and had only 53 keys. Not all ASCII characters can be typed.
   Especially in raw mode, it behaves kind of weird, like CAPS affecting the number keys.
   This was by design and is normal. Cooked keyboard mode (the default) overcomes some of these quirks in emulation.
   For games you might need to switch to raw mode though, as they might do their own keyboard scan for certain combinations.

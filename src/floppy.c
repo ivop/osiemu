@@ -130,6 +130,8 @@ static bool rxirq_enabled;
 
 #define DRIVE0_NOT_READY_MASK   0x01        // 0 = drive0 reads, 1 = not ready
 #define HEAD_NOT_TRACK0_MASK    0x02        // 0 = above, 1 = not above
+#define FAULT_NOT_MASK          0x04
+#define SECTOR_NOT_MASK         0x08
 #define DRIVE1_NOT_READY_MASK   0x10        // 0 = drive1 reads, 1 = not ready
 #define DISK_R_W_MASK           0x20        // 0 = protected, 1 = r/w
 #define DRIVE0_SELECT_MASK      0x40        // 0 = drive1, 1 = drive0
@@ -341,6 +343,9 @@ static void determine_porta_input_value(void) {
     if (!hole) {
         setbit(v, NOT_INDEX_HOLE_MASK);
     }
+
+    setbit(v, FAULT_NOT_MASK);
+    setbit(v, SECTOR_NOT_MASK);
 
     pia.porta.input_value = v;
 }

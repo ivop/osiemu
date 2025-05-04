@@ -246,6 +246,37 @@ void write6502(uint16_t address, uint8_t value) {
             RAM[0x3321] = RAM[0x3123] = value;
             return;
         };
+        /* CFs - Coupling Faults */
+        /* Inversion Coupling Fault, victim higher */
+        if (address == 0x3456) {
+            uint8_t old = RAM[address] & 0x08;
+            uint8_t new = value & 0x08;
+            if (new > old) {                // Rising
+                RAM[address+0x5a] ^= 0x08;
+            }
+        }
+        if (address == 0x3856) {
+            uint8_t old = RAM[address] & 0x08;
+            uint8_t new = value & 0x08;
+            if (new < old) {                // Falling
+                RAM[address+0x5a] ^= 0x08;
+            }
+        }
+        /* Inversion Coupling Fault, victim lower */
+        if (address == 0x3956) {
+            uint8_t old = RAM[address] & 0x08;
+            uint8_t new = value & 0x08;
+            if (new > old) {                // Rising
+                RAM[address-0x5a] ^= 0x08;
+            }
+        }
+        if (address == 0x3d56) {
+            uint8_t old = RAM[address] & 0x08;
+            uint8_t new = value & 0x08;
+            if (new < old) {                // Falling
+                RAM[address-0x5a] ^= 0x08;
+            }
+        }
 #endif
         RAM[address] = value;
         return;

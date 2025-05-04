@@ -89,6 +89,11 @@ static uint16_t kernel_bottom;
 uint8_t read6502(uint16_t address) {
     heatmap_read(address);
     if (address <= mmu_ram_top) {
+#ifdef TEST_BADRAM
+        if (address == 0x1f73) {
+            return RAM[address] ^ 0x40;
+        }
+#endif
         return RAM[address];
     }
     if (mmu_basic_enabled) {
@@ -161,6 +166,12 @@ uint8_t read6502(uint16_t address) {
 void write6502(uint16_t address, uint8_t value) {
     heatmap_write(address);
     if (address <= mmu_ram_top) {
+#ifdef TEST_BADRAM
+        if (address == 0x4321) {
+            RAM[address] = value ^ 2;
+            return;
+        }
+#endif
         RAM[address] = value;
         return;
     }

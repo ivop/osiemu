@@ -1,3 +1,7 @@
+; MARCH MEMTEST
+; Copyright © 2025 by Ivo van Poorten
+; BSD-0 License
+; Ref. paper https://www.ijvdcs.org/uploads/524361IJVDCS2672-94.pdf
 
     icl 'zif.s'
 
@@ -64,6 +68,8 @@ main:
     
 ; ----------------------------------------------------------------------------
 
+; Detect size of memory
+
     mwa #$0300 zp
 
     zrepeat
@@ -81,6 +87,8 @@ main:
     sta nblocks
 
 ; ----------------------------------------------------------------------------
+
+; MAIN testing loop
 
 RESTART:
     mwa #STARTPOS scr
@@ -115,6 +123,8 @@ RESTART:
             jsr putchar
             jmp skip_block
         zendif
+
+; determine end of block
 
         lda start+1
         clc
@@ -216,7 +226,6 @@ skip_block:
         adc #4
         sta start+1
 
-        sta start
         inc block
         lda block
         cmp nblocks
@@ -234,37 +243,29 @@ skip_block:
 
 printhex:
     pha
-    lsr
-    lsr
-    lsr
-    lsr
-    jsr bin2ascii
-    jsr putchar
+:4    lsr
+    jsr bin2ascii_putchar
     pla
     and #15
-    jsr bin2ascii
-    jsr putchar
-    rts
+    jmp bin2ascii_putchar
 
-bin2ascii:
-    clc
+bin2ascii_putchar:
+    sed
+    cmp #10
     adc #$30
-    cmp #$3a
-    zif_ge
-        adc #$06
-    zendif
-    rts
-
-nextline:
-    adw scr #STRIDE
-    ldy #0
-    sty xpos
-    rts
+    cld
 
 putchar:
     ldy xpos
     sta (scr),y
     inc xpos
+    rts
+
+
+nextline:
+    adw scr #STRIDE
+    ldy #0
+    sty xpos
     rts
 
 ; ----------------------------------------------------------------------------

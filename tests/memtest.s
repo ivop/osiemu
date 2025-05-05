@@ -42,6 +42,7 @@ end   = $86
 block   = $a0
 nblocks = $a1
 xpos    = $a2
+updown  = $e3
 
 ; ----------------------------------------------------------------------------
 
@@ -52,6 +53,7 @@ xpos    = $a2
 main:
     ldy #0
     sty zp
+    sty updown
     lda #$d0
     sta zp+1
     lda #' '
@@ -137,20 +139,33 @@ RESTART:
 
 ; start MARCH
 
-; MATS++ { 🡙(w0); 🡑(r0,w1); 🡓(r1,w0,r0); }
 ; MARCH C- { 🡙(w0); 🡑(r0,w1); 🡑(r1,w0); 🡓(r0,w1); 🡓(r1,w0); 🡙(r0); }
+; pair of 🡙 cycle through upup, updown, downup, downdown
 
         ldy #0
 
         ; 🡙(w0)
 
-        ; (up)
-        jsr init_zp_start
-        zloop
-            tya                     ; w0
-            sta (zp),y
-            jsr inw_zp_cmp_end
-        zuntil_eq
+        lda updown
+        and #1
+        zif_zero
+            ; (up)
+            jsr init_zp_start
+            zloop
+                tya                     ; w0
+                sta (zp),y
+                jsr inw_zp_cmp_end
+            zuntil_eq
+        zelse
+            ; (down)
+            jsr init_zp_end
+            zloop
+                jsr dew_zp
+                tya                     ; w0
+                sta (zp),y
+                jsr cmp_start
+            zuntil_eq
+        zendif
 
         ; 🡑(r0,w1)
 
@@ -180,16 +195,12 @@ RESTART:
         jsr init_zp_end
         zloop
             jsr dew_zp
-
             lda (zp),y              ; r0
             jne ERROR
-
             lda #$ff                ; w1
             sta (zp),y
-
             jsr cmp_start
-            zbreakif_eq
-        zendloop
+        zuntil_eq
 
         ; 🡓(r1,w0)
 
@@ -205,20 +216,30 @@ RESTART:
             sta (zp),y
 
             jsr cmp_start
-            zbreakif_eq
-        zendloop
+        zuntil_eq
 
         ; 🡙(r0)
 
-        ; (up)
-        jsr init_zp_start
-        tya
-        zloop
-            lda (zp),y              ; r0
-            jne ERROR
-            jsr inw_zp_cmp_end
-        zuntil_eq
-
+        lda updown
+        and #2
+        zif_zero
+            ; (up)
+            jsr init_zp_start
+            zloop
+                lda (zp),y              ; r0
+                jne ERROR
+                jsr inw_zp_cmp_end
+            zuntil_eq
+        zelse
+            ; (down)
+            jsr init_zp_end
+            zloop
+                jsr dew_zp
+                lda (zp),y
+                jne ERROR
+                jsr cmp_start
+            zuntil_eq
+        zendif
 ; end MARCH
 
 OK:
@@ -249,7 +270,9 @@ skip_block:
         zif_zero
             jsr nextline
         zendif
-    zendloop
+    zendloop                    ; loop for each block
+
+    inc updown
 
     jmp RESTART
 

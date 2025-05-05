@@ -41,6 +41,9 @@ uint8_t KERNEL[0x1000];             // 4kB Kernel ROM
 uint16_t tape_location = 0xf000;
 static uint16_t kernel_bottom;
 
+//#define TEST_BADRAM1
+//#define TEST_BADRAM2
+//#define TEST_BADRAM3
 #include "badram.h"
 
 // ----------------------------------------------------------------------------
@@ -91,7 +94,7 @@ static uint16_t kernel_bottom;
 uint8_t read6502(uint16_t address) {
     heatmap_read(address);
     if (address <= mmu_ram_top) {
-#ifdef TEST_BADRAM
+#if defined(TEST_BADRAM1) || defined(TEST_BADRAM2) || defined(TEST_BADRAM3)
         return badram_read6502(address);
 #endif
         return RAM[address];
@@ -166,7 +169,7 @@ uint8_t read6502(uint16_t address) {
 void write6502(uint16_t address, uint8_t value) {
     heatmap_write(address);
     if (address <= mmu_ram_top) {
-#ifdef TEST_BADRAM
+#if defined(TEST_BADRAM1) || defined(TEST_BADRAM2) || defined(TEST_BADRAM3)
         badram_write6502(address, value);
         return;
 #endif

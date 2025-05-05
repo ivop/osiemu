@@ -145,7 +145,7 @@ RESTART:
         ; 🡙(w0)
 
         ; (up)
-        mwa start zp
+        jsr init_zp_start
         zloop
             tya                     ; w0
             sta (zp),y
@@ -154,8 +154,7 @@ RESTART:
 
         ; 🡑(r0,w1)
 
-        mwa start zp
-
+        jsr init_zp_start
         zloop
             lda (zp),y              ; r0
             jne ERROR
@@ -166,8 +165,7 @@ RESTART:
 
         ; 🡑(r1,w0)
 
-        mwa start zp
-
+        jsr init_zp_start
         zloop
             lda (zp),y              ; r1
             cmp #$ff
@@ -179,8 +177,7 @@ RESTART:
 
         ; 🡓(r0,w1)
 
-        mwa end zp
-
+        jsr init_zp_end
         zloop
             jsr dew_zp
 
@@ -196,8 +193,7 @@ RESTART:
 
         ; 🡓(r1,w0)
 
-        mwa end zp
-
+        jsr init_zp_end
         zloop
             jsr dew_zp
 
@@ -215,7 +211,7 @@ RESTART:
         ; 🡙(r0)
 
         ; (up)
-        mwa start zp
+        jsr init_zp_start
         tya
         zloop
             lda (zp),y              ; r0
@@ -277,6 +273,14 @@ cmp_start:
 
 dew_zp:
     dew zp
+    rts
+
+init_zp_start:
+    mwa start zp
+    rts
+
+init_zp_end:
+    mwa end zp
     rts
 
 ; ----------------------------------------------------------------------------

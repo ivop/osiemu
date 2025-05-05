@@ -3,7 +3,7 @@ main.o: src/main.c src/fake6502/fake6502.h src/monitor.h src/mmu.h \
  src/control.h src/trace.h src/../version.h
 mmu.o: src/mmu.c src/fake6502/fake6502.h src/mmu.h src/keyboard.h \
  src/video.h src/tape.h src/floppy.h src/control.h src/sound.h \
- src/heatmap.h
+ src/heatmap.h src/badram.h
 keyboard.o: src/keyboard.c src/portability.h src/fake6502/fake6502.h \
  src/keyboard.h src/cooked.h
 video.o: src/video.c src/video.h src/tape.h src/floppy.h src/hslrgb.h \

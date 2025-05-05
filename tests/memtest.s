@@ -53,7 +53,6 @@ updown  = $e3
 main:
     ldy #0
     sty zp
-    sty updown
     lda #$d0
     sta zp+1
     lda #' '
@@ -99,8 +98,6 @@ main:
 
 ; MAIN testing loop
 
-    ldx #0
-
 RESTART:
     mwa #STARTPOS scr
 
@@ -145,6 +142,10 @@ RESTART:
 ; pair of 🡙 cycle through upup, updown, downup, downdown
 
         ldy #0
+        ldx #0
+        sty updown
+
+block_cycle:
 
         ; 🡙(w0)
 
@@ -246,6 +247,16 @@ RESTART:
                 jsr cmp_start
             zuntil_eq
         zendif
+
+        inc updown
+        lda updown
+        cmp #4
+        jne block_cycle
+        sty updown
+        inx
+        cpx #4
+        jne block_cycle
+
 ; end MARCH
 
 OK:
@@ -277,19 +288,6 @@ skip_block:
             jsr nextline
         zendif
     zendloop                    ; loop for each block
-
-    inc updown
-
-    lda updown
-    cmp #4
-    zif_eq
-        sty updown
-        inx
-        cpx #4
-        zif_eq
-            ldx #0
-        zendif
-    zendif
 
     jmp RESTART
 

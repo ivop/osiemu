@@ -99,6 +99,8 @@ main:
 
 ; MAIN testing loop
 
+    ldx #0
+
 RESTART:
     mwa #STARTPOS scr
 
@@ -152,7 +154,7 @@ RESTART:
             ; (up)
             jsr init_zp_start
             zloop
-                tya                     ; w0
+                lda data0,x             ; w0
                 sta (zp),y
                 jsr inw_zp_cmp_end
             zuntil_eq
@@ -161,7 +163,7 @@ RESTART:
             jsr init_zp_end
             zloop
                 jsr dew_zp
-                tya                     ; w0
+                lda data0,x             ; w0
                 sta (zp),y
                 jsr cmp_start
             zuntil_eq
@@ -172,8 +174,9 @@ RESTART:
         jsr init_zp_start
         zloop
             lda (zp),y              ; r0
+            cmp data0,x
             jne ERROR
-            lda #$ff                ; w1
+            lda data1,x             ; w1
             sta (zp),y
             jsr inw_zp_cmp_end
         zuntil_eq
@@ -183,9 +186,9 @@ RESTART:
         jsr init_zp_start
         zloop
             lda (zp),y              ; r1
-            cmp #$ff
+            cmp data1,x
             jne ERROR
-            lda #$00                ; w0
+            lda data0,x             ; w0
             sta (zp),y
             jsr inw_zp_cmp_end
         zuntil_eq
@@ -196,8 +199,9 @@ RESTART:
         zloop
             jsr dew_zp
             lda (zp),y              ; r0
+            cmp data0,x
             jne ERROR
-            lda #$ff                ; w1
+            lda data1,x             ; w1
             sta (zp),y
             jsr cmp_start
         zuntil_eq
@@ -209,10 +213,10 @@ RESTART:
             jsr dew_zp
 
             lda (zp),y              ; r1
-            cmp #$ff
+            cmp data1,x
             jne ERROR
 
-            tya                     ; w0
+            lda data0,x             ; w0
             sta (zp),y
 
             jsr cmp_start
@@ -227,6 +231,7 @@ RESTART:
             jsr init_zp_start
             zloop
                 lda (zp),y              ; r0
+                cmp data0,x
                 jne ERROR
                 jsr inw_zp_cmp_end
             zuntil_eq
@@ -236,6 +241,7 @@ RESTART:
             zloop
                 jsr dew_zp
                 lda (zp),y
+                cmp data0,x
                 jne ERROR
                 jsr cmp_start
             zuntil_eq
@@ -273,6 +279,17 @@ skip_block:
     zendloop                    ; loop for each block
 
     inc updown
+
+    lda updown
+    cmp #4
+    zif_eq
+        sty updown
+        inx
+        cpx #4
+        zif_eq
+            ldx #0
+        zendif
+    zendif
 
     jmp RESTART
 
@@ -340,6 +357,11 @@ nextline:
 msg_title:
     dta 'MARCH MEMTEST'
 msg_title_end:
+
+data0:
+    dta %00000000, %00001111, %00110011, %01010101
+data1:
+    dta %11111111, %11110000, %11001100, %10101010
 
 ; ----------------------------------------------------------------------------
 

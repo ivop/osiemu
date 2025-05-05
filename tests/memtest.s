@@ -133,12 +133,14 @@ RESTART:
 
 ; start MARCH
 
-; MATS++ { 🡙(w0); 🡑(r0; w1); 🡓(r1; w0; r0); }
+; MATS++ { 🡙(w0); 🡑(r0,w1); 🡓(r1,w0,r0); }
+; MARCH C- { 🡙(w0); 🡑(r0,w1); 🡑(r1,w0); 🡓(r0,w1); 🡓(r1,w0); 🡙(r0); }
 
         ldy #0
 
-        ; 🡑(w0)
+        ; 🡙(w0)
 
+        ; (up)
         mwa start zp
         tya
         zloop
@@ -148,7 +150,7 @@ RESTART:
             cpx end+1
         zuntil_eq
 
-        ; 🡑(r0; w1)
+        ; 🡑(r0,w1)
 
         mwa start zp
 
@@ -163,9 +165,45 @@ RESTART:
             cpx end+1
         zuntil_eq
 
-        ; 🡓(r1; w0; r0)
+        ; 🡑(r1,w0)
+
+        mwa start zp
+
+        zloop
+            lda (zp),y              ; r1
+            cmp #$ff
+            jne ERROR
+
+            lda #$00                ; w0
+            sta (zp),y
+
+            inw zp
+            ldx zp+1
+            cpx end+1
+        zuntil_eq
+
+        ; 🡓(r0,w1)
 
         mwa end zp
+
+        zloop
+            dew zp
+
+            lda (zp),y              ; r0
+            jne ERROR
+
+            lda #$ff                ; w1
+            sta (zp),y
+
+            lda zp+1
+            cmp start+1
+            zcontinueif_ne
+            lda zp
+            cmp start
+            zbreakif_eq
+        zendloop
+
+        ; 🡓(r1,w0)
 
         zloop
             dew zp
@@ -177,9 +215,6 @@ RESTART:
             tya                     ; w0
             sta (zp),y
 
-            lda (zp),y
-            jne ERROR
-
             lda zp+1
             cmp start+1
             zcontinueif_ne
@@ -188,6 +223,18 @@ RESTART:
             zbreakif_eq
         zendloop
 
+        ; 🡙(r0)
+
+        ; (up)
+        mwa start zp
+        tya
+        zloop
+            lda (zp),y              ; r0
+            jne ERROR
+            inw zp
+            ldx zp+1
+            cpx end+1
+        zuntil_eq
 ; end MARCH
 
 OK:

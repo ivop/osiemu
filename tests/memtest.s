@@ -147,11 +147,9 @@ RESTART:
         ; (up)
         mwa start zp
         zloop
-            tya
-            sta (zp),y              ; w0
-            inw zp
-            lda zp+1
-            cmp end+1
+            tya                     ; w0
+            sta (zp),y
+            jsr inw_zp_cmp_end
         zuntil_eq
 
         ; 🡑(r0,w1)
@@ -163,10 +161,7 @@ RESTART:
             jne ERROR
             lda #$ff                ; w1
             sta (zp),y
-
-            inw zp
-            lda zp+1
-            cmp end+1
+            jsr inw_zp_cmp_end
         zuntil_eq
 
         ; 🡑(r1,w0)
@@ -177,13 +172,9 @@ RESTART:
             lda (zp),y              ; r1
             cmp #$ff
             jne ERROR
-
             lda #$00                ; w0
             sta (zp),y
-
-            inw zp
-            lda zp+1
-            cmp end+1
+            jsr inw_zp_cmp_end
         zuntil_eq
 
         ; 🡓(r0,w1)
@@ -191,7 +182,7 @@ RESTART:
         mwa end zp
 
         zloop
-            dew zp
+            jsr dew_zp
 
             lda (zp),y              ; r0
             jne ERROR
@@ -199,11 +190,7 @@ RESTART:
             lda #$ff                ; w1
             sta (zp),y
 
-            lda zp+1
-            cmp start+1
-            zcontinueif_ne
-            lda zp
-            cmp start
+            jsr cmp_start
             zbreakif_eq
         zendloop
 
@@ -212,7 +199,7 @@ RESTART:
         mwa end zp
 
         zloop
-            dew zp
+            jsr dew_zp
 
             lda (zp),y              ; r1
             cmp #$ff
@@ -221,11 +208,7 @@ RESTART:
             tya                     ; w0
             sta (zp),y
 
-            lda zp+1
-            cmp start+1
-            zcontinueif_ne
-            lda zp
-            cmp start
+            jsr cmp_start
             zbreakif_eq
         zendloop
 
@@ -237,9 +220,7 @@ RESTART:
         zloop
             lda (zp),y              ; r0
             jne ERROR
-            inw zp
-            lda zp+1
-            cmp end+1
+            jsr inw_zp_cmp_end
         zuntil_eq
 
 ; end MARCH
@@ -275,6 +256,28 @@ skip_block:
     zendloop
 
     jmp RESTART
+
+; ----------------------------------------------------------------------------
+
+inw_zp_cmp_end:
+    inw zp
+    lda zp+1
+    cmp end+1
+    rts
+
+cmp_start:
+    lda zp+1
+    cmp start+1
+    zif_ne
+        rts
+    zendif
+    lda zp
+    cmp start
+    rts
+
+dew_zp:
+    dew zp
+    rts
 
 ; ----------------------------------------------------------------------------
 

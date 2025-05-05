@@ -254,6 +254,9 @@ block_cycle:
         jne block_cycle
         sty updown
         inx
+        lda busy-1,x
+        jsr putchar
+        dec xpos
         cpx #4
         jne block_cycle
 
@@ -341,6 +344,7 @@ putchar:
     ldy xpos
     sta (scr),y
     inc xpos
+    ldy #0
     rts
 
 
@@ -356,6 +360,8 @@ msg_title:
     dta 'MARCH MEMTEST'
 msg_title_end:
 
+busy:
+    dta '\', $7d, '/'
 data0:
     dta %00000000, %00001111, %00110011, %01010101
 data1:

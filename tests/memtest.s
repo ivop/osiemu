@@ -137,7 +137,7 @@ RESTART:
 
         ldy #0
 
-        ; 🡑(w0) -- write all 8 cells at once
+        ; 🡑(w0)
 
         mwa start zp
         tya
@@ -153,18 +153,10 @@ RESTART:
         mwa start zp
 
         zloop
-            ldx #7
-            zloop
-                lda (zp),y
-                and masks,x         ; r0
-                zif_not_zero
-                    jmp ERROR
-                zendif
-                lda (zp),y
-                ora masks,x         ; w1
-                sta (zp),y
-                dex
-            zuntil_mi
+            lda (zp),y              ; r0
+            jne ERROR
+            lda #$ff                ; w1
+            sta (zp),y
 
             inw zp
             ldx zp+1
@@ -178,24 +170,15 @@ RESTART:
         zloop
             dew zp
 
-            ldx #7
-            zloop
-                lda (zp),y
-                and masks,x         ; r1
-                zif_zero
-                    jmp ERROR
-                zendif
-                lda masks,x
-                eor #$ff
-                and (zp),y          ; w0
-                sta (zp),y
-                lda (zp),y
-                and masks,x         ; r0
-                zif_not_zero
-                    jmp ERROR
-                zendif
-                dex
-            zuntil_mi
+            lda (zp),y              ; r1
+            cmp #$ff
+            jne ERROR
+
+            tya                     ; w0
+            sta (zp),y
+
+            lda (zp),y
+            jne ERROR
 
             lda zp+1
             cmp start+1
@@ -274,8 +257,10 @@ msg_title:
     dta 'MARCH MEMTEST'
 msg_title_end:
 
-masks:
-    dta 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+maskup:
+    dta 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40        ; , 0x80
+maskdown:
+    dta 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
 
 ; ----------------------------------------------------------------------------
 

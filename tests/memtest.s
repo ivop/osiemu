@@ -1,7 +1,14 @@
-; MARCH MEMTEST
+; MARCH C- MEMTEST
 ; Copyright © 2025 by Ivo van Poorten
 ; BSD-0 License
-; Ref. paper https://www.ijvdcs.org/uploads/524361IJVDCS2672-94.pdf
+; References:
+; - International Journal of VLSI System Design and Communication Systems
+;   Volume.02, IssueNo.07, October-2014, Pages: 0512-0517
+; - Lecture, RAM Testing, Jin-Fu Li, Advanced Reliable Systems (ARES) Lab.
+;   Dept. of Electrical Engineering, National Central University,
+;   Jhongli, Taiwan
+; - Understanding Memory Fault Models,
+;   https://www.embedded.com/understanding-memory-fault-models/
 
     icl 'zif.s'
 

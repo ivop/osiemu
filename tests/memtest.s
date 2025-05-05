@@ -120,16 +120,13 @@ RESTART:
             jmp skip_block
         zendif
 
-        lda #'?'
+        lda #'-'
         jsr putchar
-        dec xpos
 
         lda block
-        zif_zero
-            lda #'-'
-            jsr putchar
-            jmp skip_block
-        zendif
+        jeq skip_block
+
+        dec xpos
 
 ; determine end of block
 
@@ -149,12 +146,12 @@ RESTART:
 
         ; (up)
         mwa start zp
-        tya
         zloop
+            tya
             sta (zp),y              ; w0
             inw zp
-            ldx zp+1
-            cpx end+1
+            lda zp+1
+            cmp end+1
         zuntil_eq
 
         ; 🡑(r0,w1)
@@ -168,8 +165,8 @@ RESTART:
             sta (zp),y
 
             inw zp
-            ldx zp+1
-            cpx end+1
+            lda zp+1
+            cmp end+1
         zuntil_eq
 
         ; 🡑(r1,w0)
@@ -185,8 +182,8 @@ RESTART:
             sta (zp),y
 
             inw zp
-            ldx zp+1
-            cpx end+1
+            lda zp+1
+            cmp end+1
         zuntil_eq
 
         ; 🡓(r0,w1)
@@ -241,8 +238,8 @@ RESTART:
             lda (zp),y              ; r0
             jne ERROR
             inw zp
-            ldx zp+1
-            cpx end+1
+            lda zp+1
+            cmp end+1
         zuntil_eq
 
 ; end MARCH

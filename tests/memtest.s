@@ -212,6 +212,8 @@ RESTART:
 
         ; 🡓(r1,w0)
 
+        mwa end zp
+
         zloop
             dew zp
 
@@ -242,6 +244,7 @@ RESTART:
             ldx zp+1
             cpx end+1
         zuntil_eq
+
 ; end MARCH
 
 OK:

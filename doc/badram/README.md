@@ -13,6 +13,8 @@ badram2, block $17 and $18
 badram3, block $05-$08, and $0d-$10  
 ![badram3](marchc-badram3.png)
 
+Reference: [Understanding Memory Fault Models](https://www.embedded.com/understanding-memory-fault-models/)
+
 ##### osiemu-badram1
 
 | block | type |

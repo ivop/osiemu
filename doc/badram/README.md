@@ -1,13 +1,11 @@
 [tests/memtest.s](../../tests/memtest.s) implements a MARCH MSS memory tester.
 Use ```make badram``` to build several osiemu binaries which simulate various bad RAM conditions.
-After MATS++ and MARCH C-, I gradually improved its coverage.
-MARCH MSS seems to be the best so far.
 Memory space for the tester is extremely tight (512 bytes), but after
 droping the title header, and some further size vs speed optimizations,
 it fits.
 It still has a busy animation.
 
-Results:
+Results, 100% coverage:
 
 badram1  
 ![badram1](marchmss-badram1.png)  
@@ -16,9 +14,9 @@ badram2
 badram3  
 ![badram3](marchmss-badram3.png)  
 
-Bad blocks that are not detected as such are:
-
-badram3, block $05-$08
+This might not look interesting, but for example MATS++ didn't detect around
+half of the simulated bad RAM blocks, and MARCH C- also failed to detect
+some of the more intricate errors, like DRDF, and CFxd.
 
 References:
 * G. Harutunyan, V. A. Vardanian, and Y. Zorian, “Minimal march tests for unlinked static faults in random access memories,”

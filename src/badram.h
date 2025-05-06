@@ -344,7 +344,7 @@ static void badram_write6502(uint16_t address, uint8_t value) {
             RAM[address-0xbc] &= ~8;        // clear victim below aggressor
         }
     }
-    if (address == 0x2182) {
+    if (address == 0x3182) {
         uint8_t old = RAM[address] & 0x40;
         uint8_t new = value & 0x40;
         if (new > old) {

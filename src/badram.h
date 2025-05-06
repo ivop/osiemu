@@ -25,7 +25,7 @@
  * Block $00 ($0000 - $03ff) is always good and the memory tester should
  * live there or run from ROM.
  *
- * TEST_BADRAM1, $0400 - $6fff  block $01 - $1b
+ * TEST_BADRAM1, $0400 - $73ff  block $01 - $1c
  *
  *      faults: RDF, DRDF, SOF, ADF, TF, WDF, CFin, CFid, CFst
  *
@@ -124,8 +124,8 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         RAM[0x3321] = RAM[0x3123] = value;
         return;
     };
-    /* CFs - Coupling Faults */
-    /* Inversion Coupling Fault, victim higher */
+    /* CF - Coupling Faults */
+    /* CFin - Inversion Coupling Fault, victim higher */
     if (address == 0x3456) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
@@ -140,15 +140,15 @@ static void badram_write6502(uint16_t address, uint8_t value) {
             RAM[address+0x5a] ^= 0x08;
         }
     }
-    /* Inversion Coupling Fault, victim lower */
-    if (address == 0x3956) {
+    /* CFin - Inversion Coupling Fault, victim lower */
+    if (address == 0x3d56) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new > old) {                // Rising, flip victim
             RAM[address-0x5a] ^= 0x08;
         }
     }
-    if (address == 0x3d56) {
+    if (address == 0x4156) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new < old) {                // Falling, flip victim
@@ -156,30 +156,30 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         }
     }
     /* MATS++ does NOT detect some of the Idempotent CFs */
-    /* Idempotent Coupling Fault, victim higher */
-    if (address == 0x4156) {
+    /* CFid - Idempotent Coupling Fault, victim higher */
+    if (address == 0x4556) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new > old) {                // Rising, clear victim
             RAM[address+0x5a] &= ~0x08;
         }
     }
-    if (address == 0x4556) {
+    if (address == 0x4956) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new < old) {                // Falling, clear victim
             RAM[address+0x5a] &= 0x08;
         }
     }
-    /* Idempotent Coupling Fault, victim lower */
-    if (address == 0x4956) {
+    /* CFid - Idempotent Coupling Fault, victim lower */
+    if (address == 0x4d56) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new > old) {                // Rising, clear victim
             RAM[address-0x5a] &= ~0x08;
         }
     }
-    if (address == 0x4d56) {
+    if (address == 0x5156) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new < old) {                // Falling, clear victim
@@ -187,14 +187,14 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         }
     }
     /* Idempotent Coupling Fault, victim higher */
-    if (address == 0x5156) {
+    if (address == 0x5556) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new > old) {                // Rising, set victim
             RAM[address+0x5a] |= 0x08;
         }
     }
-    if (address == 0x5556) {
+    if (address == 0x5956) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new < old) {                // Falling, set victim
@@ -202,14 +202,14 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         }
     }
     /* Idempotent Coupling Fault, victim lower */
-    if (address == 0x5956) {
+    if (address == 0x5d56) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new > old) {                // Rising, set victim
             RAM[address-0x5a] |= 0x08;
         }
     }
-    if (address == 0x5d56) {
+    if (address == 0x6156) {
         uint8_t old = RAM[address] & 0x08;
         uint8_t new = value & 0x08;
         if (new < old) {                // Falling, set victim
@@ -217,23 +217,23 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         }
     }
     /* Static Coupling, victim higher */
-    if (address == 0x6123) {
+    if (address == 0x6523) {
         if ((RAM[address] & 0x01) == 0) {
             RAM[address+0x5a] &= ~2;    // aggressor 0, victim 0
         }
     }
-    if (address == 0x6523) {
+    if (address == 0x6923) {
         if ((RAM[address] & 0x01) == 0) {
             RAM[address+0x5a] |= 2;    // aggressor 0, victim 1
         }
     }
     /* Static Coupling, victim lower */
-    if (address == 0x6923) {
+    if (address == 0x6d23) {
         if ((RAM[address] & 0x01) == 0) {
             RAM[address-0x5a] &= ~2;    // aggressor 0, victim 0
         }
     }
-    if (address == 0x6d23) {
+    if (address == 0x7123) {
         if ((RAM[address] & 0x01) == 0) {
             RAM[address-0x5a] |= 2;    // aggressor 0, victim 1
         }

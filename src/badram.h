@@ -245,7 +245,7 @@ static void badram_write6502(uint16_t address, uint8_t value) {
 
 #ifdef TEST_BADRAM2
 static uint8_t badram_read6502(uint16_t address) {
-    /* Disturb Cell Coupling Faults */
+    /* Disturb Cell Coupling Faults CFd */
     /* Disturb Victim when Aggressor reads 0 */
     if (address == 0x0543) {
         if ((RAM[address] & 0x20) == 0) {
@@ -288,7 +288,7 @@ static uint8_t badram_read6502(uint16_t address) {
             RAM[address+0x6e] &= ~1;         // clear victim above aggressor
         }
     }
-    /* Incorrect Read Coupling Faults (partial) */
+    /* CFir - Incorrect Read Coupling Faults (partial) */
     if (address == 0x6532) {
         bool readval = RAM[address] & 0x10;
         bool addr = RAM[address-0x41] & 0x04;
@@ -321,7 +321,7 @@ static uint8_t badram_read6502(uint16_t address) {
 }
 
 static void badram_write6502(uint16_t address, uint8_t value) {
-    /* Disturb Cell Coupling Faults */
+    /* Disturb Cell Coupling Faults CFd */
     /* Disturb Victim when Aggressor writes 0->1 transition */
     if (address == 0x2582) {
         uint8_t old = RAM[address] & 0x40;
@@ -535,7 +535,7 @@ static uint8_t badram_read6502(uint16_t address) {
 }
 
 static void badram_write6502(uint16_t address, uint8_t value) {
-    /* Transition Coupling Faults */
+    /* CFtr - Transition Coupling Faults */
     /* Write transition to victim fails if aggressor is in certain state */
     /* 0->1 transitions */
     if (address == 0x0567) {
@@ -595,7 +595,7 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         if (new < old && aggr)              // fail 1->0 if aggr above is 1
             value &= ~0x04;
     }
-    /* Write Destructive Coupling Faults */
+    /* CFwd - Write Destructive Coupling Faults */
     /* non-transition write to victim flips if aggressor in state x */
     /* 0->0 non-transitions */
     if (address == 0x2589) {

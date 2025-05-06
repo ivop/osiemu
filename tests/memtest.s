@@ -144,6 +144,7 @@ inc_and_skip:
 
 ; pair of 🡙 cycle through upup, updown, downup, downdown
 
+        ldy #0
         ldx #0
         stx updown
 
@@ -361,7 +362,6 @@ putchar:
     ldy xpos
     sta (scr),y
     inc xpos
-;    ldy #0
     rts
 
 

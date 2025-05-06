@@ -37,6 +37,8 @@ block   type
 1b      (W) CFst - Static Coupling Fault, v below a, a0, v0
 1c      (W) CFst - Static Coupling Fault, v below a, a0, v1
 
+(a=1 CFst missing)
+
 TEST_BADRAM2
 
 block   type

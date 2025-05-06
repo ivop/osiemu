@@ -6,7 +6,7 @@ it fits.
 It still has a busy animation.
 
 Block $00 is always skipped, as that's were ZP, the stack, and the tester reside, and it is assumed to be correctly working RAM.
-It's advised that once one or more banks are tested OK, to physically swap that bank with bank $00 to have that chip tested, too.
+It's advised that once one or more banks are tested OK, to physically swap that bank with bank $00 to have these chips tested, too.
 
 Results, 100% coverage:
 

@@ -572,28 +572,28 @@ static void badram_write6502(uint16_t address, uint8_t value) {
         uint8_t new = value & 0x04;
         bool aggr = RAM[address - 0x98] & 0x20;
         if (new < old && !aggr)             // fail 1->0 if aggr below is 0
-            value &= ~0x04;
+            value |= 0x04;
     }
     if (address == 0x1967) {
         uint8_t old = RAM[address] & 0x04;
         uint8_t new = value & 0x04;
         bool aggr = RAM[address + 0x98] & 0x20;
         if (new < old && !aggr)             // fail 1->0 if aggr above is 0
-            value &= ~0x04;
+            value |= 0x04;
     }
     if (address == 0x1d67) {
         uint8_t old = RAM[address] & 0x04;
         uint8_t new = value & 0x04;
         bool aggr = RAM[address - 0x98] & 0x20;
         if (new < old && aggr)              // fail 1->0 if aggr below is 1
-            value &= ~0x04;
+            value |= 0x04;
     }
     if (address == 0x2167) {
         uint8_t old = RAM[address] & 0x04;
         uint8_t new = value & 0x04;
         bool aggr = RAM[address + 0x98] & 0x20;
         if (new < old && aggr)              // fail 1->0 if aggr above is 1
-            value &= ~0x04;
+            value |= 0x04;
     }
     /* CFwd - Write Destructive Coupling Faults */
     /* non-transition write to victim flips if aggressor in state x */

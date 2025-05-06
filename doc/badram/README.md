@@ -1,3 +1,16 @@
+tests/memtest.s implements MARCH C- memory tester.
+Use ```make badram``` to build several osiemu binaries which simulate various bad RAM conditions.
+MARCH C- is able to detect most of them, but not all.
+
+Bad blocks that are not detected as such are:
+
+badram1, block $03
+badram2, block $17 and $18  
+badram3, block $05-$08, and $0d-$10  
+
+![badram1](marchc-badram1.png)
+![badram2](marchc-badram2.png)
+![badram3](marchc-badram3.png)
 
 ##### osiemu-badram1
 

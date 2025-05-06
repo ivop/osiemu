@@ -10,11 +10,11 @@ It still has a busy animation.
 Results:
 
 badram1  
-![badram1](marchc-badram1.png)  
+![badram1](marchmss-badram1.png)  
 badram2  
-![badram2](marchc-badram2.png)  
+![badram2](marchmss-badram2.png)  
 badram3  
-![badram3](marchc-badram3.png)  
+![badram3](marchmss-badram3.png)  
 
 Bad blocks that are not detected as such are:
 

@@ -1,4 +1,4 @@
-tests/memtest.s implements MARCH C- memory tester.
+[tests/memtest.s](../../tests/memtest.s) implements MARCH C- memory tester.
 Use ```make badram``` to build several osiemu binaries which simulate various bad RAM conditions.
 MARCH C- is able to detect most of them, but not all.
 

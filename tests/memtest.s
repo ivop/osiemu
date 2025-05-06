@@ -1,7 +1,10 @@
-; MARCH C- MEMTEST
+; MARCH MSS MEMTEST
 ; Copyright © 2025 by Ivo van Poorten
 ; BSD-0 License
 ; References:
+; - Minimal March tests for unlinked static faults in random access memories
+;   G. Harutunvan; V.A. Vardanian; Y. Zorian
+;   23rd IEEE VLSI Test Symposium (VTS'05)
 ; - International Journal of VLSI System Design and Communication Systems
 ;   Volume.02, IssueNo.07, October-2014, Pages: 0512-0517
 ; - Lecture, RAM Testing, Jin-Fu Li, Advanced Reliable Systems (ARES) Lab.
@@ -66,6 +69,7 @@ main:
 
 ; ----------------------------------------------------------------------------
 
+.ifdef SHOW_TITLE
     ldx #msg_title_end-msg_title-1
 
     zrepeat
@@ -73,6 +77,7 @@ main:
         sta TITLEPOS,x
         dex
     zuntil_mi
+.endif
     
 ; ----------------------------------------------------------------------------
 
@@ -91,7 +96,7 @@ main:
     zuntil_ne
 
     lda zp+1
-:2  lsr             // divide by 4
+:2  lsr                         ; 4 pages per block
     sta nblocks
 
 ; ----------------------------------------------------------------------------
@@ -117,17 +122,13 @@ RESTART:
         lda (scr),y
         cmp #BAD
         zif_eq
+inc_and_skip:
             inc xpos
             jmp skip_block
         zendif
 
-        lda #'-'
-        jsr putchar
-
         lda block
-        jeq skip_block
-
-        dec xpos
+        jeq inc_and_skip
 
 ; determine end of block
 
@@ -138,14 +139,20 @@ RESTART:
 
 ; start MARCH
 
-; MARCH C- { 🡙(w0); 🡑(r0,w1); 🡑(r1,w0); 🡓(r0,w1); 🡓(r1,w0); 🡙(r0); }
+; MARCH MSS { 🡙(w0); 🡑(r0,r0,w1,w1); 🡑(r1,r1,w0,w0); 🡓(r0,r0,w1,w1);
+;             🡓(r1,r1,w0,w0); 🡙(r0) }
+
 ; pair of 🡙 cycle through upup, updown, downup, downdown
 
-        ldy #0
         ldx #0
-        sty updown
+        stx updown
 
 block_cycle:
+
+        lda busy,x
+        jsr putchar
+        dec xpos
+        ldy #0
 
         ; 🡙(w0)
 
@@ -170,56 +177,61 @@ block_cycle:
             zuntil_eq
         zendif
 
-        ; 🡑(r0,w1)
+        ; 🡑(r0,r0,w1,w1)
 
         jsr init_zp_start
         zloop
-            lda (zp),y              ; r0
-            cmp data0,x
+            jsr step_r0_cmp         ; r0
             jne ERROR
-            lda data1,x             ; w1
-            sta (zp),y
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            lda data1,x
+            sta (zp),y              ; w1
+            sta (zp),y              ; w1
             jsr inw_zp_cmp_end
         zuntil_eq
 
-        ; 🡑(r1,w0)
+        ; 🡑(r1,r1,w0,w0)
 
         jsr init_zp_start
         zloop
-            lda (zp),y              ; r1
-            cmp data1,x
+            jsr step_r1_cmp         ; r1
             jne ERROR
-            lda data0,x             ; w0
-            sta (zp),y
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            lda data0,x
+            sta (zp),y              ; w0
+            sta (zp),y              ; w0
             jsr inw_zp_cmp_end
         zuntil_eq
 
-        ; 🡓(r0,w1)
+        ; 🡓(r0,r0,w1,w1)
 
         jsr init_zp_end
         zloop
             jsr dew_zp
-            lda (zp),y              ; r0
-            cmp data0,x
+            jsr step_r0_cmp         ; r0
             jne ERROR
-            lda data1,x             ; w1
-            sta (zp),y
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            lda data1,x
+            sta (zp),y              ; w1
+            sta (zp),y              ; w1
             jsr cmp_start
         zuntil_eq
 
-        ; 🡓(r1,w0)
+        ; 🡓(r1,r1,w0,w0)
 
         jsr init_zp_end
         zloop
             jsr dew_zp
-
-            lda (zp),y              ; r1
-            cmp data1,x
+            jsr step_r1_cmp         ; r1
             jne ERROR
-
-            lda data0,x             ; w0
-            sta (zp),y
-
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            lda data0,x
+            sta (zp),y              ; w0
+            sta (zp),y              ; w0
             jsr cmp_start
         zuntil_eq
 
@@ -231,8 +243,7 @@ block_cycle:
             ; (up)
             jsr init_zp_start
             zloop
-                lda (zp),y              ; r0
-                cmp data0,x
+                jsr step_r0_cmp         ; r0
                 jne ERROR
                 jsr inw_zp_cmp_end
             zuntil_eq
@@ -241,8 +252,7 @@ block_cycle:
             jsr init_zp_end
             zloop
                 jsr dew_zp
-                lda (zp),y
-                cmp data0,x
+                jsr step_r0_cmp         ; r0
                 jne ERROR
                 jsr cmp_start
             zuntil_eq
@@ -254,9 +264,6 @@ block_cycle:
         jne block_cycle
         sty updown
         inx
-        lda busy-1,x
-        jsr putchar
-        dec xpos
         cpx #4
         jne block_cycle
 
@@ -295,6 +302,16 @@ skip_block:
     jmp RESTART
 
 ; ----------------------------------------------------------------------------
+
+step_r0_cmp:
+    lda (zp),y              ; r0
+    cmp data0,x
+    rts
+
+step_r1_cmp:
+    lda (zp),y              ; r1
+    cmp data1,x
+    rts
 
 inw_zp_cmp_end:
     inw zp
@@ -344,7 +361,7 @@ putchar:
     ldy xpos
     sta (scr),y
     inc xpos
-    ldy #0
+;    ldy #0
     rts
 
 
@@ -356,12 +373,15 @@ nextline:
 
 ; ----------------------------------------------------------------------------
 
+.ifdef SHOW_TITLE
 msg_title:
     dta 'MARCH MEMTEST'
 msg_title_end:
+.endif
 
 busy:
-    dta '\', $7d, '/'
+    dta '-', '\', $7d, '/'
+
 data0:
     dta %00000000, %00001111, %00110011, %01010101
 data1:

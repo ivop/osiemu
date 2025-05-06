@@ -1,19 +1,31 @@
-[tests/memtest.s](../../tests/memtest.s) implements MARCH C- memory tester.
+[tests/memtest.s](../../tests/memtest.s) implements a MARCH MSS memory tester.
 Use ```make badram``` to build several osiemu binaries which simulate various bad RAM conditions.
-MARCH C- is able to detect most of them, but not all.
+After MATS++ and MARCH C-, I gradually improved its coverage.
+MARCH MSS seems to be the best so far.
+Memory space for the tester is extremely tight (512 bytes), but after
+droping the title header, and some further size vs speed optimizations,
+it fits.
+It still has a busy animation.
+
+Results:
+
+badram1  
+![badram1](marchc-badram1.png)  
+badram2  
+![badram2](marchc-badram2.png)  
+badram3  
+![badram3](marchc-badram3.png)  
 
 Bad blocks that are not detected as such are:
 
-badram1, block $03  
-![badram1](marchc-badram1.png)
+badram3, block $05-$08
 
-badram2, block $17 and $18  
-![badram2](marchc-badram2.png)
+References:
+* G. Harutunyan, V. A. Vardanian, and Y. Zorian, “Minimal march tests for unlinked static faults in random access memories,”
+in 23rd IEEE VLSI Test Symposium (VTS’05), 2005, pp. 53–59, doi: 10.1109/VTS.2005.56.
+[sci-hub link](https://sci-hub.se/10.1109/VTS.2005.56)
+* [Understanding Memory Fault Models](https://www.embedded.com/understanding-memory-fault-models/)  
 
-badram3, block $05-$08, and $0d-$10  
-![badram3](marchc-badram3.png)
-
-Reference: [Understanding Memory Fault Models](https://www.embedded.com/understanding-memory-fault-models/)
 
 ##### osiemu-badram1
 

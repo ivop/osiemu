@@ -17,7 +17,7 @@ badram2
 badram3  
 ![badram3](marchmss-badram3.png)  
 
-This might not look interesting, but for example MATS++ didn't detect around
+This might not look that interesting, but for example MATS++ didn't detect around
 half of the simulated bad RAM blocks, and MARCH C- also failed to detect
 some of the more intricate errors, like DRDF, and CFxd.
 

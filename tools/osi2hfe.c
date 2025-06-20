@@ -51,7 +51,7 @@ static void put_bit(bool bit, FILE *outp) {
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        fprintf(stderr, "error: usage: osi2hfe input.os[58]\n");
+        fprintf(stderr, "error: usage: osi2hfe input.os[58] output.hfe\n");
         return 1;
     }
 

@@ -248,6 +248,10 @@ Use Cygwin64. MinGW64 doesn't work because it is missing mmap, O_NONBLOCK, and g
 For macOS 12 (Monterey) and later, homebrew should work. For earlier versions, use MacPorts.
 Has been tested to be fully working on Big Sur with MacPorts.
 
+### Simulating bad RAM
+
+See [](doc/badram) for details.
+
 ## Disk images
 
 ```osiemu``` uses its own disk image format.

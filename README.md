@@ -250,7 +250,7 @@ Has been tested to be fully working on Big Sur with MacPorts.
 
 ### Simulating bad RAM
 
-See [](doc/badram) for details.
+See [doc/badram](doc/badram) for details.
 
 ## Disk images
 

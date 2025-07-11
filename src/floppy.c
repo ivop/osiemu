@@ -439,7 +439,7 @@ static void act_on_portb_output_value(uint8_t prev_value) {
                 printf("floppy: seek out, track %d\n", drives[curdrive].curtrk);
             }
         }
-        seek_counter = seek_time;
+        seek_counter = bits_per_seek;
     }
 }
 

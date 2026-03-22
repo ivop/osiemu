@@ -18,6 +18,7 @@
 #include "control.h"
 
 bool sound_enabled;
+bool sound_muted = true;
 unsigned int sound_bufsize = 256;
 
 enum sound_mode_e sound_mode = SOUND_MODE_542B;
@@ -113,6 +114,7 @@ static void calculate_542b_tonegen_volumes(double cpu_clock) {
 // ----------------------------------------------------------------------------
 
 static uint16_t mixer(void) {
+    if (sound_muted) return 0;
     uint16_t sample = 0;
     if (sound_mode == SOUND_MODE_542B) {
         // we mix the DAC and tone generator (or silence) 50:50

@@ -1,0 +1,392 @@
+; MARCH MSS MEMTEST
+; Copyright © 2025 by Ivo van Poorten
+; BSD-0 License
+; References:
+; - Minimal March tests for unlinked static faults in random access memories
+;   G. Harutunvan; V.A. Vardanian; Y. Zorian
+;   23rd IEEE VLSI Test Symposium (VTS'05)
+; - International Journal of VLSI System Design and Communication Systems
+;   Volume.02, IssueNo.07, October-2014, Pages: 0512-0517
+; - Lecture, RAM Testing, Jin-Fu Li, Advanced Reliable Systems (ARES) Lab.
+;   Dept. of Electrical Engineering, National Central University,
+;   Jhongli, Taiwan
+; - Understanding Memory Fault Models,
+;   https://www.embedded.com/understanding-memory-fault-models/
+
+    icl 'zif.s'
+
+; 32x32 --> 24x26, hidden 6L, 2R, 3T, 3B
+
+TMARGIN = 3
+BMARGIN = 3
+LMARGIN = 6
+RMARGIN = 2
+
+STRIDE = 32
+;STRIDE = 64
+
+.ifndef STRIDE
+STRIDE = 32
+.endif
+
+SCRMEM = $d000
+
+TITLEPOS = SCRMEM + TMARGIN * STRIDE + LMARGIN
+STARTPOS = TITLEPOS + STRIDE
+
+GOOD = '+'
+BAD = 'a'+$40        ; big block
+
+zp  = $80
+scr = $82
+start = $84
+end   = $86
+
+block   = $a0
+nblocks = $a1
+xpos    = $a2
+updown  = $e3
+
+; ----------------------------------------------------------------------------
+
+    org $0200
+
+; ----------------------------------------------------------------------------
+
+main:
+    ldy #0
+    sty zp
+    lda #$d0
+    sta zp+1
+    lda #' '
+
+    zrepeat
+        sta (zp),y
+        inw zp
+        ldx zp+1
+        cpx #$d8
+    zuntil_eq
+
+; ----------------------------------------------------------------------------
+
+.ifdef SHOW_TITLE
+    ldx #msg_title_end-msg_title-1
+
+    zrepeat
+        lda msg_title,x
+        sta TITLEPOS,x
+        dex
+    zuntil_mi
+.endif
+    
+; ----------------------------------------------------------------------------
+
+; Detect size of memory
+
+    mwa #$0300 zp
+
+    zrepeat
+        inc zp+1
+        lda zp+1
+        cmp #$c0
+        zbreakif_eq
+        lda #$03
+        sta (zp),y
+        cmp (zp),y
+    zuntil_ne
+
+    lda zp+1
+:2  lsr                         ; 4 pages per block
+    sta nblocks
+
+; ----------------------------------------------------------------------------
+
+; MAIN testing loop
+
+RESTART:
+    mwa #STARTPOS scr
+
+    mva #0 block
+    mwa #0 start
+    sta end+1
+    sta xpos
+
+    zloop
+        lda #'B'
+        jsr putchar
+        lda block
+        jsr printhex
+        lda #':'
+        jsr putchar
+        ldy xpos
+        lda (scr),y
+        cmp #BAD
+        zif_eq
+inc_and_skip:
+            inc xpos
+            jmp skip_block
+        zendif
+
+        lda block
+        jeq inc_and_skip
+
+; determine end of block
+
+        lda start+1
+        clc
+        adc #4
+        sta end+1
+
+; start MARCH
+
+; MARCH MSS { 🡙(w0); 🡑(r0,r0,w1,w1); 🡑(r1,r1,w0,w0); 🡓(r0,r0,w1,w1);
+;             🡓(r1,r1,w0,w0); 🡙(r0) }
+
+; pair of 🡙 cycle through upup, updown, downup, downdown
+
+        ldy #0
+        ldx #0
+        stx updown
+
+block_cycle:
+
+        lda busy,x
+        jsr putchar
+        dec xpos
+        ldy #0
+
+        ; 🡙(w0)
+
+        lda updown
+        and #1
+        zif_zero
+            ; (up)
+            jsr init_zp_start
+            zloop
+                lda data0,x             ; w0
+                sta (zp),y
+                jsr inw_zp_cmp_end
+            zuntil_eq
+        zelse
+            ; (down)
+            jsr init_zp_end
+            zloop
+                jsr dew_zp
+                lda data0,x             ; w0
+                sta (zp),y
+                jsr cmp_start
+            zuntil_eq
+        zendif
+
+        ; 🡑(r0,r0,w1,w1)
+
+        jsr init_zp_start
+        zloop
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            lda data1,x
+            sta (zp),y              ; w1
+            sta (zp),y              ; w1
+            jsr inw_zp_cmp_end
+        zuntil_eq
+
+        ; 🡑(r1,r1,w0,w0)
+
+        jsr init_zp_start
+        zloop
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            lda data0,x
+            sta (zp),y              ; w0
+            sta (zp),y              ; w0
+            jsr inw_zp_cmp_end
+        zuntil_eq
+
+        ; 🡓(r0,r0,w1,w1)
+
+        jsr init_zp_end
+        zloop
+            jsr dew_zp
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            jsr step_r0_cmp         ; r0
+            jne ERROR
+            lda data1,x
+            sta (zp),y              ; w1
+            sta (zp),y              ; w1
+            jsr cmp_start
+        zuntil_eq
+
+        ; 🡓(r1,r1,w0,w0)
+
+        jsr init_zp_end
+        zloop
+            jsr dew_zp
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            jsr step_r1_cmp         ; r1
+            jne ERROR
+            lda data0,x
+            sta (zp),y              ; w0
+            sta (zp),y              ; w0
+            jsr cmp_start
+        zuntil_eq
+
+        ; 🡙(r0)
+
+        lda updown
+        and #2
+        zif_zero
+            ; (up)
+            jsr init_zp_start
+            zloop
+                jsr step_r0_cmp         ; r0
+                jne ERROR
+                jsr inw_zp_cmp_end
+            zuntil_eq
+        zelse
+            ; (down)
+            jsr init_zp_end
+            zloop
+                jsr dew_zp
+                jsr step_r0_cmp         ; r0
+                jne ERROR
+                jsr cmp_start
+            zuntil_eq
+        zendif
+
+        inc updown
+        lda updown
+        cmp #4
+        jne block_cycle
+        sty updown
+        inx
+        cpx #4
+        jne block_cycle
+
+; end MARCH
+
+OK:
+        lda #GOOD
+        jsr putchar
+        jmp no_error
+
+ERROR:
+        lda #BAD
+        jsr putchar
+
+no_error:
+skip_block:
+        lda #' '
+        jsr putchar
+
+        lda start+1
+        clc
+        adc #4
+        sta start+1
+
+        inc block
+        lda block
+        cmp nblocks
+        zbreakif_eq
+
+        and #3
+        zif_zero
+            jsr nextline
+        zendif
+    zendloop                    ; loop for each block
+
+    jmp RESTART
+
+; ----------------------------------------------------------------------------
+
+step_r0_cmp:
+    lda (zp),y              ; r0
+    cmp data0,x
+    rts
+
+step_r1_cmp:
+    lda (zp),y              ; r1
+    cmp data1,x
+    rts
+
+inw_zp_cmp_end:
+    inw zp
+    lda zp+1
+    cmp end+1
+    rts
+
+cmp_start:
+    lda zp+1
+    cmp start+1
+    zif_ne
+        rts
+    zendif
+    lda zp
+    cmp start
+    rts
+
+dew_zp:
+    dew zp
+    rts
+
+init_zp_start:
+    mwa start zp
+    rts
+
+init_zp_end:
+    mwa end zp
+    rts
+
+; ----------------------------------------------------------------------------
+
+printhex:
+    pha
+:4    lsr
+    jsr bin2ascii_putchar
+    pla
+    and #15
+    jmp bin2ascii_putchar
+
+bin2ascii_putchar:
+    sed
+    cmp #10
+    adc #$30
+    cld
+
+putchar:
+    ldy xpos
+    sta (scr),y
+    inc xpos
+    rts
+
+
+nextline:
+    adw scr #STRIDE
+    ldy #0
+    sty xpos
+    rts
+
+; ----------------------------------------------------------------------------
+
+.ifdef SHOW_TITLE
+msg_title:
+    dta 'MARCH MEMTEST'
+msg_title_end:
+.endif
+
+busy:
+    dta '-', '\', $7d, '/'
+
+data0:
+    dta %00000000, %00001111, %00110011, %01010101
+data1:
+    dta %11111111, %11110000, %11001100, %10101010
+
+; ----------------------------------------------------------------------------
+
+    run main

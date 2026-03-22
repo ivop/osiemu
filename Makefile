@@ -49,6 +49,22 @@ launcher/build/launcher.app/Contents/MacOS/launcher:
 osiemu-launcher.app: launcher/build/launcher.app/Contents/MacOS/launcher
 	cp $< $@
 
+badram:
+	+make cleaner
+	+make DEFINES=-DTEST_BADRAM1
+	mv osiemu osiemu-badram1
+	rm -f src/mmu.o
+	+make DEFINES=-DTEST_BADRAM2
+	mv osiemu osiemu-badram2
+	rm -f src/mmu.o
+	+make DEFINES=-DTEST_BADRAM3
+	mv osiemu osiemu-badram3
+	rm -f src/mmu.o
+	+make
+
+cleaner: clean
+	rm -f osiemu-badram1 osiemu-badram2 osiemu-badram3
+
 clean:
 	rm -f *~ osiemu osiemu.exe $(OBJ_FILES) */*~ */*/*~ osiemu-launcher osiemu-launcher.exe *.tar.gz *.tar.bz2 *.tar.xz *.zip osiemu-launcher.app *.dmg
 	+make -C launcher clean

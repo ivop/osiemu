@@ -360,19 +360,19 @@ void MainWindow::on_browse_tape_output_clicked() {
 }
 
 void MainWindow::on_browse_drive_a_clicked() {
-    browse_all(ui->line_drive_a, "Disk Images (*.os5 *.os8)");
+    browse_all(ui->line_drive_a, "Disk Images (*.os5 *.os8 *.osi)");
 }
 
 void MainWindow::on_browse_drive_b_clicked() {
-    browse_all(ui->line_drive_b, "Disk Images (*.os5 *.os8)");
+    browse_all(ui->line_drive_b, "Disk Images (*.os5 *.os8 *.osi)");
 }
 
 void MainWindow::on_browse_drive_c_clicked() {
-    browse_all(ui->line_drive_c, "Disk Images (*.os5 *.os8)");
+    browse_all(ui->line_drive_c, "Disk Images (*.os5 *.os8 *.osi)");
 }
 
 void MainWindow::on_browse_drive_d_clicked() {
-    browse_all(ui->line_drive_d, "Disk Images (*.os5 *.os8)");
+    browse_all(ui->line_drive_d, "Disk Images (*.os5 *.os8 *.osi)");
 }
 
 void MainWindow::on_button_save_settings_clicked() {

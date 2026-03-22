@@ -51,7 +51,7 @@ static void put_bit(bool bit, FILE *outp) {
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        fprintf(stderr, "error: usage: osi2hfe input.os[58]\n");
+        fprintf(stderr, "error: usage: osi2hfe input.os[58] output.hfe\n");
         return 1;
     }
 
@@ -126,7 +126,8 @@ int main(int argc, char **argv) {
     ph.encoding = 0xff;
     ph.interface = 0x07;    // generic shugart
     ph.offset = 0x01;       // 1*512 bytes offset to LUT
-    ph.dnu = ph.r_w = 0;
+    ph.dnu = 0;             // do not use -- reserved
+    ph.r_w = 0xff;          // read/write (unprotected)
 
     // layout:
     // 512 bytes header

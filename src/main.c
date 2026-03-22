@@ -56,6 +56,7 @@ static int cpu_clock = CPU_CLOCK_QUARTER;
 
 static double fps = FPS_60HZ;
 static double ticks_per_frame;
+static uint64_t frame_counter;
 static bool warp_speed;
 static char *tape_input_arg;
 static char *tape_output_arg;
@@ -213,7 +214,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxX:y:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxX:y:Y:z:Z:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
@@ -638,6 +639,9 @@ int main_program(int argc, char **argv) {
     while (1) {
         fflush(stdout);
         fflush(stderr);
+
+        frame_counter++;
+        if (frame_counter == 90) sound_muted = false;
 
         target += sdl_ticks_per_frame;
 

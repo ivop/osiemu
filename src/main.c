@@ -214,7 +214,7 @@ int main_program(int argc, char **argv) {
 
     printf("OSIEMU - %s - Copyright © 2024 Ivo van Poorten\n", VERSION_STRING);
 
-    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxX:y:Y:zZ:",
+    while ((option = getopt_long(argc, argv, "a:Ab:B:c:C:d:D:f:F:g:G:hH:ij:J:k:K:L:m:M:nqrR:s:St:T:vVwxX:y:Y:z:Z:",
                                  long_options, &index)) != -1) {
         switch (option) {
         case 0:
